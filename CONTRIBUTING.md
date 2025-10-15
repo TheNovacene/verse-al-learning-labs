@@ -55,6 +55,21 @@ All contributions are subject to the license in this repository. By contributing
 If you’re stuck or unsure how to begin:
 - Post in **Discussions**
 - Tag @lilithandeve in your issue or PR
-- Or email hello@buildingschoolsinthecloud.com
+- Or email hello@thenovacene.com
 
 We’re here to support your first contribution 💫
+
+### ☕ Fuel the Field
+
+If you love what we're building and want to keep the Lab lights glowing — you can buy us a symbolic coffee (or five) to help sustain this work:
+ko-fi.com/thenovacene
+
+Every drop supports:
+
+💻 open-source tools and joyful simulators
+
+🌍 accessible learning for neurodivergent & remote learners
+
+🧵 symbolic infrastructure, from glyphons to verse‑al logic
+
+We don’t just code. We brew futures.
