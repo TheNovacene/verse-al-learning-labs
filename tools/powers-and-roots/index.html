@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Powers & Roots Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .visual-block {
+            transition: all 0.3s ease;
+        }
+        
+        .challenge-fade {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slider-track {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-full font-sans">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🧩 Powers & Roots Explorer</h1>
+            <p class="text-lg text-gray-600">Discover the magic of exponents and roots through interactive visualization</p>
+        </header>
+
+        <!-- Mode Tabs -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white rounded-lg p-1 shadow-lg">
+                <button id="exponentsTab" class="px-6 py-3 rounded-md font-semibold transition-all bg-blue-500 text-white">
+                    Exponents
+                </button>
+                <button id="rootsTab" class="px-6 py-3 rounded-md font-semibold transition-all text-gray-600 hover:bg-gray-100">
+                    Roots
+                </button>
+                <button id="fractionalTab" class="px-6 py-3 rounded-md font-semibold transition-all text-gray-600 hover:bg-gray-100">
+                    Fractional Powers
+                </button>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Controls Panel -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Controls</h2>
+                
+                <!-- Base Slider -->
+                <div class="mb-6">
+                    <label for="baseSlider" class="block text-lg font-semibold text-gray-700 mb-2">Base (a)</label>
+                    <input type="range" id="baseSlider" min="1" max="10" value="3" step="1" 
+                           class="w-full h-3 rounded-lg appearance-none cursor-pointer slider-track">
+                    <div class="flex justify-between text-sm text-gray-500 mt-1">
+                        <span>1</span>
+                        <span id="baseValue" class="font-bold text-blue-600">3</span>
+                        <span>10</span>
+                    </div>
+                </div>
+
+                <!-- Exponent Slider -->
+                <div class="mb-6">
+                    <label for="exponentSlider" class="block text-lg font-semibold text-gray-700 mb-2">Exponent (n)</label>
+                    <input type="range" id="exponentSlider" min="-3" max="3" value="2" step="0.25" 
+                           class="w-full h-3 rounded-lg appearance-none cursor-pointer slider-track">
+                    <div class="flex justify-between text-sm text-gray-500 mt-1">
+                        <span>-3</span>
+                        <span id="exponentValue" class="font-bold text-purple-600">2</span>
+                        <span>3</span>
+                    </div>
+                </div>
+
+                <!-- Custom Input -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="customBase" class="block text-sm font-medium text-gray-700 mb-1">Custom Base</label>
+                        <input type="number" id="customBase" min="0.1" max="100" step="0.1" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="customExponent" class="block text-sm font-medium text-gray-700 mb-1">Custom Exponent</label>
+                        <input type="number" id="customExponent" min="-10" max="10" step="0.1" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3">
+                    <button id="resetBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                        🔄 Reset
+                    </button>
+                    <button id="challengeBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                        🎯 Try This!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visualization Panel -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Visualization</h2>
+                
+                <!-- Expression Display -->
+                <div class="bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg p-4 mb-6 text-center">
+                    <div id="expression" class="text-3xl font-bold text-gray-800 mb-2">3² = 9</div>
+                    <div id="explanation" class="text-lg text-gray-600">3 × 3 = 9</div>
+                </div>
+
+                <!-- Visual Representation -->
+                <div id="visualContainer" class="min-h-48 flex flex-col items-center justify-center">
+                    <!-- Visual blocks will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenge Section -->
+        <div id="challengeSection" class="mt-8 bg-white rounded-xl shadow-lg p-6 hidden">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Challenge Problem</h3>
+            <div id="challengeContent" class="text-center">
+                <!-- Challenge content will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'exponents';
+        let base = 3;
+        let exponent = 2;
+
+        // DOM elements
+        const baseSlider = document.getElementById('baseSlider');
+        const exponentSlider = document.getElementById('exponentSlider');
+        const baseValue = document.getElementById('baseValue');
+        const exponentValue = document.getElementById('exponentValue');
+        const customBase = document.getElementById('customBase');
+        const customExponent = document.getElementById('customExponent');
+        const expression = document.getElementById('expression');
+        const explanation = document.getElementById('explanation');
+        const visualContainer = document.getElementById('visualContainer');
+        const challengeSection = document.getElementById('challengeSection');
+        const challengeContent = document.getElementById('challengeContent');
+
+        // Tab buttons
+        const exponentsTab = document.getElementById('exponentsTab');
+        const rootsTab = document.getElementById('rootsTab');
+        const fractionalTab = document.getElementById('fractionalTab');
+
+        // Action buttons
+        const resetBtn = document.getElementById('resetBtn');
+        const challengeBtn = document.getElementById('challengeBtn');
+
+        // Tab switching
+        function switchTab(mode) {
+            currentMode = mode;
+            
+            // Update tab appearance
+            [exponentsTab, rootsTab, fractionalTab].forEach(tab => {
+                tab.className = 'px-6 py-3 rounded-md font-semibold transition-all text-gray-600 hover:bg-gray-100';
+            });
+            
+            if (mode === 'exponents') {
+                exponentsTab.className = 'px-6 py-3 rounded-md font-semibold transition-all bg-blue-500 text-white';
+            } else if (mode === 'roots') {
+                rootsTab.className = 'px-6 py-3 rounded-md font-semibold transition-all bg-blue-500 text-white';
+            } else {
+                fractionalTab.className = 'px-6 py-3 rounded-md font-semibold transition-all bg-blue-500 text-white';
+            }
+            
+            updateVisualization();
+        }
+
+        // Update visualization based on current values
+        function updateVisualization() {
+            const result = Math.pow(base, exponent);
+            
+            // Update expression and explanation based on mode
+            if (currentMode === 'exponents') {
+                if (exponent === 0) {
+                    expression.textContent = `${base}⁰ = 1`;
+                    explanation.textContent = 'Any number to the power of 0 equals 1';
+                } else if (exponent === 1) {
+                    expression.textContent = `${base}¹ = ${base}`;
+                    explanation.textContent = 'Any number to the power of 1 equals itself';
+                } else if (exponent < 0) {
+                    expression.textContent = `${base}^${exponent} = ${result.toFixed(4)}`;
+                    explanation.textContent = `1 ÷ ${base}^${Math.abs(exponent)} = ${result.toFixed(4)}`;
+                } else if (exponent % 1 === 0) {
+                    const multiplication = Array(Math.floor(exponent)).fill(base).join(' × ');
+                    expression.textContent = `${base}^${exponent} = ${Math.round(result)}`;
+                    explanation.textContent = `${multiplication} = ${Math.round(result)}`;
+                } else {
+                    expression.textContent = `${base}^${exponent} = ${result.toFixed(3)}`;
+                    explanation.textContent = `Fractional exponent: ${base} raised to ${exponent}`;
+                }
+            } else if (currentMode === 'roots') {
+                const rootIndex = Math.abs(exponent);
+                if (rootIndex === 0.5) {
+                    expression.textContent = `√${base} = ${result.toFixed(3)}`;
+                    explanation.textContent = `Square root of ${base}`;
+                } else if (rootIndex === 1/3) {
+                    expression.textContent = `∛${base} = ${result.toFixed(3)}`;
+                    explanation.textContent = `Cube root of ${base}`;
+                } else {
+                    expression.textContent = `${base}^(1/${1/exponent}) = ${result.toFixed(3)}`;
+                    explanation.textContent = `${1/exponent}th root of ${base}`;
+                }
+            } else {
+                expression.textContent = `${base}^${exponent} = ${result.toFixed(3)}`;
+                explanation.textContent = `${base} to the power of ${exponent}`;
+            }
+
+            // Generate visual representation
+            generateVisual();
+        }
+
+        // Generate visual blocks
+        function generateVisual() {
+            visualContainer.innerHTML = '';
+            
+            if (exponent === 0) {
+                // Show single block for x^0 = 1
+                const block = document.createElement('div');
+                block.className = 'w-16 h-16 bg-yellow-400 rounded-lg flex items-center justify-center text-white font-bold text-xl visual-block';
+                block.textContent = '1';
+                visualContainer.appendChild(block);
+                return;
+            }
+
+            if (exponent < 0) {
+                // Show fraction representation
+                const fractionDiv = document.createElement('div');
+                fractionDiv.className = 'text-center';
+                fractionDiv.innerHTML = `
+                    <div class="text-2xl font-bold mb-2">1</div>
+                    <div class="border-t-2 border-gray-400 w-24 mx-auto mb-2"></div>
+                    <div class="text-2xl font-bold">${base}^${Math.abs(exponent)}</div>
+                `;
+                visualContainer.appendChild(fractionDiv);
+                return;
+            }
+
+            if (exponent >= 1 && exponent <= 4 && exponent % 1 === 0) {
+                // Show multiplication blocks
+                const container = document.createElement('div');
+                container.className = 'flex flex-wrap gap-2 justify-center items-center';
+                
+                for (let i = 0; i < Math.floor(exponent); i++) {
+                    if (i > 0) {
+                        const multiply = document.createElement('span');
+                        multiply.className = 'text-2xl font-bold text-gray-600';
+                        multiply.textContent = '×';
+                        container.appendChild(multiply);
+                    }
+                    
+                    const block = document.createElement('div');
+                    block.className = 'w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold visual-block';
+                    block.textContent = base;
+                    container.appendChild(block);
+                }
+                
+                visualContainer.appendChild(container);
+            } else {
+                // Show result block for other cases
+                const result = Math.pow(base, exponent);
+                const block = document.createElement('div');
+                block.className = 'w-24 h-24 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-xl visual-block';
+                block.textContent = result.toFixed(2);
+                visualContainer.appendChild(block);
+            }
+        }
+
+        // Event listeners
+        baseSlider.addEventListener('input', (e) => {
+            base = parseFloat(e.target.value);
+            baseValue.textContent = base;
+            customBase.value = base;
+            updateVisualization();
+        });
+
+        exponentSlider.addEventListener('input', (e) => {
+            exponent = parseFloat(e.target.value);
+            exponentValue.textContent = exponent;
+            customExponent.value = exponent;
+            updateVisualization();
+        });
+
+        customBase.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value) && value > 0) {
+                base = value;
+                baseSlider.value = Math.min(Math.max(value, 1), 10);
+                baseValue.textContent = value;
+                updateVisualization();
+            }
+        });
+
+        customExponent.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                exponent = value;
+                exponentSlider.value = Math.min(Math.max(value, -3), 3);
+                exponentValue.textContent = value;
+                updateVisualization();
+            }
+        });
+
+        // Tab event listeners
+        exponentsTab.addEventListener('click', () => switchTab('exponents'));
+        rootsTab.addEventListener('click', () => switchTab('roots'));
+        fractionalTab.addEventListener('click', () => switchTab('fractional'));
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            base = Math.floor(Math.random() * 9) + 2;
+            exponent = (Math.floor(Math.random() * 25) - 12) * 0.25;
+            
+            baseSlider.value = Math.min(Math.max(base, 1), 10);
+            exponentSlider.value = Math.min(Math.max(exponent, -3), 3);
+            baseValue.textContent = base;
+            exponentValue.textContent = exponent;
+            customBase.value = base;
+            customExponent.value = exponent;
+            
+            challengeSection.classList.add('hidden');
+            updateVisualization();
+        });
+
+        // Challenge button
+        challengeBtn.addEventListener('click', () => {
+            const challenges = [
+                { base: 2, exp: 3, question: "What is 2³?", answer: 8 },
+                { base: 9, exp: 0.5, question: "What is √9?", answer: 3 },
+                { base: 16, exp: 1.5, question: "What is 16^(3/2)?", answer: 64 },
+                { base: 4, exp: -1, question: "What is 4⁻¹?", answer: 0.25 },
+                { base: 27, exp: 1/3, question: "What is ∛27?", answer: 3 },
+                { base: 5, exp: 0, question: "What is 5⁰?", answer: 1 }
+            ];
+            
+            const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+            
+            challengeContent.innerHTML = `
+                <div class="challenge-fade">
+                    <p class="text-xl font-semibold mb-4">${challenge.question}</p>
+                    <p class="text-lg text-gray-600 mb-4">Set the sliders to match this expression and see the result!</p>
+                    <button id="revealAnswer" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                        Reveal Answer
+                    </button>
+                    <div id="answerReveal" class="hidden mt-4 p-4 bg-green-100 rounded-lg">
+                        <p class="text-lg font-bold text-green-800">Answer: ${challenge.answer}</p>
+                    </div>
+                </div>
+            `;
+            
+            challengeSection.classList.remove('hidden');
+            
+            document.getElementById('revealAnswer').addEventListener('click', () => {
+                document.getElementById('answerReveal').classList.remove('hidden');
+            });
+        });
+
+        // Initialize
+        updateVisualization();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99290f0ae47a99f8',t:'MTc2MTEzNjc4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
