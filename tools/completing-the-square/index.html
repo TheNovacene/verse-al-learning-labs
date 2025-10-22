@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete the Square - Interactive Learning Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .slider-track {
+            background: linear-gradient(to right, #e2e8f0 0%, #3b82f6 50%, #e2e8f0 100%);
+        }
+        
+        .math-expression {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2em;
+        }
+        
+        .visual-square {
+            transition: all 0.3s ease;
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .success-animation {
+            animation: bounce 0.6s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .step-highlight {
+            background: linear-gradient(90deg, #fef3c7, #fde68a);
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .draggable-piece {
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .draggable-piece:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .draggable-piece.dragging {
+            cursor: grabbing;
+            transform: rotate(5deg) scale(1.1);
+            z-index: 1000;
+            opacity: 0.8;
+        }
+        
+        .drop-cell {
+            border: 2px dashed #d1d5db;
+            transition: all 0.2s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .drop-cell.drag-over {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            transform: scale(1.02);
+        }
+        
+        .drop-cell.filled {
+            border-style: solid;
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+        
+        .piece-x-squared {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .piece-x-term {
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: white;
+        }
+        
+        .piece-constant {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .piece-missing {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: 2px dashed #fca5a5;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-full">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🔢 Complete the Square</h1>
+            <p class="text-lg text-gray-600">Interactive GCSE Quadratic Equation Solver</p>
+        </div>
+
+        <!-- Level Selection -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Choose Your Level</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="setLevel(1)" id="level1-btn" class="level-badge text-white p-4 rounded-lg font-medium transition-all hover:scale-105">
+                    <div class="text-lg font-bold">Level 1</div>
+                    <div class="text-sm opacity-90">Perfect Square Trinomials</div>
+                </button>
+                <button onclick="setLevel(2)" id="level2-btn" class="bg-gray-300 text-gray-700 p-4 rounded-lg font-medium transition-all hover:scale-105">
+                    <div class="text-lg font-bold">Level 2</div>
+                    <div class="text-sm opacity-90">Integer Solutions</div>
+                </button>
+                <button onclick="setLevel(3)" id="level3-btn" class="bg-gray-300 text-gray-700 p-4 rounded-lg font-medium transition-all hover:scale-105">
+                    <div class="text-lg font-bold">Level 3</div>
+                    <div class="text-sm opacity-90">Irrational Roots</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Panel: Interactive Drag and Drop -->
+            <div class="space-y-6">
+                <!-- Interactive Drag and Drop Square -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🎯 Drag & Drop: Complete the Square!</h3>
+                    
+                    <!-- Instructions -->
+                    <div class="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+                        <strong>Instructions:</strong> Drag the geometric pieces below to form a perfect square! You have an x×x square, two x×3 rectangles, and need to add a 3×3 square to complete it.
+                    </div>
+                    
+                    <!-- Drop Zone Canvas -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4 min-h-[320px] relative" id="drop-zone">
+                        <div class="text-center text-gray-500 text-sm mb-2">Drop Zone - Arrange pieces to form a perfect square</div>
+                        <svg id="canvas" width="100%" height="280" viewBox="0 0 400 280" class="border-2 border-dashed border-gray-300 rounded-lg bg-white">
+                            <!-- Grid lines for guidance -->
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                        </svg>
+                    </div>
+                    
+                    <!-- Toolbox with draggable pieces -->
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-yellow-800 mb-3">🧰 Geometric Pieces - Drag to arrange:</div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="toolbox">
+                            <!-- Draggable pieces will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Feedback -->
+                    <div id="drag-feedback" class="mt-4 text-center font-medium"></div>
+                    
+                    <!-- Check and Reset buttons -->
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="checkSquareCompletion()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium transition-colors">
+                            ✓ Check My Square
+                        </button>
+                        <button onclick="resetDragDrop()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-medium transition-colors">
+                            🔄 Reset Pieces
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Problem Controls and Solution -->
+            <div class="space-y-6">
+                <!-- Current Problem -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Current Problem</h3>
+                    <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                        <div class="math-expression text-2xl text-center text-blue-800" id="original-expression">
+                            x² + 6x + 8 = 0
+                        </div>
+                    </div>
+                    
+                    <!-- Sliders -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Coefficient b: <span id="b-value" class="font-bold text-blue-600">6</span></label>
+                            <input type="range" id="b-slider" min="-10" max="10" value="6" class="w-full h-2 bg-gray-200 rounded-lg slider-track" oninput="updateExpression()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Constant c: <span id="c-value" class="font-bold text-purple-600">8</span></label>
+                            <input type="range" id="c-slider" min="-15" max="15" value="8" class="w-full h-2 bg-gray-200 rounded-lg slider-track" oninput="updateExpression()">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="generateNewProblem()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            🎲 New Problem
+                        </button>
+                        <button onclick="resetSliders()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            ↺ Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Solution -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Step-by-Step Solution</h3>
+                    <div id="solution-steps" class="space-y-3">
+                        <!-- Steps will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Completed Square Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Completed Square Form</h3>
+                    <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                        <div class="math-expression text-xl text-center text-yellow-800" id="completed-form">
+                            (x + 3)² - 1 = 0
+                        </div>
+                    </div>
+                    
+                    <!-- Solution -->
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-green-700 mb-2">Solutions:</div>
+                        <div class="math-expression text-lg text-center text-green-800" id="solutions">
+                            x = -2 or x = -4
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check Understanding -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Check Your Understanding</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">What goes in the brackets? (x + ?)</label>
+                            <input type="number" id="bracket-input" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter the number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">What constant do we subtract?</label>
+                            <input type="number" id="constant-input" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter the constant">
+                        </div>
+                        <button onclick="checkAnswer()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium transition-colors">
+                            ✓ Check Answer
+                        </button>
+                        <div id="feedback" class="text-center font-medium"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        let currentB = 6;
+        let currentC = 8;
+        let draggedElement = null;
+        let gridState = Array(9).fill(null); // 3x3 grid state
+
+        function setLevel(level) {
+            currentLevel = level;
+            
+            // Update button styles
+            document.querySelectorAll('[id^="level"]').forEach(btn => {
+                btn.className = 'bg-gray-300 text-gray-700 p-4 rounded-lg font-medium transition-all hover:scale-105';
+            });
+            document.getElementById(`level${level}-btn`).className = 'level-badge text-white p-4 rounded-lg font-medium transition-all hover:scale-105';
+            
+            generateNewProblem();
+        }
+
+        function generateNewProblem() {
+            let b, c;
+            
+            switch(currentLevel) {
+                case 1: // Perfect squares
+                    const perfectSquares = [
+                        {b: 2, c: 1}, {b: 4, c: 4}, {b: 6, c: 9}, 
+                        {b: 8, c: 16}, {b: -2, c: 1}, {b: -4, c: 4}
+                    ];
+                    const perfect = perfectSquares[Math.floor(Math.random() * perfectSquares.length)];
+                    b = perfect.b;
+                    c = perfect.c;
+                    break;
+                case 2: // Integer solutions
+                    b = Math.floor(Math.random() * 11) - 5; // -5 to 5
+                    c = Math.floor(Math.random() * 11) - 5;
+                    break;
+                case 3: // Irrational roots
+                    b = Math.floor(Math.random() * 9) + 1; // 1 to 9
+                    c = Math.floor(Math.random() * 10) + 5; // 5 to 14
+                    break;
+            }
+            
+            currentB = b;
+            currentC = c;
+            
+            document.getElementById('b-slider').value = b;
+            document.getElementById('c-slider').value = c;
+            
+            updateExpression();
+            clearInputs();
+        }
+
+        function resetSliders() {
+            document.getElementById('b-slider').value = currentB;
+            document.getElementById('c-slider').value = currentC;
+            updateExpression();
+        }
+
+        function updateExpression() {
+            const b = parseInt(document.getElementById('b-slider').value);
+            const c = parseInt(document.getElementById('c-slider').value);
+            
+            document.getElementById('b-value').textContent = b;
+            document.getElementById('c-value').textContent = c;
+            
+            // Update original expression
+            let bTerm = b === 0 ? '' : (b === 1 ? ' + x' : (b === -1 ? ' - x' : (b > 0 ? ` + ${b}x` : ` - ${Math.abs(b)}x`)));
+            let cTerm = c === 0 ? '' : (c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`);
+            
+            document.getElementById('original-expression').textContent = `x²${bTerm}${cTerm} = 0`;
+            
+            // Calculate completed square form
+            const h = b / 2;
+            const k = c - (h * h);
+            
+            // Update completed form
+            let hDisplay = h === 0 ? 'x' : (h > 0 ? `(x + ${h})` : `(x - ${Math.abs(h)})`);
+            if (h % 1 !== 0) {
+                hDisplay = h > 0 ? `(x + ${h.toFixed(1)})` : `(x - ${Math.abs(h).toFixed(1)})`;
+            }
+            
+            let kDisplay = k === 0 ? '' : (k > 0 ? ` + ${k}` : ` - ${Math.abs(k)}`);
+            if (k % 1 !== 0) {
+                kDisplay = k > 0 ? ` + ${k.toFixed(2)}` : ` - ${Math.abs(k).toFixed(2)}`;
+            }
+            
+            document.getElementById('completed-form').textContent = `${hDisplay}²${kDisplay} = 0`;
+            
+            // Calculate solutions
+            const discriminant = k;
+            let solutionText;
+            
+            if (discriminant === 0) {
+                solutionText = `x = ${(-h).toFixed(h % 1 === 0 ? 0 : 1)}`;
+            } else if (discriminant < 0) {
+                const sqrtAbs = Math.sqrt(Math.abs(discriminant));
+                const x1 = -h + sqrtAbs;
+                const x2 = -h - sqrtAbs;
+                solutionText = `x = ${x1.toFixed(2)} or x = ${x2.toFixed(2)}`;
+            } else {
+                solutionText = 'No real solutions';
+            }
+            
+            document.getElementById('solutions').textContent = solutionText;
+            
+            // Update step-by-step solution
+            updateSteps(b, c, h, k);
+            
+            // Initialize drag and drop
+            initializeDragDrop(b, c);
+        }
+
+        function updateSteps(b, c, h, k) {
+            const steps = [
+                `<div class="step-highlight p-3 rounded">Step 1: Start with x² + ${b}x + ${c} = 0</div>`,
+                `<div class="p-3">Step 2: Take half of the x coefficient: ${b}/2 = ${h}</div>`,
+                `<div class="p-3">Step 3: Square it: (${h})² = ${(h*h).toFixed(2)}</div>`,
+                `<div class="p-3">Step 4: Add and subtract: x² + ${b}x + ${(h*h).toFixed(2)} - ${(h*h).toFixed(2)} + ${c}</div>`,
+                `<div class="step-highlight p-3 rounded">Step 5: Group: (x + ${h})² + ${k.toFixed(2)} = 0</div>`
+            ];
+            
+            document.getElementById('solution-steps').innerHTML = steps.join('');
+        }
+
+        function initializeDragDrop(b, c) {
+            const h = Math.abs(b / 2); // Use absolute value for visual representation
+            
+            // Clear canvas
+            const canvas = document.getElementById('canvas');
+            // Keep the grid pattern but clear other content
+            const defs = canvas.querySelector('defs');
+            const gridPattern = canvas.querySelector('rect[fill="url(#grid)"]');
+            canvas.innerHTML = '';
+            if (defs) canvas.appendChild(defs);
+            if (gridPattern) canvas.appendChild(gridPattern);
+            
+            // Create draggable geometric pieces
+            const toolbox = document.getElementById('toolbox');
+            toolbox.innerHTML = '';
+            
+            // Calculate consistent sizing - use a base unit for proper fitting
+            const baseUnit = 60; // pixels per unit
+            const hPixels = Math.max(30, h * 20); // Minimum 30px for visibility
+            
+            // Create pieces with actual square and rectangle shapes
+            
+            // 1. x×x square (blue) - actual square shape (80×80px)
+            toolbox.innerHTML += `
+                <div class="bg-blue-500 text-white p-1 rounded-lg border-2 border-blue-600 text-center cursor-grab hover:bg-blue-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                     style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;"
+                     draggable="true" 
+                     data-piece-type="x-square"
+                     data-canvas-width="80"
+                     data-canvas-height="80"
+                     onmousedown="this.style.transform='scale(0.95)'"
+                     onmouseup="this.style.transform='scale(1)'"
+                     ondragstart="handleGeometricDragStart(event)"
+                     ondragend="handleGeometricDragEnd(event)">
+                    <div class="text-xs font-bold">x</div>
+                    <div class="text-xs font-bold">x</div>
+                </div>
+            `;
+            
+            // 2. First x×h rectangle (green) - wide rectangle (80×40px)
+            toolbox.innerHTML += `
+                <div class="bg-green-500 text-white p-1 rounded-lg border-2 border-green-600 text-center cursor-grab hover:bg-green-600 transition-all flex items-center justify-center shadow-lg" 
+                     style="width: 80px; height: 40px; min-width: 80px; min-height: 40px;"
+                     draggable="true" 
+                     data-piece-type="x-rect1"
+                     data-canvas-width="80"
+                     data-canvas-height="40"
+                     onmousedown="this.style.transform='scale(0.95)'"
+                     onmouseup="this.style.transform='scale(1)'"
+                     ondragstart="handleGeometricDragStart(event)"
+                     ondragend="handleGeometricDragEnd(event)">
+                    <div class="text-xs font-bold">x × ${h}</div>
+                </div>
+            `;
+            
+            // 3. Second h×x rectangle (green) - tall rectangle (40×80px)
+            toolbox.innerHTML += `
+                <div class="bg-green-500 text-white p-1 rounded-lg border-2 border-green-600 text-center cursor-grab hover:bg-green-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                     style="width: 40px; height: 80px; min-width: 40px; min-height: 80px;"
+                     draggable="true" 
+                     data-piece-type="x-rect2"
+                     data-canvas-width="40"
+                     data-canvas-height="80"
+                     onmousedown="this.style.transform='scale(0.95)'"
+                     onmouseup="this.style.transform='scale(1)'"
+                     ondragstart="handleGeometricDragStart(event)"
+                     ondragend="handleGeometricDragEnd(event)">
+                    <div class="text-xs font-bold">${h}</div>
+                    <div class="text-xs font-bold">×</div>
+                    <div class="text-xs font-bold">x</div>
+                </div>
+            `;
+            
+            // 4. h×h square - the missing piece (orange with dashed border) - small square (40×40px)
+            toolbox.innerHTML += `
+                <div class="bg-orange-500 text-white p-1 rounded-lg border-2 border-dashed border-red-400 text-center cursor-grab hover:bg-orange-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                     style="width: 40px; height: 40px; min-width: 40px; min-height: 40px;"
+                     draggable="true" 
+                     data-piece-type="missing-square"
+                     data-canvas-width="40"
+                     data-canvas-height="40"
+                     onmousedown="this.style.transform='scale(0.95)'"
+                     onmouseup="this.style.transform='scale(1)'"
+                     ondragstart="handleGeometricDragStart(event)"
+                     ondragend="handleGeometricDragEnd(event)">
+                    <div class="text-xs font-bold">${h}</div>
+                    <div class="text-xs font-bold">${h}</div>
+                </div>
+            `;
+            
+            // Clear feedback and show confirmation
+            document.getElementById('drag-feedback').innerHTML = '<div class="text-blue-600">✨ Geometric pieces loaded! Drag them to the canvas above to form a perfect square.</div>';
+            
+            // Initialize drag and drop for canvas
+            initializeCanvasDragDrop();
+        }
+        
+        function createGeometricPiece(type, width, height, color, label) {
+            const container = document.createElement('div');
+            container.className = 'bg-white p-3 rounded-lg border-2 border-gray-300 text-center cursor-grab hover:shadow-lg transition-all min-h-[120px] flex flex-col items-center justify-center hover:scale-105';
+            container.draggable = true;
+            container.dataset.pieceType = type;
+            container.dataset.width = width;
+            container.dataset.height = height;
+            container.dataset.color = color;
+            
+            // Create visual representation based on piece type
+            let visualElement = document.createElement('div');
+            
+            if (type === 'x-square') {
+                // x×x square - blue
+                visualElement.className = 'w-16 h-16 rounded-lg border-2 flex items-center justify-center text-white font-bold text-lg shadow-md';
+                visualElement.style.backgroundColor = '#3b82f6';
+                visualElement.style.borderColor = '#1d4ed8';
+                visualElement.textContent = 'x²';
+            } else if (type === 'x-rect1' || type === 'x-rect2') {
+                // x×h rectangles - green
+                visualElement.className = 'w-16 h-10 rounded-lg border-2 flex items-center justify-center text-white font-bold text-sm shadow-md';
+                visualElement.style.backgroundColor = '#10b981';
+                visualElement.style.borderColor = '#047857';
+                const h = Math.abs(parseInt(document.getElementById('b-slider').value) / 2);
+                visualElement.textContent = `${h}x`;
+            } else if (type === 'missing-square') {
+                // h×h square - orange with dashed border
+                visualElement.className = 'w-12 h-12 rounded-lg border-2 border-dashed flex items-center justify-center text-white font-bold text-sm shadow-md';
+                visualElement.style.backgroundColor = '#f59e0b';
+                visualElement.style.borderColor = '#ef4444';
+                const h = Math.abs(parseInt(document.getElementById('b-slider').value) / 2);
+                visualElement.textContent = `${h}²`;
+            }
+            
+            // Add label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'text-xs font-semibold text-gray-800 mt-2 px-1';
+            labelDiv.textContent = label;
+            
+            container.appendChild(visualElement);
+            container.appendChild(labelDiv);
+            
+            // Add drag event listeners
+            container.addEventListener('dragstart', handleGeometricDragStart);
+            container.addEventListener('dragend', handleGeometricDragEnd);
+            
+            return container;
+        }
+        
+        function initializeCanvasDragDrop() {
+            const canvas = document.getElementById('canvas');
+            canvas.addEventListener('dragover', handleCanvasDragOver);
+            canvas.addEventListener('drop', handleCanvasDrop);
+        }
+        
+        let draggedGeometricPiece = null;
+        let placedPieces = [];
+        
+        function handleGeometricDragStart(e) {
+            draggedGeometricPiece = e.target.closest('[data-piece-type]');
+            e.target.style.opacity = '0.5';
+        }
+        
+        function handleGeometricDragEnd(e) {
+            e.target.style.opacity = '1';
+            draggedGeometricPiece = null;
+        }
+        
+        function handleCanvasDragOver(e) {
+            e.preventDefault();
+        }
+        
+        function handleCanvasDrop(e) {
+            e.preventDefault();
+            
+            if (!draggedGeometricPiece) return;
+            
+            // Get piece dimensions
+            const rectWidth = parseInt(draggedGeometricPiece.dataset.canvasWidth);
+            const rectHeight = parseInt(draggedGeometricPiece.dataset.canvasHeight);
+            
+            // Get the piece type
+            const pieceType = draggedGeometricPiece.dataset.pieceType;
+            
+            // Fixed positions for perfect alignment - each piece has its designated spot
+            let snappedX, snappedY;
+            const baseX = 150; // Starting X position
+            const baseY = 90;  // Starting Y position
+            
+            switch(pieceType) {
+                case 'x-square':
+                    // Top-left corner (80x80)
+                    snappedX = baseX;
+                    snappedY = baseY;
+                    break;
+                case 'x-rect1':
+                    // Horizontal rectangle - align along BOTTOM edge of blue square
+                    snappedX = baseX;  // Same X as blue square (left edge aligned)
+                    snappedY = baseY + 80;  // Below the blue square (bottom edge aligned)
+                    break;
+                case 'x-rect2':
+                    // Vertical rectangle - align along RIGHT edge of blue square  
+                    snappedX = baseX + 80;  // To the right of blue square (right edge aligned)
+                    snappedY = baseY;  // Same Y as blue square (top edge aligned)
+                    break;
+                case 'missing-square':
+                    // Bottom-right corner (40x40) - fills the gap
+                    snappedX = baseX + 80;
+                    snappedY = baseY + 80;
+                    break;
+                default:
+                    snappedX = 150;
+                    snappedY = 100;
+            }
+            
+            // Ensure piece fits in canvas
+            if (snappedX + rectWidth > 400 || snappedY + rectHeight > 280 || snappedX < 0 || snappedY < 0) {
+                return; // Don't place if it goes outside
+            }
+            
+            // Determine color and label based on piece type
+            let color, label;
+            const h = Math.abs(parseInt(document.getElementById('b-slider').value) / 2);
+            
+            switch(pieceType) {
+                case 'x-square':
+                    color = '#3b82f6'; // blue
+                    label = 'x×x';
+                    break;
+                case 'x-rect1':
+                    color = '#10b981'; // green
+                    label = `x×${h}`;
+                    break;
+                case 'x-rect2':
+                    color = '#10b981'; // green
+                    label = `${h}×x`;
+                    break;
+                case 'missing-square':
+                    color = '#f59e0b'; // orange
+                    label = `${h}×${h}`;
+                    break;
+            }
+            
+            const svgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            svgRect.setAttribute('x', snappedX);
+            svgRect.setAttribute('y', snappedY);
+            svgRect.setAttribute('width', rectWidth);
+            svgRect.setAttribute('height', rectHeight);
+            svgRect.setAttribute('fill', color);
+            svgRect.setAttribute('fill-opacity', '0.7');
+            svgRect.setAttribute('stroke', color);
+            svgRect.setAttribute('stroke-width', '2');
+            svgRect.setAttribute('cursor', 'pointer');
+            svgRect.dataset.pieceType = pieceType;
+            
+            // Add click to remove functionality
+            const removeFunction = function() {
+                canvas.removeChild(svgRect);
+                canvas.removeChild(textElement);
+                
+                // Return piece to toolbox by recreating just this piece
+                const toolbox = document.getElementById('toolbox');
+                const h = Math.abs(parseInt(document.getElementById('b-slider').value) / 2);
+                
+                let pieceHTML = '';
+                switch(pieceType) {
+                    case 'x-square':
+                        pieceHTML = `
+                            <div class="bg-blue-500 text-white p-1 rounded-lg border-2 border-blue-600 text-center cursor-grab hover:bg-blue-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                                 style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;"
+                                 draggable="true" 
+                                 data-piece-type="x-square"
+                                 data-canvas-width="80"
+                                 data-canvas-height="80"
+                                 onmousedown="this.style.transform='scale(0.95)'"
+                                 onmouseup="this.style.transform='scale(1)'"
+                                 ondragstart="handleGeometricDragStart(event)"
+                                 ondragend="handleGeometricDragEnd(event)">
+                                <div class="text-xs font-bold">x</div>
+                                <div class="text-xs font-bold">x</div>
+                            </div>
+                        `;
+                        break;
+                    case 'x-rect1':
+                        pieceHTML = `
+                            <div class="bg-green-500 text-white p-1 rounded-lg border-2 border-green-600 text-center cursor-grab hover:bg-green-600 transition-all flex items-center justify-center shadow-lg" 
+                                 style="width: 80px; height: 40px; min-width: 80px; min-height: 40px;"
+                                 draggable="true" 
+                                 data-piece-type="x-rect1"
+                                 data-canvas-width="80"
+                                 data-canvas-height="40"
+                                 onmousedown="this.style.transform='scale(0.95)'"
+                                 onmouseup="this.style.transform='scale(1)'"
+                                 ondragstart="handleGeometricDragStart(event)"
+                                 ondragend="handleGeometricDragEnd(event)">
+                                <div class="text-xs font-bold">x × ${h}</div>
+                            </div>
+                        `;
+                        break;
+                    case 'x-rect2':
+                        pieceHTML = `
+                            <div class="bg-green-500 text-white p-1 rounded-lg border-2 border-green-600 text-center cursor-grab hover:bg-green-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                                 style="width: 40px; height: 80px; min-width: 40px; min-height: 80px;"
+                                 draggable="true" 
+                                 data-piece-type="x-rect2"
+                                 data-canvas-width="40"
+                                 data-canvas-height="80"
+                                 onmousedown="this.style.transform='scale(0.95)'"
+                                 onmouseup="this.style.transform='scale(1)'"
+                                 ondragstart="handleGeometricDragStart(event)"
+                                 ondragend="handleGeometricDragEnd(event)">
+                                <div class="text-xs font-bold">${h}</div>
+                                <div class="text-xs font-bold">×</div>
+                                <div class="text-xs font-bold">x</div>
+                            </div>
+                        `;
+                        break;
+                    case 'missing-square':
+                        pieceHTML = `
+                            <div class="bg-orange-500 text-white p-1 rounded-lg border-2 border-dashed border-red-400 text-center cursor-grab hover:bg-orange-600 transition-all flex flex-col items-center justify-center shadow-lg" 
+                                 style="width: 40px; height: 40px; min-width: 40px; min-height: 40px;"
+                                 draggable="true" 
+                                 data-piece-type="missing-square"
+                                 data-canvas-width="40"
+                                 data-canvas-height="40"
+                                 onmousedown="this.style.transform='scale(0.95)'"
+                                 onmouseup="this.style.transform='scale(1)'"
+                                 ondragstart="handleGeometricDragStart(event)"
+                                 ondragend="handleGeometricDragEnd(event)">
+                                <div class="text-xs font-bold">${h}</div>
+                                <div class="text-xs font-bold">${h}</div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                toolbox.innerHTML += pieceHTML;
+                
+                // Remove from placed pieces array
+                placedPieces = placedPieces.filter(p => p.element !== svgRect);
+            };
+            
+            svgRect.addEventListener('click', removeFunction);
+            
+            // Add label text
+            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textElement.setAttribute('x', snappedX + rectWidth/2);
+            textElement.setAttribute('y', snappedY + rectHeight/2);
+            textElement.setAttribute('text-anchor', 'middle');
+            textElement.setAttribute('dominant-baseline', 'middle');
+            textElement.setAttribute('fill', 'white');
+            textElement.setAttribute('font-weight', 'bold');
+            textElement.setAttribute('font-size', '12');
+            textElement.textContent = label;
+            textElement.style.pointerEvents = 'none';
+            
+            canvas.appendChild(svgRect);
+            canvas.appendChild(textElement);
+            
+            // Store placed piece info
+            placedPieces.push({
+                element: svgRect,
+                textElement: textElement,
+                type: pieceType,
+                x: snappedX,
+                y: snappedY,
+                width: rectWidth,
+                height: rectHeight
+            });
+            
+            // Remove from toolbox
+            draggedGeometricPiece.remove();
+        }
+        
+        function createDraggablePiece(text, type, className) {
+            const piece = document.createElement('div');
+            piece.className = `draggable-piece ${className} px-3 py-2 rounded-lg font-bold text-sm min-w-[60px] text-center`;
+            piece.textContent = text;
+            piece.draggable = true;
+            piece.dataset.pieceType = type;
+            piece.dataset.pieceValue = text;
+            
+            piece.addEventListener('dragstart', handleDragStart);
+            piece.addEventListener('dragend', handleDragEnd);
+            
+            return piece;
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            if (draggedElement && !e.target.hasChildNodes()) {
+                const cellIndex = parseInt(e.target.dataset.cellIndex);
+                
+                // Clone the piece and add to grid
+                const clonedPiece = draggedElement.cloneNode(true);
+                clonedPiece.draggable = false;
+                clonedPiece.classList.remove('dragging');
+                clonedPiece.classList.add('cursor-pointer');
+                clonedPiece.onclick = () => removePieceFromGrid(cellIndex);
+                
+                e.target.appendChild(clonedPiece);
+                e.target.classList.add('filled');
+                
+                // Update grid state
+                gridState[cellIndex] = {
+                    type: draggedElement.dataset.pieceType,
+                    value: draggedElement.dataset.pieceValue
+                };
+                
+                // Remove original piece from toolbox
+                draggedElement.remove();
+            }
+        }
+        
+        function removePieceFromGrid(cellIndex) {
+            const cell = document.querySelector(`[data-cell-index="${cellIndex}"]`);
+            const piece = cell.firstChild;
+            
+            if (piece) {
+                // Return piece to toolbox
+                const toolbox = document.getElementById('toolbox');
+                const newPiece = createDraggablePiece(
+                    gridState[cellIndex].value,
+                    gridState[cellIndex].type,
+                    getPieceClassName(gridState[cellIndex].type)
+                );
+                toolbox.appendChild(newPiece);
+                
+                // Clear cell
+                cell.innerHTML = '';
+                cell.classList.remove('filled');
+                gridState[cellIndex] = null;
+            }
+        }
+        
+        function getPieceClassName(type) {
+            switch(type) {
+                case 'x-squared': return 'piece-x-squared';
+                case 'x-term': return 'piece-x-term';
+                case 'constant': return 'piece-constant';
+                case 'missing': return 'piece-missing';
+                default: return '';
+            }
+        }
+        
+        function checkSquareCompletion() {
+            const feedback = document.getElementById('drag-feedback');
+            
+            // Count pieces on canvas by checking SVG rectangles with data-piece-type (excluding the grid background)
+            const canvas = document.getElementById('canvas');
+            const svgRects = canvas.querySelectorAll('rect[data-piece-type]');
+            const placedCount = svgRects.length;
+            
+            // Check if all pieces are placed
+            if (placedCount !== 4) {
+                feedback.innerHTML = `<div class="text-orange-600">🤔 You need to place all 4 pieces to complete the square! (${placedCount}/4 placed)</div>`;
+                return;
+            }
+            
+            // All 4 pieces are placed - show success message
+            const b = parseInt(document.getElementById('b-slider').value);
+            const h = Math.abs(b / 2);
+            const perfectSquareExpression = `(x + ${h})²`;
+            
+            feedback.innerHTML = `
+                <div class="text-green-600 success-animation">
+                    🎉 Perfect! You've completed the square correctly!
+                    <div class="mt-2 p-3 bg-green-50 rounded-lg border-2 border-green-200">
+                        <div class="text-lg font-bold text-green-800 math-expression">
+                            Your perfect square = ${perfectSquareExpression}
+                        </div>
+                        <div class="text-sm text-green-700 mt-1">
+                            x² + two x×${h} rectangles + ${h}² = (x + ${h})²
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add visual celebration
+            svgRects.forEach(rect => {
+                rect.setAttribute('stroke', '#10b981');
+                rect.setAttribute('stroke-width', '4');
+                rect.setAttribute('filter', 'drop-shadow(0 0 8px #10b981)');
+            });
+        }
+        
+        function resetDragDrop() {
+            // Clear placed pieces
+            placedPieces = [];
+            
+            // Clear canvas except grid
+            const canvas = document.getElementById('canvas');
+            const defs = canvas.querySelector('defs');
+            const gridRect = canvas.querySelector('rect[fill="url(#grid)"]');
+            canvas.innerHTML = '';
+            canvas.appendChild(defs);
+            canvas.appendChild(gridRect);
+            
+            // Reinitialize
+            const b = parseInt(document.getElementById('b-slider').value);
+            const c = parseInt(document.getElementById('c-slider').value);
+            initializeDragDrop(b, c);
+        }
+
+        function checkAnswer() {
+            const b = parseInt(document.getElementById('b-slider').value);
+            const bracketAnswer = parseFloat(document.getElementById('bracket-input').value);
+            const constantAnswer = parseFloat(document.getElementById('constant-input').value);
+            
+            const correctBracket = b / 2;
+            const correctConstant = (b / 2) * (b / 2);
+            
+            const feedback = document.getElementById('feedback');
+            
+            if (Math.abs(bracketAnswer - correctBracket) < 0.01 && Math.abs(constantAnswer - correctConstant) < 0.01) {
+                feedback.innerHTML = '<div class="text-green-600 success-animation">🎉 Excellent! You got it right!</div>';
+            } else {
+                feedback.innerHTML = '<div class="text-red-600">❌ Not quite right. Try again!</div>';
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('bracket-input').value = '';
+            document.getElementById('constant-input').value = '';
+            document.getElementById('feedback').innerHTML = '';
+        }
+
+        // Initialize
+        updateExpression();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99291978e26b99f8',t:'MTc2MTEzNzIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
