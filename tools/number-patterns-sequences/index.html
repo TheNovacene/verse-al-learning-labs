@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Number Patterns & Sequences Interactive</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .level-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .level-btn.arithmetic {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .level-btn.geometric {
+            background: #10b981;
+            color: white;
+        }
+
+        .level-btn.complex {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .level-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .sequence-area {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 3px solid #e2e8f0;
+        }
+
+        .sequence-display {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .sequence-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .sequence-terms {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .term {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .term.highlight {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .comma {
+            font-size: 1.5rem;
+            color: #64748b;
+        }
+
+        .ellipsis {
+            font-size: 2rem;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .workings {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #dcfce7;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .feedback.hint {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .dashboard {
+            background: #f1f5f9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .dashboard h3 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            font-size: 1.4rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .toggle-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .level-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .sequence-terms {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>GCSE Number Patterns & Sequences Interactive</h1>
+            <p>Explore arithmetic, geometric, and complex sequences</p>
+        </header>
+
+        <div class="main-content">
+            <div class="level-selector">
+                <button class="level-btn arithmetic active" onclick="setLevel('arithmetic')">
+                    Level 1: Arithmetic Sequences
+                </button>
+                <button class="level-btn geometric" onclick="setLevel('geometric')">
+                    Level 2: Geometric Sequences
+                </button>
+                <button class="level-btn complex" onclick="setLevel('complex')">
+                    Level 3: Complex Sequences
+                </button>
+            </div>
+
+            <div class="toggle-section">
+                <label class="toggle">
+                    <input type="checkbox" id="minimalMode" onchange="toggleMinimalMode()">
+                    Show only two terms, find next five
+                </label>
+            </div>
+
+            <div class="sequence-area">
+                <div class="sequence-display">
+                    <div class="sequence-title" id="sequenceTitle">Arithmetic Sequence</div>
+                    <div class="sequence-terms" id="sequenceTerms"></div>
+                    <div class="workings" id="workings" style="display: none;"></div>
+                </div>
+
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="nextTerms">Enter the next terms:</label>
+                        <input type="text" id="nextTerms" placeholder="e.g., 13, 16, 19">
+                    </div>
+                    <div class="input-group">
+                        <label for="nthTerm">nth term formula:</label>
+                        <input type="text" id="nthTerm" placeholder="e.g., 3n + 1">
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+                    <button class="btn btn-secondary" onclick="showHint()">Show Hint</button>
+                    <button class="btn btn-success" onclick="generateNewSequence()">New Sequence</button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="dashboard">
+                <h3>Your Progress</h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAttempts">0</div>
+                        <div class="stat-label">Total Attempts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="correctAnswers">0</div>
+                        <div class="stat-label">Correct Answers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentLevel = 'arithmetic';
+        let currentSequence = {};
+        let stats = {
+            totalAttempts: 0,
+            correctAnswers: 0,
+            currentStreak: 0
+        };
+        let minimalMode = false;
+
+        function setLevel(level) {
+            currentLevel = level;
+            
+            // Update button states
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.level-btn.${level}`).classList.add('active');
+            
+            generateNewSequence();
+        }
+
+        function toggleMinimalMode() {
+            minimalMode = document.getElementById('minimalMode').checked;
+            generateNewSequence();
+        }
+
+        function generateArithmeticSequence() {
+            const firstTerm = Math.floor(Math.random() * 20) + 1;
+            const commonDiff = Math.floor(Math.random() * 10) + 1;
+            
+            const sequence = [];
+            for (let i = 0; i < 8; i++) {
+                sequence.push(firstTerm + i * commonDiff);
+            }
+            
+            return {
+                type: 'arithmetic',
+                sequence: sequence,
+                commonDiff: commonDiff,
+                nthTerm: `${commonDiff}n + ${firstTerm - commonDiff}`,
+                workings: `Common difference: +${commonDiff}`
+            };
+        }
+
+        function generateGeometricSequence() {
+            const firstTerm = Math.floor(Math.random() * 5) + 2;
+            const commonRatio = Math.floor(Math.random() * 3) + 2;
+            
+            const sequence = [];
+            for (let i = 0; i < 6; i++) {
+                sequence.push(firstTerm * Math.pow(commonRatio, i));
+            }
+            
+            return {
+                type: 'geometric',
+                sequence: sequence,
+                commonRatio: commonRatio,
+                nthTerm: `${firstTerm} × ${commonRatio}^(n-1)`,
+                workings: `Common ratio: ×${commonRatio}`
+            };
+        }
+
+        function generateComplexSequence() {
+            const type = Math.random() < 0.5 ? 'quadratic' : 'alternating';
+            
+            if (type === 'quadratic') {
+                const a = Math.floor(Math.random() * 3) + 1;
+                const b = Math.floor(Math.random() * 5) + 1;
+                const c = Math.floor(Math.random() * 5) + 1;
+                
+                const sequence = [];
+                for (let n = 1; n <= 6; n++) {
+                    sequence.push(a * n * n + b * n + c);
+                }
+                
+                return {
+                    type: 'quadratic',
+                    sequence: sequence,
+                    nthTerm: `${a}n² + ${b}n + ${c}`,
+                    workings: `Quadratic sequence: second differences are constant`
+                };
+            } else {
+                const base = Math.floor(Math.random() * 10) + 5;
+                const sequence = [];
+                for (let n = 1; n <= 6; n++) {
+                    sequence.push(n % 2 === 1 ? base + n : base - n);
+                }
+                
+                return {
+                    type: 'alternating',
+                    sequence: sequence,
+                    nthTerm: 'Alternating pattern',
+                    workings: `Alternating: odd positions increase, even positions decrease`
+                };
+            }
+        }
+
+        function generateNewSequence() {
+            let newSequence;
+            
+            switch (currentLevel) {
+                case 'arithmetic':
+                    newSequence = generateArithmeticSequence();
+                    document.getElementById('sequenceTitle').textContent = 'Arithmetic Sequence';
+                    break;
+                case 'geometric':
+                    newSequence = generateGeometricSequence();
+                    document.getElementById('sequenceTitle').textContent = 'Geometric Sequence';
+                    break;
+                case 'complex':
+                    newSequence = generateComplexSequence();
+                    document.getElementById('sequenceTitle').textContent = 'Complex Sequence';
+                    break;
+            }
+            
+            currentSequence = newSequence;
+            displaySequence();
+            clearInputs();
+            hideFeedback();
+        }
+
+        function displaySequence() {
+            const termsContainer = document.getElementById('sequenceTerms');
+            const visibleTerms = minimalMode ? 2 : (currentLevel === 'complex' ? 4 : 3);
+            
+            termsContainer.innerHTML = '';
+            
+            for (let i = 0; i < visibleTerms; i++) {
+                const termDiv = document.createElement('div');
+                termDiv.className = 'term';
+                termDiv.textContent = currentSequence.sequence[i];
+                termsContainer.appendChild(termDiv);
+                
+                if (i < visibleTerms - 1) {
+                    const comma = document.createElement('span');
+                    comma.className = 'comma';
+                    comma.textContent = ',';
+                    termsContainer.appendChild(comma);
+                }
+            }
+            
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'ellipsis';
+            ellipsis.textContent = '...';
+            termsContainer.appendChild(ellipsis);
+        }
+
+        function checkAnswers() {
+            const nextTermsInput = document.getElementById('nextTerms').value.trim();
+            const nthTermInput = document.getElementById('nthTerm').value.trim();
+            
+            if (!nextTermsInput && !nthTermInput) {
+                showFeedback('Please enter at least one answer to check.', 'hint');
+                return;
+            }
+            
+            stats.totalAttempts++;
+            let correct = true;
+            let feedback = '';
+            
+            // Check next terms
+            if (nextTermsInput) {
+                const userTerms = nextTermsInput.split(',').map(t => parseInt(t.trim()));
+                const visibleTerms = minimalMode ? 2 : (currentLevel === 'complex' ? 4 : 3);
+                const expectedTerms = minimalMode ? 
+                    currentSequence.sequence.slice(2, 7) : 
+                    currentSequence.sequence.slice(visibleTerms, visibleTerms + 3);
+                
+                const termsCorrect = userTerms.length === expectedTerms.length && 
+                    userTerms.every((term, i) => term === expectedTerms[i]);
+                
+                if (termsCorrect) {
+                    feedback += '✓ Next terms are correct! ';
+                } else {
+                    feedback += `✗ Next terms should be: ${expectedTerms.join(', ')}. `;
+                    correct = false;
+                }
+            }
+            
+            // Check nth term (simplified check)
+            if (nthTermInput) {
+                const nthCorrect = nthTermInput.toLowerCase().includes(currentSequence.nthTerm.toLowerCase().replace(/\s/g, ''));
+                
+                if (nthCorrect || nthTermInput.toLowerCase() === currentSequence.nthTerm.toLowerCase()) {
+                    feedback += '✓ nth term formula is correct!';
+                } else {
+                    feedback += `✗ nth term should be: ${currentSequence.nthTerm}`;
+                    correct = false;
+                }
+            }
+            
+            if (correct) {
+                stats.correctAnswers++;
+                stats.currentStreak++;
+                showFeedback(feedback, 'correct');
+            } else {
+                stats.currentStreak = 0;
+                showFeedback(feedback, 'incorrect');
+            }
+            
+            updateStats();
+        }
+
+        function showHint() {
+            document.getElementById('workings').textContent = currentSequence.workings;
+            document.getElementById('workings').style.display = 'block';
+            
+            let hint = '';
+            switch (currentLevel) {
+                case 'arithmetic':
+                    hint = 'Look for the common difference between consecutive terms. Add this difference to find the next terms.';
+                    break;
+                case 'geometric':
+                    hint = 'Look for the common ratio between consecutive terms. Multiply by this ratio to find the next terms.';
+                    break;
+                case 'complex':
+                    hint = 'Look for patterns in differences between terms, or alternating patterns. Complex sequences may have quadratic or other relationships.';
+                    break;
+            }
+            
+            showFeedback(hint, 'hint');
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.style.display = 'block';
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('workings').style.display = 'none';
+        }
+
+        function clearInputs() {
+            document.getElementById('nextTerms').value = '';
+            document.getElementById('nthTerm').value = '';
+        }
+
+        function updateStats() {
+            document.getElementById('totalAttempts').textContent = stats.totalAttempts;
+            document.getElementById('correctAnswers').textContent = stats.correctAnswers;
+            document.getElementById('currentStreak').textContent = stats.currentStreak;
+            
+            const accuracy = stats.totalAttempts > 0 ? 
+                Math.round((stats.correctAnswers / stats.totalAttempts) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        // Initialize the tool
+        generateNewSequence();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928f0a79721deb0',t:'MTc2MTEzNTUzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
