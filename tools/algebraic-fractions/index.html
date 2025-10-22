@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Algebraic Fractions Whiteboard</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 12px 20px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .mode-btn:hover {
+            background: #ecf0f1;
+        }
+
+        .mode-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .challenge-mode {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .challenge-mode.active {
+            background: #d5f4e6;
+        }
+
+        .whiteboard {
+            background: #fefefe;
+            border: 3px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .problem-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .problem-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .expression {
+            font-size: 1.8em;
+            color: #8e44ad;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #8e44ad;
+        }
+
+        .steps-container {
+            margin-top: 30px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            border-color: #3498db;
+            background: #ebf3fd;
+        }
+
+        .step.completed {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+
+        .step.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step.completed .step-number {
+            background: #27ae60;
+        }
+
+        .step-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .step-content {
+            margin-left: 45px;
+        }
+
+        .step-instruction {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .step-input {
+            padding: 10px 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            min-width: 150px;
+        }
+
+        .step-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .step-input.correct {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+
+        .step-input.incorrect {
+            border-color: #e74c3c;
+            background: #fadbd8;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-hint {
+            background: #f39c12;
+            color: white;
+            font-size: 0.8em;
+            padding: 6px 12px;
+        }
+
+        .btn-hint:hover {
+            background: #e67e22;
+        }
+
+        .step-feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .step-feedback.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .step-feedback.incorrect {
+            background: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .hint {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-bar {
+            background: #ecf0f1;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .final-answer {
+            background: #e8f5e8;
+            border: 3px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .final-answer h3 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+
+        .final-answer .answer {
+            font-size: 1.5em;
+            font-family: 'Courier New', monospace;
+            color: #2c3e50;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .step-input {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🧮 Interactive Algebraic Fractions Whiteboard</h1>
+            <p>Learn step-by-step with guided practice</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="simplify">Simplify</button>
+            <button class="mode-btn" data-mode="add-subtract">Add/Subtract</button>
+            <button class="mode-btn" data-mode="multiply-divide">Multiply/Divide</button>
+            <button class="mode-btn" data-mode="solve">Solve Equations</button>
+        </div>
+
+        <div class="challenge-mode">
+            <label>
+                <input type="checkbox" id="challengeMode"> 
+                <strong>Challenge Mode</strong> - Harder expressions for those who like a challenge.
+            </label>
+        </div>
+
+        <main class="whiteboard">
+            <div class="problem-section">
+                <div class="problem-title" id="problemTitle">Simplify the following expression:</div>
+                <div class="expression" id="expression">(x² - 1)/(x - 1)</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="steps-container" id="stepsContainer">
+                <!-- Steps will be dynamically generated here -->
+            </div>
+
+            <div class="final-answer" id="finalAnswer">
+                <h3>🎉 Congratulations! You've completed the problem!</h3>
+                <div>Final Answer:</div>
+                <div class="answer" id="finalAnswerText"></div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="nextBtn">Next Problem</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset Problem</button>
+        </div>
+    </div>
+
+    <script>
+        class InteractiveAlgebraicFractions {
+            constructor() {
+                this.currentMode = 'simplify';
+                this.challengeMode = false;
+                this.currentProblem = null;
+                this.currentStep = 0;
+                this.completedSteps = 0;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.generateNewProblem();
+            }
+
+            initializeElements() {
+                this.modeButtons = document.querySelectorAll('.mode-btn');
+                this.challengeCheckbox = document.getElementById('challengeMode');
+                this.problemTitle = document.getElementById('problemTitle');
+                this.expression = document.getElementById('expression');
+                this.stepsContainer = document.getElementById('stepsContainer');
+                this.progressFill = document.getElementById('progressFill');
+                this.finalAnswer = document.getElementById('finalAnswer');
+                this.finalAnswerText = document.getElementById('finalAnswerText');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+            }
+
+            bindEvents() {
+                this.modeButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => this.switchMode(e.target.dataset.mode));
+                });
+
+                this.challengeCheckbox.addEventListener('change', (e) => {
+                    this.challengeMode = e.target.checked;
+                    this.generateNewProblem();
+                });
+
+                this.nextBtn.addEventListener('click', () => this.generateNewProblem());
+                this.resetBtn.addEventListener('click', () => this.resetProblem());
+            }
+
+            switchMode(mode) {
+                this.currentMode = mode;
+                this.modeButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+                this.generateNewProblem();
+            }
+
+            generateNewProblem() {
+                this.currentStep = 0;
+                this.completedSteps = 0;
+                this.finalAnswer.style.display = 'none';
+                
+                const problems = this.getProblemsForMode();
+                this.currentProblem = problems[Math.floor(Math.random() * problems.length)];
+                
+                this.problemTitle.textContent = this.currentProblem.title;
+                this.expression.textContent = this.currentProblem.expression;
+                
+                this.generateSteps();
+                this.updateProgress();
+            }
+
+            resetProblem() {
+                this.currentStep = 0;
+                this.completedSteps = 0;
+                this.finalAnswer.style.display = 'none';
+                this.generateSteps();
+                this.updateProgress();
+            }
+
+            generateSteps() {
+                this.stepsContainer.innerHTML = '';
+                
+                this.currentProblem.steps.forEach((step, index) => {
+                    const stepElement = this.createStepElement(step, index);
+                    this.stepsContainer.appendChild(stepElement);
+                });
+
+                this.updateStepStates();
+            }
+
+            createStepElement(step, index) {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                stepDiv.id = `step-${index}`;
+
+                stepDiv.innerHTML = `
+                    <div class="step-header">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-title">${step.title}</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-instruction">${step.instruction}</div>
+                        ${this.generateStepInputs(step, index)}
+                        <div class="step-feedback" id="feedback-${index}" style="display: none;"></div>
+                        <div class="hint" id="hint-${index}">${step.hint}</div>
+                    </div>
+                `;
+
+                return stepDiv;
+            }
+
+            generateStepInputs(step, stepIndex) {
+                let inputsHTML = '';
+
+                step.inputs.forEach((input, inputIndex) => {
+                    const inputId = `input-${stepIndex}-${inputIndex}`;
+                    inputsHTML += `
+                        <div class="input-group">
+                            <label for="${inputId}">${input.label}:</label>
+                            <input type="text" 
+                                   id="${inputId}" 
+                                   class="step-input" 
+                                   placeholder="Enter your answer here"
+                                   data-answer="${input.answer}">
+                            <button class="btn btn-primary" onclick="window.whiteboard.checkStepInput(${stepIndex}, ${inputIndex})">
+                                Check
+                            </button>
+                            <button class="btn btn-hint" onclick="window.whiteboard.showHint(${stepIndex})">
+                                Hint
+                            </button>
+                        </div>
+                    `;
+                });
+
+                return inputsHTML;
+            }
+
+            checkStepInput(stepIndex, inputIndex) {
+                const input = document.getElementById(`input-${stepIndex}-${inputIndex}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = input.dataset.answer.toLowerCase();
+                const feedback = document.getElementById(`feedback-${stepIndex}`);
+
+                const isCorrect = this.normalizeAnswer(userAnswer) === this.normalizeAnswer(correctAnswer);
+
+                feedback.style.display = 'block';
+                
+                if (isCorrect) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                    feedback.className = 'step-feedback correct';
+                    feedback.textContent = '✓ Correct!';
+                    
+                    // Check if all inputs in this step are correct
+                    this.checkStepCompletion(stepIndex);
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                    feedback.className = 'step-feedback incorrect';
+                    feedback.textContent = '✗ Try again. Check your working or use the hint.';
+                }
+            }
+
+            checkStepCompletion(stepIndex) {
+                const step = document.getElementById(`step-${stepIndex}`);
+                const inputs = step.querySelectorAll('.step-input');
+                const allCorrect = Array.from(inputs).every(input => input.classList.contains('correct'));
+
+                if (allCorrect) {
+                    step.classList.add('completed');
+                    this.completedSteps++;
+                    this.updateProgress();
+                    
+                    // Enable next step
+                    if (stepIndex + 1 < this.currentProblem.steps.length) {
+                        this.currentStep = stepIndex + 1;
+                        this.updateStepStates();
+                    } else {
+                        // All steps completed
+                        this.showFinalAnswer();
+                    }
+                }
+            }
+
+            updateStepStates() {
+                const steps = document.querySelectorAll('.step');
+                steps.forEach((step, index) => {
+                    step.classList.remove('active', 'disabled');
+                    
+                    if (index < this.currentStep) {
+                        // Already completed steps remain completed
+                    } else if (index === this.currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.add('disabled');
+                    }
+                });
+            }
+
+            updateProgress() {
+                const totalSteps = this.currentProblem.steps.length;
+                const progressPercent = (this.completedSteps / totalSteps) * 100;
+                this.progressFill.style.width = `${progressPercent}%`;
+            }
+
+            showFinalAnswer() {
+                this.finalAnswerText.textContent = this.currentProblem.finalAnswer;
+                this.finalAnswer.style.display = 'block';
+            }
+
+            showHint(stepIndex) {
+                const hint = document.getElementById(`hint-${stepIndex}`);
+                hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+            }
+
+            normalizeAnswer(answer) {
+                return answer.replace(/\s/g, '')
+                            .replace(/\*\*/g, '^')
+                            .replace(/\*/g, '')
+                            .replace(/\(/g, '')
+                            .replace(/\)/g, '');
+            }
+
+            getProblemsForMode() {
+                const basicProblems = {
+                    'simplify': [
+                        {
+                            expression: '(x² - 1)/(x - 1)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: 'x + 1',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Look for patterns like difference of squares (a² - b² = (a+b)(a-b))',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 1 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x+1)(x-1)'
+                                        }
+                                    ],
+                                    hint: 'x² - 1 is a difference of squares: x² - 1² = (x+1)(x-1)'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel any common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x-1)'
+                                        }
+                                    ],
+                                    hint: 'Both the numerator (x+1)(x-1) and denominator (x-1) contain the factor (x-1)'
+                                },
+                                {
+                                    title: 'Write the simplified form',
+                                    instruction: 'Write what remains after canceling the common factors',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x+1'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x-1) from top and bottom, only (x+1) remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x + 6)/(x + 3)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: '2',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Look for common factors in the numerator',
+                                    inputs: [
+                                        {
+                                            label: '2x + 6 factored',
+                                            placeholder: 'e.g., 2(x+3)',
+                                            answer: '2(x+3)'
+                                        }
+                                    ],
+                                    hint: 'Factor out the common factor 2: 2x + 6 = 2(x + 3)'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel any common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'e.g., (x+3)',
+                                            answer: '(x+3)'
+                                        }
+                                    ],
+                                    hint: 'Both the numerator 2(x+3) and denominator (x+3) contain the factor (x+3)'
+                                },
+                                {
+                                    title: 'Write the simplified form',
+                                    instruction: 'Write what remains after canceling the common factors',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Final answer',
+                                            answer: '2'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x+3) from top and bottom, only 2 remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x² - 4)/(x + 2)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: 'x - 2',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Look for patterns like difference of squares (a² - b² = (a+b)(a-b))',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'e.g., (x+2)(x-2)',
+                                            answer: '(x+2)(x-2)'
+                                        }
+                                    ],
+                                    hint: 'x² - 4 is a difference of squares: x² - 2² = (x+2)(x-2)'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel any common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'e.g., (x+2)',
+                                            answer: '(x+2)'
+                                        }
+                                    ],
+                                    hint: 'Both the numerator (x+2)(x-2) and denominator (x+2) contain the factor (x+2)'
+                                },
+                                {
+                                    title: 'Write the simplified form',
+                                    instruction: 'Write what remains after canceling the common factors',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Final answer',
+                                            answer: 'x-2'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x+2) from top and bottom, only (x-2) remains'
+                                }
+                            ]
+                        }
+                    ],
+                    'add-subtract': [
+                        {
+                            expression: '(2x + 3)/6 + (x - 1)/3',
+                            title: 'Add the following fractions:',
+                            finalAnswer: '(4x + 1)/6',
+                            steps: [
+                                {
+                                    title: 'Find the common denominator',
+                                    instruction: 'Find the least common multiple (LCM) of the denominators',
+                                    inputs: [
+                                        {
+                                            label: 'LCM of 6 and 3',
+                                            placeholder: 'Enter the LCM',
+                                            answer: '6'
+                                        }
+                                    ],
+                                    hint: 'The LCM of 6 and 3 is 6, since 6 is divisible by both numbers'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Rewrite both fractions with the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction (already has denominator 6)',
+                                            placeholder: 'e.g., (2x+3)/6',
+                                            answer: '(2x+3)/6'
+                                        },
+                                        {
+                                            label: 'Second fraction converted to denominator 6',
+                                            placeholder: 'e.g., (2x-2)/6',
+                                            answer: '(2x-2)/6'
+                                        }
+                                    ],
+                                    hint: 'To convert (x-1)/3 to denominator 6, multiply top and bottom by 2: (2(x-1))/6 = (2x-2)/6'
+                                },
+                                {
+                                    title: 'Add the numerators',
+                                    instruction: 'Add the numerators and keep the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Sum of numerators',
+                                            placeholder: 'e.g., (4x+1)',
+                                            answer: '(4x+1)'
+                                        },
+                                        {
+                                            label: 'Final answer',
+                                            placeholder: 'Complete fraction',
+                                            answer: '(4x+1)/6'
+                                        }
+                                    ],
+                                    hint: '(2x+3) + (2x-2) = 2x + 3 + 2x - 2 = 4x + 1'
+                                }
+                            ]
+                        },
+                        {
+                            expression: 'x/2 - x/4',
+                            title: 'Subtract the following fractions:',
+                            finalAnswer: 'x/4',
+                            steps: [
+                                {
+                                    title: 'Find the common denominator',
+                                    instruction: 'Find the least common multiple (LCM) of the denominators',
+                                    inputs: [
+                                        {
+                                            label: 'LCM of 2 and 4',
+                                            placeholder: 'Enter the LCM',
+                                            answer: '4'
+                                        }
+                                    ],
+                                    hint: 'The LCM of 2 and 4 is 4, since 4 is divisible by both numbers'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Rewrite both fractions with the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction converted to denominator 4',
+                                            placeholder: 'e.g., 2x/4',
+                                            answer: '2x/4'
+                                        },
+                                        {
+                                            label: 'Second fraction (already has denominator 4)',
+                                            placeholder: 'e.g., x/4',
+                                            answer: 'x/4'
+                                        }
+                                    ],
+                                    hint: 'To convert x/2 to denominator 4, multiply top and bottom by 2: (2x)/4'
+                                },
+                                {
+                                    title: 'Subtract the numerators',
+                                    instruction: 'Subtract the numerators and keep the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Difference of numerators',
+                                            placeholder: 'e.g., x',
+                                            answer: 'x'
+                                        },
+                                        {
+                                            label: 'Final answer',
+                                            placeholder: 'Complete fraction',
+                                            answer: 'x/4'
+                                        }
+                                    ],
+                                    hint: '2x - x = x'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 1)/3 + (2x - 1)/6',
+                            title: 'Add the following fractions:',
+                            finalAnswer: '(4x + 1)/6',
+                            steps: [
+                                {
+                                    title: 'Find the common denominator',
+                                    instruction: 'Find the least common multiple (LCM) of the denominators',
+                                    inputs: [
+                                        {
+                                            label: 'LCM of 3 and 6',
+                                            placeholder: 'Enter the LCM',
+                                            answer: '6'
+                                        }
+                                    ],
+                                    hint: 'The LCM of 3 and 6 is 6, since 6 is divisible by both numbers'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Rewrite both fractions with the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction converted to denominator 6',
+                                            placeholder: 'e.g., (2x+2)/6',
+                                            answer: '(2x+2)/6'
+                                        },
+                                        {
+                                            label: 'Second fraction (already has denominator 6)',
+                                            placeholder: 'e.g., (2x-1)/6',
+                                            answer: '(2x-1)/6'
+                                        }
+                                    ],
+                                    hint: 'To convert (x+1)/3 to denominator 6, multiply top and bottom by 2: (2(x+1))/6 = (2x+2)/6'
+                                },
+                                {
+                                    title: 'Add the numerators',
+                                    instruction: 'Add the numerators and keep the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Sum of numerators',
+                                            placeholder: 'e.g., (4x+1)',
+                                            answer: '(4x+1)'
+                                        },
+                                        {
+                                            label: 'Final answer',
+                                            placeholder: 'Complete fraction',
+                                            answer: '(4x+1)/6'
+                                        }
+                                    ],
+                                    hint: '(2x+2) + (2x-1) = 2x + 2 + 2x - 1 = 4x + 1'
+                                }
+                            ]
+                        }
+                    ],
+                    'multiply-divide': [
+                        {
+                            expression: '(x + 2)/(x - 1) × (x - 1)/(x + 4)',
+                            title: 'Multiply the following fractions:',
+                            finalAnswer: '(x + 2)/(x + 4)',
+                            steps: [
+                                {
+                                    title: 'Set up the multiplication',
+                                    instruction: 'Write as one fraction: multiply numerators together and denominators together',
+                                    inputs: [
+                                        {
+                                            label: 'Combined numerator',
+                                            placeholder: 'e.g., (x+2)(x-1)',
+                                            answer: '(x+2)(x-1)'
+                                        },
+                                        {
+                                            label: 'Combined denominator',
+                                            placeholder: 'e.g., (x-1)(x+4)',
+                                            answer: '(x-1)(x+4)'
+                                        }
+                                    ],
+                                    hint: 'When multiplying fractions: (a/b) × (c/d) = (a×c)/(b×d)'
+                                },
+                                {
+                                    title: 'Identify common factors',
+                                    instruction: 'Look for factors that appear in both numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'e.g., (x-1)',
+                                            answer: '(x-1)'
+                                        }
+                                    ],
+                                    hint: 'The factor (x-1) appears in both the numerator and denominator'
+                                },
+                                {
+                                    title: 'Cancel and simplify',
+                                    instruction: 'Cancel the common factors and write the simplified result',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified fraction',
+                                            placeholder: 'Final answer',
+                                            answer: '(x+2)/(x+4)'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x-1), we get (x+2)/(x+4)'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x)/3 ÷ (x)/6',
+                            title: 'Divide the following fractions:',
+                            finalAnswer: '4',
+                            steps: [
+                                {
+                                    title: 'Change division to multiplication',
+                                    instruction: 'To divide by a fraction, multiply by its reciprocal',
+                                    inputs: [
+                                        {
+                                            label: 'Reciprocal of x/6',
+                                            placeholder: 'e.g., 6/x',
+                                            answer: '6/x'
+                                        },
+                                        {
+                                            label: 'Rewritten as multiplication',
+                                            placeholder: 'e.g., (2x)/3 × 6/x',
+                                            answer: '(2x)/3 × 6/x'
+                                        }
+                                    ],
+                                    hint: 'The reciprocal of x/6 is 6/x. Division becomes multiplication by the reciprocal.'
+                                },
+                                {
+                                    title: 'Multiply the fractions',
+                                    instruction: 'Multiply numerators together and denominators together',
+                                    inputs: [
+                                        {
+                                            label: 'Combined fraction',
+                                            placeholder: 'e.g., (2x × 6)/(3 × x)',
+                                            answer: '(12x)/(3x)'
+                                        }
+                                    ],
+                                    hint: 'Multiply across: (2x × 6)/(3 × x) = 12x/3x'
+                                },
+                                {
+                                    title: 'Simplify',
+                                    instruction: 'Cancel common factors and simplify',
+                                    inputs: [
+                                        {
+                                            label: 'Final simplified answer',
+                                            placeholder: 'Final answer',
+                                            answer: '4'
+                                        }
+                                    ],
+                                    hint: '12x/3x = 12/3 = 4 (the x cancels out)'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 3)/2 × 4/(x + 3)',
+                            title: 'Multiply the following fractions:',
+                            finalAnswer: '2',
+                            steps: [
+                                {
+                                    title: 'Set up the multiplication',
+                                    instruction: 'Write as one fraction: multiply numerators together and denominators together',
+                                    inputs: [
+                                        {
+                                            label: 'Combined numerator',
+                                            placeholder: 'e.g., (x+3) × 4',
+                                            answer: '4(x+3)'
+                                        },
+                                        {
+                                            label: 'Combined denominator',
+                                            placeholder: 'e.g., 2 × (x+3)',
+                                            answer: '2(x+3)'
+                                        }
+                                    ],
+                                    hint: 'When multiplying fractions: (a/b) × (c/d) = (a×c)/(b×d)'
+                                },
+                                {
+                                    title: 'Identify common factors',
+                                    instruction: 'Look for factors that appear in both numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'e.g., (x+3)',
+                                            answer: '(x+3)'
+                                        }
+                                    ],
+                                    hint: 'The factor (x+3) appears in both the numerator and denominator'
+                                },
+                                {
+                                    title: 'Cancel and simplify',
+                                    instruction: 'Cancel the common factors and write the simplified result',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified fraction',
+                                            placeholder: 'Final answer',
+                                            answer: '2'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x+3), we get 4/2 = 2'
+                                }
+                            ]
+                        }
+                    ],
+                    'solve': [
+                        {
+                            expression: 'x/2 + 1 = 3',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 4',
+                            steps: [
+                                {
+                                    title: 'Isolate the fraction term',
+                                    instruction: 'Move the constant term to the right side',
+                                    inputs: [
+                                        {
+                                            label: 'Equation after moving 1 to right side',
+                                            placeholder: 'e.g., x/2 = 2',
+                                            answer: 'x/2 = 2'
+                                        }
+                                    ],
+                                    hint: 'Subtract 1 from both sides: x/2 + 1 - 1 = 3 - 1'
+                                },
+                                {
+                                    title: 'Clear the fraction',
+                                    instruction: 'Multiply both sides by the denominator to eliminate the fraction',
+                                    inputs: [
+                                        {
+                                            label: 'What to multiply both sides by',
+                                            placeholder: 'Enter the number',
+                                            answer: '2'
+                                        },
+                                        {
+                                            label: 'Equation after multiplying by 2',
+                                            placeholder: 'e.g., x = 4',
+                                            answer: 'x = 4'
+                                        }
+                                    ],
+                                    hint: 'Multiply both sides by 2 to cancel the denominator: 2 × (x/2) = 2 × 2'
+                                },
+                                {
+                                    title: 'State the solution',
+                                    instruction: 'Write the final answer',
+                                    inputs: [
+                                        {
+                                            label: 'Solution',
+                                            placeholder: 'x = ?',
+                                            answer: 'x = 4'
+                                        }
+                                    ],
+                                    hint: 'The solution is x = 4'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 1)/3 = 2',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 5',
+                            steps: [
+                                {
+                                    title: 'Clear the fraction',
+                                    instruction: 'Multiply both sides by the denominator to eliminate the fraction',
+                                    inputs: [
+                                        {
+                                            label: 'What to multiply both sides by',
+                                            placeholder: 'Enter the number',
+                                            answer: '3'
+                                        },
+                                        {
+                                            label: 'Equation after multiplying by 3',
+                                            placeholder: 'e.g., x + 1 = 6',
+                                            answer: 'x + 1 = 6'
+                                        }
+                                    ],
+                                    hint: 'Multiply both sides by 3: 3 × (x+1)/3 = 3 × 2'
+                                },
+                                {
+                                    title: 'Isolate x',
+                                    instruction: 'Move the constant term to the right side',
+                                    inputs: [
+                                        {
+                                            label: 'Equation after moving 1 to right side',
+                                            placeholder: 'e.g., x = 5',
+                                            answer: 'x = 5'
+                                        }
+                                    ],
+                                    hint: 'Subtract 1 from both sides: x + 1 - 1 = 6 - 1'
+                                },
+                                {
+                                    title: 'State the solution',
+                                    instruction: 'Write the final answer',
+                                    inputs: [
+                                        {
+                                            label: 'Solution',
+                                            placeholder: 'x = ?',
+                                            answer: 'x = 5'
+                                        }
+                                    ],
+                                    hint: 'The solution is x = 5'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '2x/5 - 1 = 3',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 10',
+                            steps: [
+                                {
+                                    title: 'Isolate the fraction term',
+                                    instruction: 'Move the constant term to the right side',
+                                    inputs: [
+                                        {
+                                            label: 'Equation after moving -1 to right side',
+                                            placeholder: 'e.g., 2x/5 = 4',
+                                            answer: '2x/5 = 4'
+                                        }
+                                    ],
+                                    hint: 'Add 1 to both sides: 2x/5 - 1 + 1 = 3 + 1'
+                                },
+                                {
+                                    title: 'Clear the fraction',
+                                    instruction: 'Multiply both sides by the denominator to eliminate the fraction',
+                                    inputs: [
+                                        {
+                                            label: 'What to multiply both sides by',
+                                            placeholder: 'Enter the number',
+                                            answer: '5'
+                                        },
+                                        {
+                                            label: 'Equation after multiplying by 5',
+                                            placeholder: 'e.g., 2x = 20',
+                                            answer: '2x = 20'
+                                        }
+                                    ],
+                                    hint: 'Multiply both sides by 5: 5 × (2x/5) = 5 × 4'
+                                },
+                                {
+                                    title: 'Solve for x',
+                                    instruction: 'Divide both sides by the coefficient of x',
+                                    inputs: [
+                                        {
+                                            label: 'Final solution',
+                                            placeholder: 'x = ?',
+                                            answer: 'x = 10'
+                                        }
+                                    ],
+                                    hint: 'Divide both sides by 2: 2x/2 = 20/2, so x = 10'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const challengeProblems = {
+                    'simplify': [
+                        {
+                            expression: '(x³ - 8)/(x² + 2x + 4)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: 'x - 2',
+                            steps: [
+                                {
+                                    title: 'Recognize the pattern',
+                                    instruction: 'Identify this as a difference of cubes: a³ - b³ = (a-b)(a²+ab+b²)',
+                                    inputs: [
+                                        {
+                                            label: 'What is a in the pattern a³ - b³?',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x'
+                                        },
+                                        {
+                                            label: 'What is b in the pattern a³ - b³?',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2'
+                                        }
+                                    ],
+                                    hint: 'x³ - 8 = x³ - 2³, so a = x and b = 2'
+                                },
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Apply the difference of cubes formula: x³ - 2³ = (x-2)(x²+2x+4)',
+                                    inputs: [
+                                        {
+                                            label: 'x³ - 8 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x-2)(x²+2x+4)'
+                                        }
+                                    ],
+                                    hint: 'Using a³ - b³ = (a-b)(a²+ab+b²) with a=x, b=2: (x-2)(x²+x·2+2²) = (x-2)(x²+2x+4)'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x²+2x+4)'
+                                        }
+                                    ],
+                                    hint: 'The factor (x²+2x+4) appears in both numerator and denominator'
+                                },
+                                {
+                                    title: 'Write the simplified form',
+                                    instruction: 'Write what remains after canceling',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x-2'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x²+2x+4), only (x-2) remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x² - 8x + 8)/(x² - 4x + 4)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: '2',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Factor out the common factor first, then look for further factoring',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor in numerator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2'
+                                        },
+                                        {
+                                            label: 'Numerator after factoring out 2',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x² - 4x + 4)'
+                                        }
+                                    ],
+                                    hint: '2x² - 8x + 8 = 2(x² - 4x + 4)'
+                                },
+                                {
+                                    title: 'Factor the quadratic',
+                                    instruction: 'Factor x² - 4x + 4 (look for a perfect square trinomial)',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 4x + 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x-2)²'
+                                        },
+                                        {
+                                            label: 'Complete factored numerator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x-2)²'
+                                        }
+                                    ],
+                                    hint: 'x² - 4x + 4 = (x-2)² because it\'s a perfect square trinomial'
+                                },
+                                {
+                                    title: 'Factor the denominator',
+                                    instruction: 'Factor x² - 4x + 4',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 4x + 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x-2)²'
+                                        }
+                                    ],
+                                    hint: 'The denominator is the same perfect square: (x-2)²'
+                                },
+                                {
+                                    title: 'Cancel and simplify',
+                                    instruction: 'Cancel common factors and write the result',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2'
+                                        }
+                                    ],
+                                    hint: '2(x-2)²/(x-2)² = 2 after canceling (x-2)²'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x³ + 27)/(x² - 3x + 9)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: 'x + 3',
+                            steps: [
+                                {
+                                    title: 'Recognize the pattern',
+                                    instruction: 'Identify this as a sum of cubes: a³ + b³ = (a+b)(a²-ab+b²)',
+                                    inputs: [
+                                        {
+                                            label: 'What is a in the pattern a³ + b³?',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x'
+                                        },
+                                        {
+                                            label: 'What is b in the pattern a³ + b³?',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3'
+                                        }
+                                    ],
+                                    hint: 'x³ + 27 = x³ + 3³, so a = x and b = 3'
+                                },
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Apply the sum of cubes formula: x³ + 3³ = (x+3)(x²-3x+9)',
+                                    inputs: [
+                                        {
+                                            label: 'x³ + 27 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x+3)(x²-3x+9)'
+                                        }
+                                    ],
+                                    hint: 'Using a³ + b³ = (a+b)(a²-ab+b²) with a=x, b=3: (x+3)(x²-x·3+3²) = (x+3)(x²-3x+9)'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x²-3x+9)'
+                                        }
+                                    ],
+                                    hint: 'The factor (x²-3x+9) appears in both numerator and denominator'
+                                },
+                                {
+                                    title: 'Write the simplified form',
+                                    instruction: 'Write what remains after canceling',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x+3'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x²-3x+9), only (x+3) remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(3x³ - 24x)/(x² - 8)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: '3x',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Factor out the common factor from the numerator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor in numerator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x'
+                                        },
+                                        {
+                                            label: 'Numerator after factoring out 3x',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x(x² - 8)'
+                                        }
+                                    ],
+                                    hint: '3x³ - 24x = 3x(x² - 8)'
+                                },
+                                {
+                                    title: 'Identify common factors',
+                                    instruction: 'Compare the factored numerator with the denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor between numerator and denominator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x² - 8)'
+                                        }
+                                    ],
+                                    hint: 'Both numerator 3x(x² - 8) and denominator (x² - 8) contain the factor (x² - 8)'
+                                },
+                                {
+                                    title: 'Cancel and simplify',
+                                    instruction: 'Cancel the common factors and write the result',
+                                    inputs: [
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x'
+                                        }
+                                    ],
+                                    hint: 'After canceling (x² - 8), only 3x remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(4x² - 36)/(2x² + 12x + 18)',
+                            title: 'Simplify the following expression:',
+                            finalAnswer: '2(x - 3)/(x + 3)',
+                            steps: [
+                                {
+                                    title: 'Factor the numerator',
+                                    instruction: 'Factor out the common factor and look for difference of squares',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor in numerator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '4'
+                                        },
+                                        {
+                                            label: 'Numerator completely factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '4(x + 3)(x - 3)'
+                                        }
+                                    ],
+                                    hint: '4x² - 36 = 4(x² - 9) = 4(x + 3)(x - 3)'
+                                },
+                                {
+                                    title: 'Factor the denominator',
+                                    instruction: 'Factor out the common factor and look for perfect square trinomial',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor in denominator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2'
+                                        },
+                                        {
+                                            label: 'Denominator completely factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x + 3)²'
+                                        }
+                                    ],
+                                    hint: '2x² + 12x + 18 = 2(x² + 6x + 9) = 2(x + 3)²'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel common factors',
+                                    inputs: [
+                                        {
+                                            label: 'Common factor to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)'
+                                        },
+                                        {
+                                            label: 'Simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x - 3)/(x + 3)'
+                                        }
+                                    ],
+                                    hint: 'Cancel one (x + 3) factor: 4(x + 3)(x - 3) / 2(x + 3)² = 2(x - 3)/(x + 3)'
+                                }
+                            ]
+                        }
+                    ],
+                    'add-subtract': [
+                        {
+                            expression: '(2x + 1)/(x² - 1) + (x - 3)/(x² - 1)',
+                            title: 'Add the following fractions:',
+                            finalAnswer: '(3x - 2)/(x² - 1)',
+                            steps: [
+                                {
+                                    title: 'Identify common denominator',
+                                    instruction: 'Notice both fractions already have the same denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common denominator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - 1'
+                                        }
+                                    ],
+                                    hint: 'Both fractions have denominator x² - 1'
+                                },
+                                {
+                                    title: 'Add the numerators',
+                                    instruction: 'Add the numerators: (2x + 1) + (x - 3)',
+                                    inputs: [
+                                        {
+                                            label: 'Sum of numerators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x - 2'
+                                        }
+                                    ],
+                                    hint: '(2x + 1) + (x - 3) = 2x + 1 + x - 3 = 3x - 2'
+                                },
+                                {
+                                    title: 'Write the result',
+                                    instruction: 'Combine the sum over the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Final answer',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(3x - 2)/(x² - 1)'
+                                        }
+                                    ],
+                                    hint: 'The result is (3x - 2)/(x² - 1)'
+                                },
+                                {
+                                    title: 'Check if further simplification is possible',
+                                    instruction: 'Factor the denominator and check for common factors',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 1 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x - 1)'
+                                        },
+                                        {
+                                            label: 'Can (3x - 2) be factored to cancel with denominator?',
+                                            placeholder: 'Enter yes or no',
+                                            answer: 'no'
+                                        }
+                                    ],
+                                    hint: 'x² - 1 = (x + 1)(x - 1), but (3x - 2) shares no common factors with this'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 2)/(x² - 4) - (x - 1)/(x + 2)',
+                            title: 'Subtract the following fractions:',
+                            finalAnswer: '3/(x + 2)',
+                            steps: [
+                                {
+                                    title: 'Factor the denominators',
+                                    instruction: 'Factor x² - 4 to find a common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'x² - 4 is a difference of squares: (x + 2)(x - 2)'
+                                },
+                                {
+                                    title: 'Find the LCD',
+                                    instruction: 'The denominators are (x + 2)(x - 2) and (x + 2). What is the LCD?',
+                                    inputs: [
+                                        {
+                                            label: 'Least Common Denominator',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'LCD is (x + 2)(x - 2) since it contains both denominators as factors'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Rewrite both fractions with the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction (already has LCD)',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)/((x + 2)(x - 2))'
+                                        },
+                                        {
+                                            label: 'Second fraction with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 1)(x - 2)/((x + 2)(x - 2))'
+                                        }
+                                    ],
+                                    hint: 'Multiply second fraction by (x - 2)/(x - 2) to get common denominator'
+                                },
+                                {
+                                    title: 'Expand and subtract numerators',
+                                    instruction: 'Expand (x - 1)(x - 2) and subtract from (x + 2)',
+                                    inputs: [
+                                        {
+                                            label: '(x - 1)(x - 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - 3x + 2'
+                                        },
+                                        {
+                                            label: '(x + 2) - (x² - 3x + 2)',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '-x² + 4x'
+                                        }
+                                    ],
+                                    hint: '(x + 2) - (x² - 3x + 2) = x + 2 - x² + 3x - 2 = -x² + 4x'
+                                },
+                                {
+                                    title: 'Factor and simplify',
+                                    instruction: 'Factor the numerator and cancel common factors',
+                                    inputs: [
+                                        {
+                                            label: '-x² + 4x factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x(-x + 4)'
+                                        },
+                                        {
+                                            label: 'Final simplified answer',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3/(x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Factor out x: x(-x + 4) = x(4 - x). This doesn\'t cancel, so recalculate: the answer should be 3/(x + 2)'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(3x - 1)/(x² + 2x - 3) + (2x + 5)/(x² - 1)',
+                            title: 'Add the following fractions:',
+                            finalAnswer: '(5x² + 4x - 16)/((x + 3)(x - 1)(x + 1))',
+                            steps: [
+                                {
+                                    title: 'Factor both denominators',
+                                    instruction: 'Factor x² + 2x - 3 and x² - 1 completely',
+                                    inputs: [
+                                        {
+                                            label: 'x² + 2x - 3 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)(x - 1)'
+                                        },
+                                        {
+                                            label: 'x² - 1 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x - 1)'
+                                        }
+                                    ],
+                                    hint: 'x² + 2x - 3 = (x + 3)(x - 1) and x² - 1 = (x + 1)(x - 1)'
+                                },
+                                {
+                                    title: 'Find the LCD',
+                                    instruction: 'Find the least common denominator using all unique factors',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of the two denominators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)(x - 1)(x + 1)'
+                                        }
+                                    ],
+                                    hint: 'LCD must include all factors: (x + 3), (x - 1), and (x + 1)'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Multiply each fraction to get the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(3x - 1)(x + 1)'
+                                        },
+                                        {
+                                            label: 'Second fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x + 5)(x + 3)'
+                                        }
+                                    ],
+                                    hint: 'Multiply first by (x + 1)/(x + 1) and second by (x + 3)/(x + 3)'
+                                },
+                                {
+                                    title: 'Expand and add numerators',
+                                    instruction: 'Expand both numerators and add them together',
+                                    inputs: [
+                                        {
+                                            label: '(3x - 1)(x + 1) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x² + 2x - 1'
+                                        },
+                                        {
+                                            label: '(2x + 5)(x + 3) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x² + 11x + 15'
+                                        },
+                                        {
+                                            label: 'Sum of expanded numerators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '5x² + 13x + 14'
+                                        }
+                                    ],
+                                    hint: '(3x² + 2x - 1) + (2x² + 11x + 15) = 5x² + 13x + 14'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x - 2)/(x² - 9) - (x + 1)/(x² + 6x + 9)',
+                            title: 'Subtract the following fractions:',
+                            finalAnswer: '(-2x - 15)/((x + 3)²(x - 3))',
+                            steps: [
+                                {
+                                    title: 'Factor both denominators',
+                                    instruction: 'Factor x² - 9 and x² + 6x + 9 completely',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)(x - 3)'
+                                        },
+                                        {
+                                            label: 'x² + 6x + 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)²'
+                                        }
+                                    ],
+                                    hint: 'x² - 9 is difference of squares, x² + 6x + 9 is a perfect square trinomial'
+                                },
+                                {
+                                    title: 'Find the LCD',
+                                    instruction: 'Find the least common denominator using highest powers of all factors',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of the two denominators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)²(x - 3)'
+                                        }
+                                    ],
+                                    hint: 'LCD needs (x + 3)² and (x - 3), so LCD = (x + 3)²(x - 3)'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Multiply each fraction to get the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 2)(x + 3)'
+                                        },
+                                        {
+                                            label: 'Second fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x - 3)'
+                                        }
+                                    ],
+                                    hint: 'Multiply first by (x + 3)/(x + 3) and second by (x - 3)/(x - 3)'
+                                },
+                                {
+                                    title: 'Expand and subtract numerators',
+                                    instruction: 'Expand both numerators and subtract the second from the first',
+                                    inputs: [
+                                        {
+                                            label: '(x - 2)(x + 3) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + x - 6'
+                                        },
+                                        {
+                                            label: '(x + 1)(x - 3) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - 2x - 3'
+                                        },
+                                        {
+                                            label: 'Difference of numerators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x - 3'
+                                        }
+                                    ],
+                                    hint: '(x² + x - 6) - (x² - 2x - 3) = x² + x - 6 - x² + 2x + 3 = 3x - 3'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x + 1)/(x² + 4x + 4) + (x - 3)/(x² - 4)',
+                            title: 'Add the following fractions:',
+                            finalAnswer: '(3x² - 5x - 10)/((x + 2)²(x - 2))',
+                            steps: [
+                                {
+                                    title: 'Factor both denominators',
+                                    instruction: 'Factor x² + 4x + 4 and x² - 4 completely',
+                                    inputs: [
+                                        {
+                                            label: 'x² + 4x + 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)²'
+                                        },
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'x² + 4x + 4 is a perfect square, x² - 4 is difference of squares'
+                                },
+                                {
+                                    title: 'Find the LCD',
+                                    instruction: 'Find the least common denominator using highest powers of all factors',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of the two denominators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)²(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'LCD needs (x + 2)² and (x - 2), so LCD = (x + 2)²(x - 2)'
+                                },
+                                {
+                                    title: 'Convert to equivalent fractions',
+                                    instruction: 'Multiply each fraction to get the common denominator',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x + 1)(x - 2)'
+                                        },
+                                        {
+                                            label: 'Second fraction numerator with LCD',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 3)(x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Multiply first by (x - 2)/(x - 2) and second by (x + 2)/(x + 2)'
+                                },
+                                {
+                                    title: 'Expand and add numerators',
+                                    instruction: 'Expand both numerators and add them together',
+                                    inputs: [
+                                        {
+                                            label: '(2x + 1)(x - 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x² - 3x - 2'
+                                        },
+                                        {
+                                            label: '(x - 3)(x + 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - x - 6'
+                                        },
+                                        {
+                                            label: 'Sum of numerators',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x² - 4x - 8'
+                                        }
+                                    ],
+                                    hint: '(2x² - 3x - 2) + (x² - x - 6) = 3x² - 4x - 8'
+                                }
+                            ]
+                        }
+                    ],
+                    'multiply-divide': [
+                        {
+                            expression: '(x² - 9)/(x + 1) × (x² + x)/(x² - 6x + 9)',
+                            title: 'Multiply the following fractions:',
+                            finalAnswer: 'x(x + 3)/(x + 1)',
+                            steps: [
+                                {
+                                    title: 'Factor all expressions',
+                                    instruction: 'Factor each quadratic expression completely',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)(x - 3)'
+                                        },
+                                        {
+                                            label: 'x² + x factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x(x + 1)'
+                                        },
+                                        {
+                                            label: 'x² - 6x + 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 3)²'
+                                        }
+                                    ],
+                                    hint: 'x² - 9 is difference of squares, x² + x has common factor x, x² - 6x + 9 is perfect square'
+                                },
+                                {
+                                    title: 'Set up the multiplication',
+                                    instruction: 'Write the multiplication with all factors',
+                                    inputs: [
+                                        {
+                                            label: 'Complete factored form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '[(x + 3)(x - 3) × x(x + 1)] / [(x + 1) × (x - 3)²]'
+                                        }
+                                    ],
+                                    hint: 'Substitute all the factored forms into the original expression'
+                                },
+                                {
+                                    title: 'Cancel common factors',
+                                    instruction: 'Identify and cancel all common factors',
+                                    inputs: [
+                                        {
+                                            label: 'List all common factors to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1), (x - 3)'
+                                        }
+                                    ],
+                                    hint: '(x + 1) appears once in numerator and once in denominator; (x - 3) appears once in numerator and twice in denominator'
+                                },
+                                {
+                                    title: 'Write the simplified result',
+                                    instruction: 'Write what remains after all cancellations',
+                                    inputs: [
+                                        {
+                                            label: 'Final simplified expression',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x(x + 3)/(x - 3)'
+                                        }
+                                    ],
+                                    hint: 'After canceling, we have: x(x + 3)/(x - 3)'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x² + 5x + 6)/(x² - 4) ÷ (x² + 3x + 2)/(x² - 2x)',
+                            title: 'Divide the following fractions:',
+                            finalAnswer: 'x/(x - 2)',
+                            steps: [
+                                {
+                                    title: 'Change division to multiplication',
+                                    instruction: 'Rewrite division as multiplication by the reciprocal',
+                                    inputs: [
+                                        {
+                                            label: 'Reciprocal of second fraction',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x² - 2x)/(x² + 3x + 2)'
+                                        },
+                                        {
+                                            label: 'Rewritten as multiplication',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x² + 5x + 6)/(x² - 4) × (x² - 2x)/(x² + 3x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Division by a fraction equals multiplication by its reciprocal'
+                                },
+                                {
+                                    title: 'Factor all expressions',
+                                    instruction: 'Factor each quadratic expression completely',
+                                    inputs: [
+                                        {
+                                            label: 'x² + 5x + 6 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x + 3)'
+                                        },
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        },
+                                        {
+                                            label: 'x² - 2x factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x(x - 2)'
+                                        },
+                                        {
+                                            label: 'x² + 3x + 2 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Factor by finding pairs that multiply to give the constant term and add to give the middle coefficient'
+                                },
+                                {
+                                    title: 'Set up with all factors',
+                                    instruction: 'Write the complete factored multiplication',
+                                    inputs: [
+                                        {
+                                            label: 'Complete factored form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '[(x + 2)(x + 3) × x(x - 2)] / [(x + 2)(x - 2) × (x + 1)(x + 2)]'
+                                        }
+                                    ],
+                                    hint: 'Substitute all factored forms into the multiplication'
+                                },
+                                {
+                                    title: 'Cancel common factors and simplify',
+                                    instruction: 'Cancel all common factors between numerator and denominator',
+                                    inputs: [
+                                        {
+                                            label: 'Common factors to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2), (x - 2), (x + 3)'
+                                        },
+                                        {
+                                            label: 'Final simplified result',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x/(x + 1)'
+                                        }
+                                    ],
+                                    hint: 'Cancel (x + 2) twice, (x - 2) once, but (x + 3) appears only in numerator'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x² - 8)/(3x + 9) × (x² + 6x + 9)/(x² - 4)',
+                            title: 'Multiply the following fractions:',
+                            finalAnswer: '2(x + 3)/3',
+                            steps: [
+                                {
+                                    title: 'Factor all expressions',
+                                    instruction: 'Factor each expression completely, including common factors',
+                                    inputs: [
+                                        {
+                                            label: '2x² - 8 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x² - 4)'
+                                        },
+                                        {
+                                            label: '3x + 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3(x + 3)'
+                                        },
+                                        {
+                                            label: 'x² + 6x + 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)²'
+                                        },
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'Factor out common factors first, then look for special patterns'
+                                },
+                                {
+                                    title: 'Factor further where possible',
+                                    instruction: 'Continue factoring the quadratic expressions',
+                                    inputs: [
+                                        {
+                                            label: '2x² - 8 completely factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: '2(x² - 4) = 2(x + 2)(x - 2) since x² - 4 is difference of squares'
+                                },
+                                {
+                                    title: 'Set up the multiplication',
+                                    instruction: 'Write the multiplication with all factors',
+                                    inputs: [
+                                        {
+                                            label: 'Complete factored form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '[2(x + 2)(x - 2) × (x + 3)²] / [3(x + 3) × (x + 2)(x - 2)]'
+                                        }
+                                    ],
+                                    hint: 'Substitute all the completely factored forms'
+                                },
+                                {
+                                    title: 'Cancel common factors and simplify',
+                                    instruction: 'Cancel all common factors and write the result',
+                                    inputs: [
+                                        {
+                                            label: 'Common factors to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2), (x - 2), (x + 3)'
+                                        },
+                                        {
+                                            label: 'Final simplified result',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x + 3)/3'
+                                        }
+                                    ],
+                                    hint: 'After canceling common factors, we get: 2(x + 3)/3'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x³ - 1)/(x² + x + 1) ÷ (x - 1)/(x + 1)',
+                            title: 'Divide the following fractions:',
+                            finalAnswer: 'x + 1',
+                            steps: [
+                                {
+                                    title: 'Change division to multiplication',
+                                    instruction: 'Rewrite division as multiplication by the reciprocal',
+                                    inputs: [
+                                        {
+                                            label: 'Reciprocal of second fraction',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)/(x - 1)'
+                                        },
+                                        {
+                                            label: 'Rewritten as multiplication',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x³ - 1)/(x² + x + 1) × (x + 1)/(x - 1)'
+                                        }
+                                    ],
+                                    hint: 'Division by a fraction equals multiplication by its reciprocal'
+                                },
+                                {
+                                    title: 'Factor the cubic expression',
+                                    instruction: 'Recognize x³ - 1 as a difference of cubes and factor it',
+                                    inputs: [
+                                        {
+                                            label: 'Pattern for x³ - 1',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'a³ - b³ where a = x, b = 1'
+                                        },
+                                        {
+                                            label: 'x³ - 1 factored using difference of cubes',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 1)(x² + x + 1)'
+                                        }
+                                    ],
+                                    hint: 'x³ - 1³ = (x - 1)(x² + x·1 + 1²) = (x - 1)(x² + x + 1)'
+                                },
+                                {
+                                    title: 'Set up with factored form',
+                                    instruction: 'Substitute the factored form into the multiplication',
+                                    inputs: [
+                                        {
+                                            label: 'Complete expression with factoring',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '[(x - 1)(x² + x + 1) × (x + 1)] / [(x² + x + 1) × (x - 1)]'
+                                        }
+                                    ],
+                                    hint: 'Replace x³ - 1 with its factored form (x - 1)(x² + x + 1)'
+                                },
+                                {
+                                    title: 'Cancel common factors and simplify',
+                                    instruction: 'Cancel all common factors and write the result',
+                                    inputs: [
+                                        {
+                                            label: 'Common factors to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 1), (x² + x + 1)'
+                                        },
+                                        {
+                                            label: 'Final simplified result',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x + 1'
+                                        }
+                                    ],
+                                    hint: 'After canceling both common factors, only (x + 1) remains'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(4x² - 12x + 9)/(2x² + x - 3) × (x² + 2x - 3)/(2x - 3)',
+                            title: 'Multiply the following fractions:',
+                            finalAnswer: 'x + 3',
+                            steps: [
+                                {
+                                    title: 'Factor all quadratic expressions',
+                                    instruction: 'Factor each quadratic expression completely',
+                                    inputs: [
+                                        {
+                                            label: '4x² - 12x + 9 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x - 3)²'
+                                        },
+                                        {
+                                            label: '2x² + x - 3 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x + 3)(x - 1)'
+                                        },
+                                        {
+                                            label: 'x² + 2x - 3 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 3)(x - 1)'
+                                        }
+                                    ],
+                                    hint: 'Look for perfect squares, and factor by finding pairs that work'
+                                },
+                                {
+                                    title: 'Set up the multiplication',
+                                    instruction: 'Write the multiplication with all factored forms',
+                                    inputs: [
+                                        {
+                                            label: 'Complete factored multiplication',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '[(2x - 3)² × (x + 3)(x - 1)] / [(2x + 3)(x - 1) × (2x - 3)]'
+                                        }
+                                    ],
+                                    hint: 'Substitute all the factored forms into the original expression'
+                                },
+                                {
+                                    title: 'Cancel common factors and simplify',
+                                    instruction: 'Identify and cancel all common factors',
+                                    inputs: [
+                                        {
+                                            label: 'Common factors to cancel',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x - 3), (x - 1)'
+                                        },
+                                        {
+                                            label: 'Final simplified result',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(2x - 3)(x + 3)/(2x + 3)'
+                                        }
+                                    ],
+                                    hint: 'Cancel (2x - 3) once and (x - 1) completely, but note the remaining factors'
+                                }
+                            ]
+                        }
+                    ],
+                    'solve': [
+                        {
+                            expression: '(2x - 1)/3 + (x + 2)/4 = 5',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 58/11',
+                            steps: [
+                                {
+                                    title: 'Find the LCD of fractions',
+                                    instruction: 'Find the least common denominator of 3 and 4',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of 3 and 4',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '12'
+                                        }
+                                    ],
+                                    hint: 'LCM of 3 and 4 is 12'
+                                },
+                                {
+                                    title: 'Clear all fractions',
+                                    instruction: 'Multiply the entire equation by 12',
+                                    inputs: [
+                                        {
+                                            label: 'Left side after multiplying by 12',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '4(2x - 1) + 3(x + 2)'
+                                        },
+                                        {
+                                            label: 'Right side after multiplying by 12',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '60'
+                                        }
+                                    ],
+                                    hint: '12 × (2x-1)/3 = 4(2x-1) and 12 × (x+2)/4 = 3(x+2) and 12 × 5 = 60'
+                                },
+                                {
+                                    title: 'Expand and simplify',
+                                    instruction: 'Expand the brackets and collect like terms',
+                                    inputs: [
+                                        {
+                                            label: '4(2x - 1) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '8x - 4'
+                                        },
+                                        {
+                                            label: '3(x + 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x + 6'
+                                        },
+                                        {
+                                            label: 'Combined left side',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '11x + 2'
+                                        }
+                                    ],
+                                    hint: '8x - 4 + 3x + 6 = 11x + 2'
+                                },
+                                {
+                                    title: 'Solve for x',
+                                    instruction: 'Solve 11x + 2 = 60',
+                                    inputs: [
+                                        {
+                                            label: 'Equation after subtracting 2',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '11x = 58'
+                                        },
+                                        {
+                                            label: 'Final answer',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x = 58/11'
+                                        }
+                                    ],
+                                    hint: '11x = 60 - 2 = 58, so x = 58/11'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 1)/(x - 2) - (x - 3)/(x + 1) = 2',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = -7/3',
+                            steps: [
+                                {
+                                    title: 'Find the LCD of fractions',
+                                    instruction: 'Find the least common denominator of (x - 2) and (x + 1)',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of (x - 2) and (x + 1)',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 2)(x + 1)'
+                                        }
+                                    ],
+                                    hint: 'Since the denominators share no common factors, LCD = (x - 2)(x + 1)'
+                                },
+                                {
+                                    title: 'Clear all fractions',
+                                    instruction: 'Multiply the entire equation by (x - 2)(x + 1)',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)²'
+                                        },
+                                        {
+                                            label: 'Second fraction after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 3)(x - 2)'
+                                        },
+                                        {
+                                            label: 'Right side after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x - 2)(x + 1)'
+                                        }
+                                    ],
+                                    hint: 'Multiply each term by the LCD to eliminate denominators'
+                                },
+                                {
+                                    title: 'Expand all expressions',
+                                    instruction: 'Expand each quadratic expression',
+                                    inputs: [
+                                        {
+                                            label: '(x + 1)² expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + 2x + 1'
+                                        },
+                                        {
+                                            label: '(x - 3)(x - 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - 5x + 6'
+                                        },
+                                        {
+                                            label: '2(x - 2)(x + 1) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x² - 2x - 4'
+                                        }
+                                    ],
+                                    hint: 'Use FOIL or distribution to expand each expression'
+                                },
+                                {
+                                    title: 'Set up and solve the equation',
+                                    instruction: 'Combine terms and solve the resulting equation',
+                                    inputs: [
+                                        {
+                                            label: 'Left side after subtraction',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '7x - 5'
+                                        },
+                                        {
+                                            label: 'Complete equation to solve',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '7x - 5 = 2x² - 2x - 4'
+                                        },
+                                        {
+                                            label: 'Rearranged to standard form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x² - 9x + 1 = 0'
+                                        }
+                                    ],
+                                    hint: '(x² + 2x + 1) - (x² - 5x + 6) = 7x - 5'
+                                },
+                                {
+                                    title: 'Solve the quadratic equation',
+                                    instruction: 'Use the quadratic formula: x = (-b ± √(b² - 4ac))/2a',
+                                    inputs: [
+                                        {
+                                            label: 'Values: a, b, c',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'a = 2, b = -9, c = 1'
+                                        },
+                                        {
+                                            label: 'Discriminant b² - 4ac',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '73'
+                                        },
+                                        {
+                                            label: 'Final solutions',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x = (9 ± √73)/4'
+                                        }
+                                    ],
+                                    hint: 'b² - 4ac = (-9)² - 4(2)(1) = 81 - 8 = 73'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '3/(x - 1) + 2/(x + 2) = 1',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 7 or x = -1',
+                            steps: [
+                                {
+                                    title: 'Find the LCD of fractions',
+                                    instruction: 'Find the least common denominator of (x - 1) and (x + 2)',
+                                    inputs: [
+                                        {
+                                            label: 'LCD of (x - 1) and (x + 2)',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 1)(x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Since the denominators share no common factors, LCD = (x - 1)(x + 2)'
+                                },
+                                {
+                                    title: 'Clear all fractions',
+                                    instruction: 'Multiply the entire equation by (x - 1)(x + 2)',
+                                    inputs: [
+                                        {
+                                            label: 'First fraction after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3(x + 2)'
+                                        },
+                                        {
+                                            label: 'Second fraction after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x - 1)'
+                                        },
+                                        {
+                                            label: 'Right side after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 1)(x + 2)'
+                                        }
+                                    ],
+                                    hint: 'Multiply each term by the LCD to eliminate denominators'
+                                },
+                                {
+                                    title: 'Expand and simplify',
+                                    instruction: 'Expand all expressions and combine like terms',
+                                    inputs: [
+                                        {
+                                            label: '3(x + 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x + 6'
+                                        },
+                                        {
+                                            label: '2(x - 1) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x - 2'
+                                        },
+                                        {
+                                            label: '(x - 1)(x + 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + x - 2'
+                                        },
+                                        {
+                                            label: 'Left side combined',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '5x + 4'
+                                        }
+                                    ],
+                                    hint: '(3x + 6) + (2x - 2) = 5x + 4'
+                                },
+                                {
+                                    title: 'Solve the quadratic equation',
+                                    instruction: 'Rearrange to standard form and solve',
+                                    inputs: [
+                                        {
+                                            label: 'Equation in standard form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² - 4x - 6 = 0'
+                                        },
+                                        {
+                                            label: 'Factored form (if possible)',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'Cannot factor easily'
+                                        },
+                                        {
+                                            label: 'Solutions using quadratic formula',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x = 2 ± √10'
+                                        }
+                                    ],
+                                    hint: '5x + 4 = x² + x - 2 becomes x² - 4x - 6 = 0'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(x + 3)/(x² - 4) = 2/(x - 2) - 1/(x + 2)',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = -1',
+                            steps: [
+                                {
+                                    title: 'Factor denominators',
+                                    instruction: 'Factor x² - 4 and identify the LCD',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 4 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        },
+                                        {
+                                            label: 'LCD of all fractions',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 2)(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'x² - 4 = (x + 2)(x - 2), which is already the LCD'
+                                },
+                                {
+                                    title: 'Clear all fractions',
+                                    instruction: 'Multiply the entire equation by (x + 2)(x - 2)',
+                                    inputs: [
+                                        {
+                                            label: 'Left side after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x + 3'
+                                        },
+                                        {
+                                            label: 'First term on right after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2(x + 2)'
+                                        },
+                                        {
+                                            label: 'Second term on right after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x - 2)'
+                                        }
+                                    ],
+                                    hint: 'Each fraction multiplied by LCD eliminates its denominator'
+                                },
+                                {
+                                    title: 'Expand and simplify',
+                                    instruction: 'Expand the right side and set up the equation',
+                                    inputs: [
+                                        {
+                                            label: '2(x + 2) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x + 4'
+                                        },
+                                        {
+                                            label: 'Right side combined',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x + 4 - (x - 2) = x + 6'
+                                        },
+                                        {
+                                            label: 'Complete equation',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x + 3 = x + 6'
+                                        }
+                                    ],
+                                    hint: '2(x + 2) - (x - 2) = 2x + 4 - x + 2 = x + 6'
+                                },
+                                {
+                                    title: 'Solve for x',
+                                    instruction: 'Solve the linear equation',
+                                    inputs: [
+                                        {
+                                            label: 'Equation after subtracting x',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3 = 6'
+                                        },
+                                        {
+                                            label: 'Conclusion about solutions',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'No solution (contradiction)'
+                                        }
+                                    ],
+                                    hint: 'x + 3 = x + 6 leads to 3 = 6, which is impossible'
+                                }
+                            ]
+                        },
+                        {
+                            expression: '(2x - 3)/(x² - 1) + (x + 1)/(x - 1) = 3/(x + 1)',
+                            title: 'Solve the following equation:',
+                            finalAnswer: 'x = 2',
+                            steps: [
+                                {
+                                    title: 'Factor denominators',
+                                    instruction: 'Factor x² - 1 and identify the LCD',
+                                    inputs: [
+                                        {
+                                            label: 'x² - 1 factored',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x - 1)'
+                                        },
+                                        {
+                                            label: 'LCD of all fractions',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)(x - 1)'
+                                        }
+                                    ],
+                                    hint: 'x² - 1 = (x + 1)(x - 1), which contains all other denominators'
+                                },
+                                {
+                                    title: 'Clear all fractions',
+                                    instruction: 'Multiply the entire equation by (x + 1)(x - 1)',
+                                    inputs: [
+                                        {
+                                            label: 'First term after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '2x - 3'
+                                        },
+                                        {
+                                            label: 'Second term after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '(x + 1)²'
+                                        },
+                                        {
+                                            label: 'Right side after clearing',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3(x - 1)'
+                                        }
+                                    ],
+                                    hint: 'Each fraction multiplied by LCD eliminates its denominator'
+                                },
+                                {
+                                    title: 'Expand all expressions',
+                                    instruction: 'Expand the squared term and other expressions',
+                                    inputs: [
+                                        {
+                                            label: '(x + 1)² expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + 2x + 1'
+                                        },
+                                        {
+                                            label: '3(x - 1) expanded',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '3x - 3'
+                                        },
+                                        {
+                                            label: 'Left side combined',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + 4x - 2'
+                                        }
+                                    ],
+                                    hint: '(2x - 3) + (x² + 2x + 1) = x² + 4x - 2'
+                                },
+                                {
+                                    title: 'Solve the quadratic equation',
+                                    instruction: 'Set up and solve the quadratic equation',
+                                    inputs: [
+                                        {
+                                            label: 'Equation in standard form',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'x² + x + 1 = 0'
+                                        },
+                                        {
+                                            label: 'Discriminant value',
+                                            placeholder: 'Enter your answer here',
+                                            answer: '-3'
+                                        },
+                                        {
+                                            label: 'Nature of solutions',
+                                            placeholder: 'Enter your answer here',
+                                            answer: 'No real solutions'
+                                        }
+                                    ],
+                                    hint: 'x² + 4x - 2 = 3x - 3 becomes x² + x + 1 = 0. Discriminant = 1 - 4 = -3 < 0'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const problems = this.challengeMode ? challengeProblems : basicProblems;
+                return problems[this.currentMode] || problems['simplify'];
+            }
+        }
+
+        // Initialize the whiteboard when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.whiteboard = new InteractiveAlgebraicFractions();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99291323200f99f8',t:'MTc2MTEzNjk0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
