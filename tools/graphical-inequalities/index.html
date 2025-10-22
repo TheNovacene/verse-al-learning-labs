@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Inequality Grapher</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 4px 8px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.75rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .controls {
+            background: #f8fafc;
+            padding: 25px;
+            border-right: 2px solid #e2e8f0;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .control-group h3 {
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        label input[type="radio"] {
+            margin-right: 8px;
+            width: auto;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        }
+
+        .button-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .button-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .button-danger {
+            background: #fc8181;
+            color: white;
+        }
+
+        .button-danger:hover {
+            background: #f56565;
+        }
+
+        .canvas-container {
+            position: relative;
+            padding: 5px;
+            background: white;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        #graphCanvas {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: crosshair;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .inequality-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f7fafc;
+        }
+
+        .inequality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .inequality-item button {
+            background: #fc8181;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .test-point-info {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .test-point-info.satisfied {
+            background: #f0fff4;
+            border-color: #68d391;
+        }
+
+        .test-point-info.not-satisfied {
+            background: #fed7d7;
+            border-color: #fc8181;
+        }
+
+        .examples {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                border-right: none;
+                border-bottom: 2px solid #e2e8f0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📊 Interactive Inequality Grapher</h1>
+            <p>GCSE Maths Tool - Graph and solve inequalities in two variables</p>
+        </header>
+
+        <main class="main-content">
+            <div class="controls">
+                <div class="control-group">
+                    <h3>🎯 Challenge Mode</h3>
+                    <div style="margin-bottom: 15px;">
+                        <label for="difficultySelect">Choose Difficulty:</label>
+                        <select id="difficultySelect" onchange="updateDifficulty()">
+                            <option value="">Select Level</option>
+                            <option value="easy">🟢 Easy - Simple Lines</option>
+                            <option value="medium">🟡 Medium - Multiple Inequalities</option>
+                            <option value="hard">🔴 Hard - Complex Regions</option>
+                        </select>
+                    </div>
+                    <button class="button button-primary" onclick="startNewProblem()" id="newProblemBtn" disabled>New Problem</button>
+                    <button class="button button-secondary" onclick="checkAnswer()" id="checkAnswerBtn" disabled>Check Answer</button>
+                    <div id="challengeInfo" style="display: none; margin-top: 15px; padding: 15px; background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px;">
+                        <div id="problemStatement" style="font-weight: 600; color: #0c4a6e; margin-bottom: 10px;"></div>
+                        <div id="problemInstructions" style="color: #075985; font-size: 0.9rem;"></div>
+                    </div>
+                    <div id="feedbackArea" style="display: none; margin-top: 15px; padding: 15px; border-radius: 8px;">
+                        <div id="feedbackText"></div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📝 Add Inequality</h3>
+                    <label for="inequalityInput">Enter inequality (e.g., y &lt; 2x + 1):</label>
+                    <input type="text" id="inequalityInput" placeholder="y < 2x + 1">
+                    <div class="examples">
+                        Examples: y ≥ x + 2, x ≤ 3, 2x + 3y > 6
+                    </div>
+                    <button class="button button-primary" onclick="addInequality()">Add Inequality</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>📋 Current Inequalities</h3>
+                    <div id="inequalityList" class="inequality-list">
+                        <p style="color: #718096; text-align: center; margin: 20px 0;">No inequalities added yet</p>
+                    </div>
+                </div>
+
+
+
+                <div class="control-group">
+                    <h3>✏️ Drawing Tools</h3>
+                    <button class="button button-secondary" onclick="setMode('coordinates')" id="coordBtn">Draw Line by Coordinates</button>
+                    <button class="button button-primary" onclick="setMode('line')" id="lineBtn">Draw Line by Clicking</button>
+                    <button class="button button-primary" onclick="setMode('shade')" id="shadeBtn">Fill Region</button>
+                    <div style="margin-top: 10px; padding: 10px; background: #f7fafc; border-radius: 8px; font-size: 0.9rem;">
+                        <strong>Current Mode:</strong> <span id="currentMode">Draw Line by Clicking</span><br>
+                        <div id="modeInstructions">Click two points to draw a line</div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="coordinateInputs" style="display: none;">
+                    <h3>📍 Enter Coordinates</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label>Point 1 (x, y):</label>
+                            <input type="text" id="point1x" placeholder="x" style="width: 45%; margin-right: 5%;">
+                            <input type="text" id="point1y" placeholder="y" style="width: 45%;">
+                        </div>
+                        <div>
+                            <label>Point 2 (x, y):</label>
+                            <input type="text" id="point2x" placeholder="x" style="width: 45%; margin-right: 5%;">
+                            <input type="text" id="point2y" placeholder="y" style="width: 45%;">
+                        </div>
+                    </div>
+                    <button class="button button-primary" onclick="drawLineFromCoordinates()">Draw Line</button>
+                    <div class="examples">
+                        Example: Point 1: (0, 2), Point 2: (3, 5)
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎨 Line Style</h3>
+                    <label>
+                        <input type="radio" name="lineStyle" value="solid" checked> Solid (≤, ≥)
+                    </label>
+                    <label>
+                        <input type="radio" name="lineStyle" value="dashed"> Dashed (<, >)
+                    </label>
+                    <div style="margin-top: 10px;">
+                        <label for="lineColor">Line Color:</label>
+                        <select id="lineColor">
+                            <option value="#4facfe">Blue</option>
+                            <option value="#fc8181">Red</option>
+                            <option value="#68d391">Green</option>
+                            <option value="#fbb6ce">Pink</option>
+                            <option value="#a78bfa">Purple</option>
+                            <option value="#fbbf24">Yellow</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🔧 Controls</h3>
+                    <button class="button button-secondary" onclick="clearGraph()">Reset Graph</button>
+                    <button class="button button-secondary" onclick="clearManualDrawings()">Clear Drawings</button>
+                    <button class="button button-danger" onclick="clearAll()">Clear All</button>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="graphCanvas" width="600" height="600"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const inequalities = [];
+        const colors = ['#4facfe', '#fc8181', '#68d391', '#fbb6ce', '#a78bfa', '#fbbf24'];
+        let colorIndex = 0;
+
+        // Graph settings
+        const gridSize = 30;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = gridSize;
+
+        // Drawing state
+        let currentMode = 'line';
+        let isDrawing = false;
+        let lineStartPoint = null;
+        let manualLines = [];
+        let shadedRegions = [];
+        let currentShadePoints = [];
+        let currentShadeRegion = null;
+
+        // Challenge mode state
+        let currentDifficulty = '';
+        let currentProblem = null;
+        let problemIndex = 0;
+        let challengeMode = false;
+
+        // Challenge problems database
+        const challengeProblems = {
+            easy: [
+                {
+                    statement: "Shade the region where y ≥ x + 1",
+                    inequalities: ["y >= x + 1"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 2, shouldSatisfy: true },
+                        { x: 0, y: 0, shouldSatisfy: false },
+                        { x: 1, y: 2, shouldSatisfy: true }
+                    ]
+                },
+                {
+                    statement: "Shade the region where x < 3",
+                    inequalities: ["x < 3"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 2, y: 0, shouldSatisfy: true },
+                        { x: 4, y: 0, shouldSatisfy: false },
+                        { x: 0, y: 5, shouldSatisfy: true }
+                    ]
+                },
+                {
+                    statement: "Shade the region where y ≤ -2x + 4",
+                    inequalities: ["y <= -2*x + 4"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 3, shouldSatisfy: true },
+                        { x: 0, y: 5, shouldSatisfy: false },
+                        { x: 2, y: 0, shouldSatisfy: true }
+                    ]
+                },
+                {
+                    statement: "Shade the region where y > -1",
+                    inequalities: ["y > -1"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 0, shouldSatisfy: true },
+                        { x: 3, y: -2, shouldSatisfy: false },
+                        { x: -2, y: 1, shouldSatisfy: true }
+                    ]
+                },
+                {
+                    statement: "Shade the region where x ≥ -2",
+                    inequalities: ["x >= -2"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 0, shouldSatisfy: true },
+                        { x: -3, y: 1, shouldSatisfy: false },
+                        { x: -2, y: -1, shouldSatisfy: true }
+                    ]
+                }
+            ],
+            medium: [
+                {
+                    statement: "Shade the region where y ≥ x AND y ≤ -x + 4",
+                    inequalities: ["y >= x", "y <= -x + 4"],
+                    description: "Use the drawing tools to shade the region that satisfies both inequalities",
+                    testPoints: [
+                        { x: 1, y: 2, shouldSatisfy: true },
+                        { x: 0, y: 0, shouldSatisfy: false },
+                        { x: 2, y: 2, shouldSatisfy: true },
+                        { x: 3, y: 0, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where x ≥ 0 AND y ≥ 0 AND y ≤ -2x + 6",
+                    inequalities: ["x >= 0", "y >= 0", "y <= -2*x + 6"],
+                    description: "Use the drawing tools to shade the region that satisfies all three inequalities",
+                    testPoints: [
+                        { x: 1, y: 1, shouldSatisfy: true },
+                        { x: -1, y: 1, shouldSatisfy: false },
+                        { x: 2, y: 1, shouldSatisfy: true },
+                        { x: 4, y: 1, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where y < 2x - 1 AND y > -x + 2",
+                    inequalities: ["y < 2*x - 1", "y > -x + 2"],
+                    description: "Use the drawing tools to shade the region that satisfies both inequalities",
+                    testPoints: [
+                        { x: 2, y: 1, shouldSatisfy: true },
+                        { x: 0, y: 0, shouldSatisfy: false },
+                        { x: 3, y: 4, shouldSatisfy: true },
+                        { x: 1, y: 2, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where x + y ≤ 5 AND x ≥ 1 AND y ≥ 0",
+                    inequalities: ["x + y <= 5", "x >= 1", "y >= 0"],
+                    description: "Use the drawing tools to shade the region that satisfies all three inequalities",
+                    testPoints: [
+                        { x: 2, y: 2, shouldSatisfy: true },
+                        { x: 0, y: 2, shouldSatisfy: false },
+                        { x: 3, y: 1, shouldSatisfy: true },
+                        { x: 4, y: 3, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where |x| ≤ 2 (hint: -2 ≤ x ≤ 2)",
+                    inequalities: ["x >= -2", "x <= 2"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 0, shouldSatisfy: true },
+                        { x: 3, y: 1, shouldSatisfy: false },
+                        { x: -1, y: 5, shouldSatisfy: true },
+                        { x: -3, y: 0, shouldSatisfy: false }
+                    ]
+                }
+            ],
+            hard: [
+                {
+                    statement: "Shade the region where y ≥ x² - 4 (approximated as y ≥ 0.25x² - 4)",
+                    inequalities: ["y >= 0.25*x*x - 4"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: -3, shouldSatisfy: true },
+                        { x: 0, y: -5, shouldSatisfy: false },
+                        { x: 2, y: -3, shouldSatisfy: true },
+                        { x: 4, y: 0, shouldSatisfy: true }
+                    ]
+                },
+                {
+                    statement: "Shade the region where 2x + 3y ≤ 12 AND x ≥ 0 AND y ≥ 0 AND x ≤ 4",
+                    inequalities: ["2*x + 3*y <= 12", "x >= 0", "y >= 0", "x <= 4"],
+                    description: "Use the drawing tools to shade the region that satisfies all four inequalities",
+                    testPoints: [
+                        { x: 1, y: 1, shouldSatisfy: true },
+                        { x: 5, y: 1, shouldSatisfy: false },
+                        { x: 3, y: 2, shouldSatisfy: true },
+                        { x: 2, y: 4, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where y ≤ 4 - x² (approximated as y ≤ 4 - 0.5x²)",
+                    inequalities: ["y <= 4 - 0.5*x*x"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 0, y: 3, shouldSatisfy: true },
+                        { x: 0, y: 5, shouldSatisfy: false },
+                        { x: 2, y: 1, shouldSatisfy: true },
+                        { x: 3, y: 0, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the region where |x - 2| + |y - 1| ≤ 3 (diamond shape)",
+                    inequalities: ["x - 2 + y - 1 <= 3", "x - 2 - y + 1 <= 3", "-x + 2 + y - 1 <= 3", "-x + 2 - y + 1 <= 3"],
+                    description: "Use the drawing tools to shade the correct region",
+                    testPoints: [
+                        { x: 2, y: 1, shouldSatisfy: true },
+                        { x: 0, y: 0, shouldSatisfy: false },
+                        { x: 3, y: 2, shouldSatisfy: true },
+                        { x: 5, y: 1, shouldSatisfy: false }
+                    ]
+                },
+                {
+                    statement: "Shade the feasible region: 3x + 2y ≤ 18, x + 4y ≤ 16, x ≥ 0, y ≥ 0",
+                    inequalities: ["3*x + 2*y <= 18", "x + 4*y <= 16", "x >= 0", "y >= 0"],
+                    description: "Use the drawing tools to shade the region that satisfies all four inequalities",
+                    testPoints: [
+                        { x: 2, y: 2, shouldSatisfy: true },
+                        { x: 7, y: 1, shouldSatisfy: false },
+                        { x: 4, y: 3, shouldSatisfy: true },
+                        { x: 1, y: 5, shouldSatisfy: false }
+                    ]
+                }
+            ]
+        };
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            
+            // Vertical lines
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#4a5568';
+            ctx.lineWidth = 2;
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            
+            // Draw axis labels
+            ctx.fillStyle = '#4a5568';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            
+            // X-axis numbers
+            for (let i = -10; i <= 10; i++) {
+                if (i !== 0) {
+                    const x = centerX + i * scale;
+                    ctx.fillText(i.toString(), x, centerY + 15);
+                }
+            }
+            
+            // Y-axis numbers
+            ctx.textAlign = 'right';
+            for (let i = -10; i <= 10; i++) {
+                if (i !== 0) {
+                    const y = centerY - i * scale;
+                    ctx.fillText(i.toString(), centerX - 5, y + 4);
+                }
+            }
+            
+            // Origin
+            ctx.textAlign = 'right';
+            ctx.fillText('0', centerX - 5, centerY + 15);
+        }
+
+        function showError(message) {
+            const input = document.getElementById('inequalityInput');
+            input.style.borderColor = '#fc8181';
+            input.placeholder = message;
+            setTimeout(() => {
+                input.style.borderColor = '#e2e8f0';
+                input.placeholder = 'y < 2x + 1';
+            }, 3000);
+        }
+
+        // Simple expression evaluator
+        function evaluateExpression(expr, x, y) {
+            // Replace variables with values, being careful with negative numbers
+            let result = expr.replace(/x/g, `(${x})`).replace(/y/g, `(${y})`);
+            
+            // Handle simple cases
+            try {
+                // Basic safety check - only allow numbers, operators, and parentheses
+                if (!/^[0-9+\-*/.() ]+$/.test(result)) {
+                    return NaN;
+                }
+                return Function('"use strict"; return (' + result + ')')();
+            } catch (e) {
+                console.log('Expression evaluation error:', e, 'for expression:', result);
+                return NaN;
+            }
+        }
+
+        function parseInequality(input) {
+            // Clean up input
+            input = input.replace(/\s/g, '');
+            
+            // Handle different inequality symbols
+            let operator = '';
+            let parts = [];
+            
+            if (input.includes('<=') || input.includes('≤')) {
+                operator = '≤';
+                parts = input.split(/<=|≤/);
+            } else if (input.includes('>=') || input.includes('≥')) {
+                operator = '≥';
+                parts = input.split(/>=|≥/);
+            } else if (input.includes('<')) {
+                operator = '<';
+                parts = input.split('<');
+            } else if (input.includes('>')) {
+                operator = '>';
+                parts = input.split('>');
+            } else {
+                return null;
+            }
+            
+            if (parts.length !== 2) return null;
+            
+            return {
+                left: parts[0].trim(),
+                right: parts[1].trim(),
+                operator: operator,
+                original: input
+            };
+        }
+
+        function satisfiesInequality(parsed, x, y) {
+            try {
+                const leftVal = evaluateExpression(parsed.left, x, y);
+                const rightVal = evaluateExpression(parsed.right, x, y);
+                
+                if (isNaN(leftVal) || isNaN(rightVal)) return false;
+                
+                switch (parsed.operator) {
+                    case '<': return leftVal < rightVal;
+                    case '>': return leftVal > rightVal;
+                    case '≤': return leftVal <= rightVal;
+                    case '≥': return leftVal >= rightVal;
+                    default: return false;
+                }
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function drawInequality(inequality, color) {
+            const parsed = parseInequality(inequality.text);
+            if (!parsed) return;
+            
+            // Draw boundary line
+            drawBoundaryLine(parsed, color);
+            
+            // Draw shading
+            drawShading(parsed, color);
+        }
+
+        function drawBoundaryLine(parsed, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            
+            // Set line style based on operator
+            if (parsed.operator === '<' || parsed.operator === '>') {
+                ctx.setLineDash([8, 4]); // Dashed line for strict inequalities
+            } else {
+                ctx.setLineDash([]); // Solid line for non-strict inequalities
+            }
+            
+            ctx.beginPath();
+            
+            // Handle different types of inequalities
+            if (parsed.left === 'x') {
+                // Vertical line: x = constant
+                const constValue = parseFloat(parsed.right);
+                if (!isNaN(constValue)) {
+                    const canvasX = centerX + constValue * scale;
+                    if (canvasX >= 0 && canvasX <= canvas.width) {
+                        ctx.moveTo(canvasX, 0);
+                        ctx.lineTo(canvasX, canvas.height);
+                    }
+                }
+            } else if (parsed.right === 'x') {
+                // Vertical line: constant = x
+                const constValue = parseFloat(parsed.left);
+                if (!isNaN(constValue)) {
+                    const canvasX = centerX + constValue * scale;
+                    if (canvasX >= 0 && canvasX <= canvas.width) {
+                        ctx.moveTo(canvasX, 0);
+                        ctx.lineTo(canvasX, canvas.height);
+                    }
+                }
+            } else if (parsed.left === 'y') {
+                // y = expression in x
+                drawLineFromExpression(parsed.right);
+            } else if (parsed.right === 'y') {
+                // expression in x = y
+                drawLineFromExpression(parsed.left);
+            } else {
+                // General form
+                drawGeneralLine(parsed);
+            }
+            
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset line dash
+        }
+
+        function drawLineFromExpression(expr) {
+            let points = [];
+            
+            // Sample points across the canvas
+            for (let canvasX = 0; canvasX <= canvas.width; canvasX += 5) {
+                const mathX = (canvasX - centerX) / scale;
+                const mathY = evaluateExpression(expr, mathX, 0);
+                
+                if (!isNaN(mathY) && isFinite(mathY)) {
+                    const canvasY = centerY - mathY * scale;
+                    if (canvasY >= 0 && canvasY <= canvas.height) {
+                        points.push({ x: canvasX, y: canvasY });
+                    }
+                }
+            }
+            
+            // Draw the line through all valid points
+            if (points.length > 1) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+            }
+        }
+
+        function drawGeneralLine(parsed) {
+            // For general inequalities, sample points to find the boundary
+            let points = [];
+            
+            for (let canvasX = 0; canvasX <= canvas.width; canvasX += 10) {
+                const mathX = (canvasX - centerX) / scale;
+                
+                // Try to find y value that satisfies the equation
+                for (let testY = -10; testY <= 10; testY += 0.2) {
+                    const leftVal = evaluateExpression(parsed.left, mathX, testY);
+                    const rightVal = evaluateExpression(parsed.right, mathX, testY);
+                    
+                    if (!isNaN(leftVal) && !isNaN(rightVal) && Math.abs(leftVal - rightVal) < 0.1) {
+                        const canvasY = centerY - testY * scale;
+                        if (canvasY >= 0 && canvasY <= canvas.height) {
+                            points.push({ x: canvasX, y: canvasY });
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Draw line through found points
+            if (points.length > 1) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+            }
+        }
+
+        function drawShading(parsed, color) {
+            // Create semi-transparent fill
+            ctx.fillStyle = color + '25'; // Add transparency
+            
+            // Sample points across the canvas to determine shading
+            const step = 10; // Pixels between sample points
+            
+            for (let canvasX = 0; canvasX < canvas.width; canvasX += step) {
+                for (let canvasY = 0; canvasY < canvas.height; canvasY += step) {
+                    const mathX = (canvasX - centerX) / scale;
+                    const mathY = (centerY - canvasY) / scale;
+                    
+                    if (satisfiesInequality(parsed, mathX, mathY)) {
+                        ctx.fillRect(canvasX, canvasY, step - 1, step - 1);
+                    }
+                }
+            }
+        }
+
+        function addInequality() {
+            const input = document.getElementById('inequalityInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            const parsed = parseInequality(text);
+            if (!parsed) {
+                showError('Please enter a valid inequality');
+                return;
+            }
+            
+            const color = colors[colorIndex % colors.length];
+            colorIndex++;
+            
+            const inequality = {
+                text: text,
+                color: color,
+                id: Date.now()
+            };
+            
+            inequalities.push(inequality);
+            input.value = '';
+            
+            updateInequalityList();
+            redrawGraph();
+        }
+
+        function removeInequality(id) {
+            const index = inequalities.findIndex(ineq => ineq.id === id);
+            if (index > -1) {
+                inequalities.splice(index, 1);
+                updateInequalityList();
+                redrawGraph();
+            }
+        }
+
+        function updateInequalityList() {
+            const list = document.getElementById('inequalityList');
+            
+            if (inequalities.length === 0) {
+                list.innerHTML = '<p style="color: #718096; text-align: center; margin: 20px 0;">No inequalities added yet</p>';
+                return;
+            }
+            
+            list.innerHTML = inequalities.map(ineq => `
+                <div class="inequality-item" style="border-left-color: ${ineq.color}">
+                    <span style="color: ${ineq.color}; font-weight: 600;">${ineq.text}</span>
+                    <button onclick="removeInequality(${ineq.id})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function redrawGraph() {
+            drawGrid();
+            
+            // Draw inequalities
+            inequalities.forEach(ineq => {
+                drawInequality(ineq, ineq.color);
+            });
+
+            // Draw manual lines
+            manualLines.forEach(line => {
+                drawManualLine(line);
+            });
+
+            // Draw shaded regions
+            shadedRegions.forEach(region => {
+                drawShadedRegion(region);
+            });
+
+            // Draw current shade points being created
+            if (currentShadePoints.length > 0) {
+                drawCurrentShadePoints();
+            }
+        }
+
+        function drawManualLine(line) {
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = 3;
+            
+            if (line.style === 'dashed') {
+                ctx.setLineDash([8, 4]);
+            } else {
+                ctx.setLineDash([]);
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(line.start.x, line.start.y);
+            ctx.lineTo(line.end.x, line.end.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawShadedRegion(region) {
+            if (region.type === 'half-plane') {
+                // Draw half-plane shading (above or below a line)
+                drawHalfPlaneShading(region);
+            } else if (region.type === 'trapezium') {
+                // Draw trapezium shaded region
+                ctx.fillStyle = region.color + '40'; // Semi-transparent
+                ctx.beginPath();
+                ctx.moveTo(region.points[0].x, region.points[0].y);
+                ctx.lineTo(region.points[1].x, region.points[1].y);
+                ctx.lineTo(region.points[2].x, region.points[2].y);
+                ctx.lineTo(region.points[3].x, region.points[3].y);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = region.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else if (region.type === 'rectangle') {
+                // Draw rectangular shaded region (legacy support)
+                ctx.fillStyle = region.color + '40'; // Semi-transparent
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                
+                // Draw border
+                ctx.strokeStyle = region.color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(region.x, region.y, region.width, region.height);
+            } else if (region.points && region.points.length >= 3) {
+                // Legacy polygon support
+                ctx.fillStyle = region.color + '40'; // Semi-transparent
+                ctx.beginPath();
+                ctx.moveTo(region.points[0].x, region.points[0].y);
+                
+                for (let i = 1; i < region.points.length; i++) {
+                    ctx.lineTo(region.points[i].x, region.points[i].y);
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = region.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function drawHalfPlaneShading(region) {
+            const line = region.line;
+            const direction = region.direction;
+            
+            // Set fill style
+            ctx.fillStyle = region.color + '30'; // Semi-transparent
+            
+            // Calculate line equation for determining which side to shade
+            const x1 = line.start.x;
+            const y1 = line.start.y;
+            const x2 = line.end.x;
+            const y2 = line.end.y;
+            
+            // Line equation: (y2-y1)x - (x2-x1)y + (x2-x1)y1 - (y2-y1)x1 = 0
+            const a = y2 - y1;
+            const b = -(x2 - x1);
+            const c = (x2 - x1) * y1 - (y2 - y1) * x1;
+            
+            // Sample points across the canvas and shade appropriate side
+            const step = 8; // Pixels between sample points
+            
+            for (let canvasX = 0; canvasX < canvas.width; canvasX += step) {
+                for (let canvasY = 0; canvasY < canvas.height; canvasY += step) {
+                    // Calculate which side of the line this point is on
+                    const lineValue = a * canvasX + b * canvasY + c;
+                    
+                    let shouldShade = false;
+                    if (direction === 'above') {
+                        // For "above", we want points where the line equation gives positive values
+                        // (this corresponds to the upper side of the line in canvas coordinates)
+                        shouldShade = lineValue > 0;
+                    } else if (direction === 'below') {
+                        // For "below", we want points where the line equation gives negative values
+                        shouldShade = lineValue < 0;
+                    }
+                    
+                    if (shouldShade) {
+                        ctx.fillRect(canvasX, canvasY, step - 1, step - 1);
+                    }
+                }
+            }
+        }
+
+        function drawCurrentShadePoints() {
+            // No longer needed with simple click-to-fill approach
+            // This function is kept for compatibility but does nothing
+        }
+
+        function clearGraph() {
+            drawGrid();
+        }
+
+        function clearAll() {
+            inequalities.length = 0;
+            colorIndex = 0;
+            manualLines = [];
+            shadedRegions = [];
+            currentShadePoints = [];
+            currentShadeRegion = null;
+            updateInequalityList();
+            clearGraph();
+        }
+
+        function clearManualDrawings() {
+            manualLines = [];
+            shadedRegions = [];
+            currentShadePoints = [];
+            currentShadeRegion = null;
+            redrawGraph();
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update button styles
+            document.querySelectorAll('#coordBtn, #lineBtn, #shadeBtn').forEach(btn => {
+                btn.className = 'button button-secondary';
+            });
+            
+            // Hide/show coordinate inputs
+            const coordInputs = document.getElementById('coordinateInputs');
+            
+            // Update UI
+            const modeText = document.getElementById('currentMode');
+            const instructions = document.getElementById('modeInstructions');
+            
+            switch(mode) {
+                case 'coordinates':
+                    document.getElementById('coordBtn').className = 'button button-primary';
+                    modeText.textContent = 'Draw Line by Coordinates';
+                    instructions.textContent = 'Enter two points and click Draw Line';
+                    canvas.style.cursor = 'default';
+                    coordInputs.style.display = 'block';
+                    break;
+                case 'line':
+                    document.getElementById('lineBtn').className = 'button button-primary';
+                    modeText.textContent = 'Draw Line by Clicking';
+                    instructions.textContent = 'Click two points to draw a line';
+                    canvas.style.cursor = 'crosshair';
+                    coordInputs.style.display = 'none';
+                    break;
+                case 'shade':
+                    document.getElementById('shadeBtn').className = 'button button-primary';
+                    modeText.textContent = 'Fill Region';
+                    instructions.textContent = 'Click anywhere in a region to fill it with color';
+                    canvas.style.cursor = 'crosshair';
+                    coordInputs.style.display = 'none';
+                    break;
+            }
+        }
+
+        function drawLineFromCoordinates() {
+            const x1 = parseFloat(document.getElementById('point1x').value);
+            const y1 = parseFloat(document.getElementById('point1y').value);
+            const x2 = parseFloat(document.getElementById('point2x').value);
+            const y2 = parseFloat(document.getElementById('point2y').value);
+            
+            // Validate inputs
+            if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+                // Show error by highlighting inputs
+                document.querySelectorAll('#point1x, #point1y, #point2x, #point2y').forEach(input => {
+                    if (isNaN(parseFloat(input.value))) {
+                        input.style.borderColor = '#fc8181';
+                        setTimeout(() => input.style.borderColor = '#e2e8f0', 2000);
+                    }
+                });
+                return;
+            }
+            
+            // Convert math coordinates to canvas coordinates
+            const canvasX1 = centerX + x1 * scale;
+            const canvasY1 = centerY - y1 * scale;
+            const canvasX2 = centerX + x2 * scale;
+            const canvasY2 = centerY - y2 * scale;
+            
+            // Calculate line direction and extend beyond the canvas
+            const dx = canvasX2 - canvasX1;
+            const dy = canvasY2 - canvasY1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            
+            if (length > 0) {
+                // Normalize direction vector
+                const unitX = dx / length;
+                const unitY = dy / length;
+                
+                // Extend line to canvas edges (use a large extension)
+                const extension = 2000; // Large enough to reach canvas edges
+                const extendedX1 = canvasX1 - unitX * extension;
+                const extendedY1 = canvasY1 - unitY * extension;
+                const extendedX2 = canvasX2 + unitX * extension;
+                const extendedY2 = canvasY2 + unitY * extension;
+                
+                // Get line style and color
+                const lineStyle = document.querySelector('input[name="lineStyle"]:checked').value;
+                const lineColor = document.getElementById('lineColor').value;
+                
+                // Create line object with extended coordinates
+                const line = {
+                    start: { x: extendedX1, y: extendedY1 },
+                    end: { x: extendedX2, y: extendedY2 },
+                    style: lineStyle,
+                    color: lineColor,
+                    id: Date.now(),
+                    mathCoords: { x1, y1, x2, y2 }, // Store original coordinates for reference
+                    isExtended: true
+                };
+                
+                manualLines.push(line);
+                
+                // Ask user if they want to shade above or below the line
+                showShadingOptions(line);
+            }
+            
+            // Clear inputs
+            document.getElementById('point1x').value = '';
+            document.getElementById('point1y').value = '';
+            document.getElementById('point2x').value = '';
+            document.getElementById('point2y').value = '';
+            
+            redrawGraph();
+        }
+
+        // Canvas click handler
+        canvas.addEventListener('click', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = event.clientX - rect.left;
+            const canvasY = event.clientY - rect.top;
+            
+            switch(currentMode) {
+                case 'line':
+                    handleLineDrawing(canvasX, canvasY);
+                    break;
+                case 'shade':
+                    if (currentShadeRegion && currentShadeRegion.isExpanding) {
+                        // Finish expanding current region
+                        currentShadeRegion.isExpanding = false;
+                        currentShadeRegion = null;
+                        document.getElementById('modeInstructions').textContent = 'Click anywhere in a region to fill it with color';
+                    } else {
+                        handleShadeDrawing(canvasX, canvasY);
+                    }
+                    break;
+                case 'coordinates':
+                    // Do nothing - coordinates are entered via input fields
+                    break;
+            }
+        });
+
+        // Mouse move handler for expanding regions
+        canvas.addEventListener('mousemove', function(event) {
+            if (currentMode === 'shade' && currentShadeRegion && currentShadeRegion.isExpanding) {
+                const rect = canvas.getBoundingClientRect();
+                const canvasX = event.clientX - rect.left;
+                const canvasY = event.clientY - rect.top;
+                
+                if (currentShadeRegion.type === 'trapezium') {
+                    // Calculate new size based on distance from start point
+                    const deltaX = Math.abs(canvasX - currentShadeRegion.startX);
+                    const deltaY = Math.abs(canvasY - currentShadeRegion.startY);
+                    const newWidth = Math.max(60, deltaX * 2.5);
+                    const newHeight = Math.max(40, deltaY * 2);
+                    
+                    // Update trapezium points to create a proper trapezium shape
+                    const topWidth = newWidth;
+                    const bottomWidth = newWidth * 0.6; // Bottom is narrower to create trapezium
+                    
+                    currentShadeRegion.points = [
+                        { x: currentShadeRegion.startX - topWidth/2, y: currentShadeRegion.startY - newHeight/2 },     // Top left
+                        { x: currentShadeRegion.startX + topWidth/2, y: currentShadeRegion.startY - newHeight/2 },     // Top right
+                        { x: currentShadeRegion.startX + bottomWidth/2, y: currentShadeRegion.startY + newHeight/2 },   // Bottom right
+                        { x: currentShadeRegion.startX - bottomWidth/2, y: currentShadeRegion.startY + newHeight/2 }    // Bottom left
+                    ];
+                    
+                    currentShadeRegion.baseWidth = newWidth;
+                    currentShadeRegion.height = newHeight;
+                } else {
+                    // Legacy rectangle support
+                    const deltaX = Math.abs(canvasX - currentShadeRegion.startX);
+                    const deltaY = Math.abs(canvasY - currentShadeRegion.startY);
+                    const newWidth = Math.max(40, deltaX * 2);
+                    const newHeight = Math.max(40, deltaY * 2);
+                    
+                    // Update region size
+                    currentShadeRegion.width = newWidth;
+                    currentShadeRegion.height = newHeight;
+                    currentShadeRegion.x = currentShadeRegion.startX - newWidth/2;
+                    currentShadeRegion.y = currentShadeRegion.startY - newHeight/2;
+                }
+                
+                redrawGraph();
+            }
+        });
+
+        // Double-click handler no longer needed for simple shading
+        canvas.addEventListener('dblclick', function(event) {
+            // Reserved for future functionality
+        });
+
+        function handleLineDrawing(x, y) {
+            if (!lineStartPoint) {
+                // First click - set start point
+                lineStartPoint = { x, y };
+                
+                // Draw temporary point
+                redrawGraph();
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            } else {
+                // Second click - complete the line and extend it
+                const lineStyle = document.querySelector('input[name="lineStyle"]:checked').value;
+                const lineColor = document.getElementById('lineColor').value;
+                
+                // Calculate line direction and extend beyond the canvas
+                const dx = x - lineStartPoint.x;
+                const dy = y - lineStartPoint.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                if (length > 0) {
+                    // Normalize direction vector
+                    const unitX = dx / length;
+                    const unitY = dy / length;
+                    
+                    // Extend line to canvas edges
+                    const extension = 2000;
+                    const extendedX1 = lineStartPoint.x - unitX * extension;
+                    const extendedY1 = lineStartPoint.y - unitY * extension;
+                    const extendedX2 = x + unitX * extension;
+                    const extendedY2 = y + unitY * extension;
+                    
+                    const line = {
+                        start: { x: extendedX1, y: extendedY1 },
+                        end: { x: extendedX2, y: extendedY2 },
+                        style: lineStyle,
+                        color: lineColor,
+                        id: Date.now(),
+                        isExtended: true
+                    };
+                    
+                    manualLines.push(line);
+                } else {
+                    // Fallback for zero-length lines
+                    const line = {
+                        start: lineStartPoint,
+                        end: { x, y },
+                        style: lineStyle,
+                        color: lineColor,
+                        id: Date.now()
+                    };
+                    
+                    manualLines.push(line);
+                }
+                
+                lineStartPoint = null;
+                
+                // Ask user if they want to shade above or below the line
+                showShadingOptions(line);
+                redrawGraph();
+            }
+        }
+
+        function handleShadeDrawing(x, y) {
+            // Check if we're starting a new region or expanding an existing one
+            if (!currentShadeRegion) {
+                // Start new expandable region
+                const fillColor = document.getElementById('lineColor').value;
+                startExpandableRegion(x, y, fillColor);
+            }
+        }
+
+        function startExpandableRegion(startX, startY, fillColor) {
+            const initialWidth = 60;
+            const initialHeight = 40;
+            
+            // Create initial trapezium points
+            const points = [
+                { x: startX - initialWidth/2, y: startY - initialHeight/2 },     // Top left
+                { x: startX + initialWidth/2, y: startY - initialHeight/2 },     // Top right
+                { x: startX + initialWidth/3, y: startY + initialHeight/2 },     // Bottom right
+                { x: startX - initialWidth/3, y: startY + initialHeight/2 }      // Bottom left
+            ];
+            
+            currentShadeRegion = {
+                startX: startX,
+                startY: startY,
+                points: points,
+                color: fillColor,
+                id: Date.now(),
+                type: 'trapezium',
+                isExpanding: true,
+                baseWidth: initialWidth,
+                height: initialHeight
+            };
+            
+            shadedRegions.push(currentShadeRegion);
+            redrawGraph();
+            
+            // Show expansion instructions
+            const instructions = document.getElementById('modeInstructions');
+            instructions.textContent = 'Drag to expand the trapezium region, click elsewhere to finish';
+        }
+
+
+
+        // Handle Enter key in input
+        document.getElementById('inequalityInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addInequality();
+            }
+        });
+
+
+
+        function showShadingOptions(line) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+            `;
+            
+            modalContent.innerHTML = `
+                <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.3rem;">🎨 Shade Region</h3>
+                <p style="margin: 0 0 25px 0; color: #4a5568; line-height: 1.5;">
+                    Would you like to shade the region above or below this line?
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button id="shadeAbove" style="
+                        padding: 12px 24px;
+                        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    ">Shade Above</button>
+                    <button id="shadeBelow" style="
+                        padding: 12px 24px;
+                        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    ">Shade Below</button>
+                    <button id="noShade" style="
+                        padding: 12px 24px;
+                        background: #e2e8f0;
+                        color: #4a5568;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    ">No Shading</button>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Add hover effects
+            const buttons = modalContent.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.transform = 'translateY(-2px)';
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Handle button clicks
+            document.getElementById('shadeAbove').onclick = () => {
+                shadeRegionRelativeToLine(line, 'above');
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('shadeBelow').onclick = () => {
+                shadeRegionRelativeToLine(line, 'below');
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('noShade').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+        }
+
+        function shadeRegionRelativeToLine(line, direction) {
+            // Create a shaded region that covers the entire canvas on one side of the line
+            const shadedRegion = {
+                type: 'half-plane',
+                line: line,
+                direction: direction,
+                color: line.color,
+                id: Date.now()
+            };
+            
+            shadedRegions.push(shadedRegion);
+            redrawGraph();
+        }
+
+        // Challenge mode functions
+        function updateDifficulty() {
+            const select = document.getElementById('difficultySelect');
+            currentDifficulty = select.value;
+            problemIndex = 0;
+            
+            const newProblemBtn = document.getElementById('newProblemBtn');
+            const challengeInfo = document.getElementById('challengeInfo');
+            const feedbackArea = document.getElementById('feedbackArea');
+            
+            if (currentDifficulty) {
+                newProblemBtn.disabled = false;
+                challengeMode = true;
+                feedbackArea.style.display = 'none';
+                challengeInfo.style.display = 'none';
+            } else {
+                newProblemBtn.disabled = true;
+                challengeMode = false;
+                challengeInfo.style.display = 'none';
+                feedbackArea.style.display = 'none';
+            }
+        }
+
+        function startNewProblem() {
+            if (!currentDifficulty) return;
+            
+            const problems = challengeProblems[currentDifficulty];
+            currentProblem = problems[problemIndex % problems.length];
+            problemIndex++;
+            
+            // Clear previous work
+            clearAll();
+            
+            // Show problem
+            const challengeInfo = document.getElementById('challengeInfo');
+            const problemStatement = document.getElementById('problemStatement');
+            const problemInstructions = document.getElementById('problemInstructions');
+            const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+            const feedbackArea = document.getElementById('feedbackArea');
+            
+            problemStatement.textContent = `Problem ${problemIndex}: ${currentProblem.statement}`;
+            problemInstructions.textContent = currentProblem.description;
+            
+            challengeInfo.style.display = 'block';
+            checkAnswerBtn.disabled = false;
+            feedbackArea.style.display = 'none';
+            
+            // Set mode to shading for easier problem solving
+            setMode('shade');
+        }
+
+        function checkAnswer() {
+            if (!currentProblem) return;
+            
+            const feedbackArea = document.getElementById('feedbackArea');
+            const feedbackText = document.getElementById('feedbackText');
+            
+            // Test multiple points to see if student's shading matches expected solution
+            let correctPoints = 0;
+            let totalPoints = currentProblem.testPoints.length;
+            let results = [];
+            
+            for (let testPoint of currentProblem.testPoints) {
+                const mathX = testPoint.x;
+                const mathY = testPoint.y;
+                const canvasX = centerX + mathX * scale;
+                const canvasY = centerY - mathY * scale;
+                
+                // Check if point is in any shaded region
+                let pointIsShaded = false;
+                
+                // Check manual shaded regions
+                for (let region of shadedRegions) {
+                    if (isPointInShadedRegion(mathX, mathY, region)) {
+                        pointIsShaded = true;
+                        break;
+                    }
+                }
+                
+                // Check if this matches expected result
+                const isCorrect = (pointIsShaded === testPoint.shouldSatisfy);
+                if (isCorrect) correctPoints++;
+                
+                results.push({
+                    point: `(${mathX}, ${mathY})`,
+                    expected: testPoint.shouldSatisfy ? 'Should be shaded' : 'Should NOT be shaded',
+                    actual: pointIsShaded ? 'Is shaded' : 'Is NOT shaded',
+                    correct: isCorrect
+                });
+            }
+            
+            // Calculate score
+            const score = Math.round((correctPoints / totalPoints) * 100);
+            let feedbackClass = '';
+            let feedbackMessage = '';
+            
+            if (score >= 80) {
+                feedbackClass = 'satisfied';
+                feedbackMessage = `🎉 Excellent! You got ${score}% correct!`;
+            } else if (score >= 60) {
+                feedbackClass = 'not-satisfied';
+                feedbackMessage = `👍 Good effort! You got ${score}% correct. Try to be more precise with your shading.`;
+            } else {
+                feedbackClass = 'not-satisfied';
+                feedbackMessage = `📚 Keep practicing! You got ${score}% correct. Review the inequalities and try again.`;
+            }
+            
+            // Show detailed feedback
+            let detailedFeedback = `<div style="font-weight: 600; margin-bottom: 10px;">${feedbackMessage}</div>`;
+            detailedFeedback += `<div style="font-size: 0.9rem;">`;
+            detailedFeedback += `<strong>Test Points Analysis:</strong><br>`;
+            
+            for (let result of results) {
+                const icon = result.correct ? '✅' : '❌';
+                detailedFeedback += `${icon} ${result.point}: ${result.expected} → ${result.actual}<br>`;
+            }
+            
+            detailedFeedback += `</div>`;
+            
+            if (score < 80) {
+                detailedFeedback += `<div style="margin-top: 10px; font-size: 0.9rem; color: #0c4a6e;">`;
+                detailedFeedback += `<strong>Hint:</strong> The correct solution satisfies: ${currentProblem.inequalities.join(' AND ')}<br>`;
+                detailedFeedback += `Try using the "Add Inequality" feature to see the correct solution!`;
+                detailedFeedback += `</div>`;
+            }
+            
+            feedbackArea.className = `test-point-info ${feedbackClass}`;
+            feedbackArea.style.display = 'block';
+            feedbackText.innerHTML = detailedFeedback;
+        }
+
+        function isPointInShadedRegion(mathX, mathY, region) {
+            const canvasX = centerX + mathX * scale;
+            const canvasY = centerY - mathY * scale;
+            
+            if (region.type === 'half-plane') {
+                // Check if point is on correct side of line
+                const line = region.line;
+                const direction = region.direction;
+                
+                const x1 = line.start.x;
+                const y1 = line.start.y;
+                const x2 = line.end.x;
+                const y2 = line.end.y;
+                
+                // Line equation: (y2-y1)x - (x2-x1)y + (x2-x1)y1 - (y2-y1)x1 = 0
+                const a = y2 - y1;
+                const b = -(x2 - x1);
+                const c = (x2 - x1) * y1 - (y2 - y1) * x1;
+                
+                const lineValue = a * canvasX + b * canvasY + c;
+                
+                // Check if point is very close to the line (within tolerance)
+                const tolerance = 5; // pixels
+                const isOnLine = Math.abs(lineValue) <= tolerance;
+                
+                // For solid lines (≥, ≤), include points on the boundary
+                // For dashed lines (<, >), exclude points on the boundary
+                const isInclusiveBoundary = line.style === 'solid';
+                
+                if (isOnLine && isInclusiveBoundary) {
+                    return true; // Point is on boundary and boundary is included
+                } else if (isOnLine && !isInclusiveBoundary) {
+                    return false; // Point is on boundary but boundary is excluded
+                }
+                
+                // Point is not on the line, check which side
+                if (direction === 'above') {
+                    return lineValue > 0;
+                } else if (direction === 'below') {
+                    return lineValue < 0;
+                }
+            } else if (region.type === 'trapezium' && region.points) {
+                // Check if point is inside trapezium using ray casting
+                return isPointInPolygon(canvasX, canvasY, region.points);
+            } else if (region.type === 'rectangle') {
+                // Check if point is inside rectangle
+                return canvasX >= region.x && canvasX <= region.x + region.width &&
+                       canvasY >= region.y && canvasY <= region.y + region.height;
+            } else if (region.points && region.points.length >= 3) {
+                // Check if point is inside polygon
+                return isPointInPolygon(canvasX, canvasY, region.points);
+            }
+            
+            return false;
+        }
+
+        function isPointInPolygon(x, y, vertices) {
+            let inside = false;
+            for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                if (((vertices[i].y > y) !== (vertices[j].y > y)) &&
+                    (x < (vertices[j].x - vertices[i].x) * (y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x)) {
+                    inside = !inside;
+                }
+            }
+            return inside;
+        }
+
+        // Initialize
+        drawGrid();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928cc63450899f8',t:'MTc2MTEzNDA1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
