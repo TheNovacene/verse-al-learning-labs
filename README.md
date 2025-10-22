@@ -63,4 +63,4 @@ This project is licensed under **VIDS‑BY 1.0** — a permissive framework for 
 
 You are free to use, adapt, remix, and redistribute anything in this repository **with attribution** and in alignment with the project’s values of openness, equity, and relational learning.
 
-For full terms, see [`LICENSE.md`](./LICENSE.md).
+For full terms, see [`LICENSE`](./LICENSE).
