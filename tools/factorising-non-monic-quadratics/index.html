@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-Monic Quadratic Factorization Whiteboard</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .accessibility-note {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .input-group input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dd6b20;
+            transform: translateY(-2px);
+        }
+
+        .quadratic-display {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 3px solid #e2e8f0;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .step-header {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #6c757d;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .factor-tiles {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tile {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .tile:hover {
+            background: #bbdefb;
+            transform: scale(1.05);
+        }
+
+        .tile.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .drop-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 5px;
+            min-height: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        .drop-zone.filled {
+            border-color: #48bb78;
+            background: #f0fff4;
+            color: #2d3748;
+        }
+
+        .step-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .grouping-visual {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .group {
+            border: 3px solid #805ad5;
+            border-radius: 10px;
+            padding: 15px;
+            background: #faf5ff;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .final-answer {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f0fff4;
+            border: 3px solid #48bb78;
+            border-radius: 15px;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .feedback.success {
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            color: #22543d;
+        }
+
+        .feedback.error {
+            background: #fed7d7;
+            border: 2px solid #e53e3e;
+            color: #742a2a;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .quadratic-display {
+                font-size: 1.8em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .factor-tiles {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Non-Monic Quadratic Factorization</h1>
+            <p>Learn to factor quadratics where a ≠ 1 using the "split the middle term" method</p>
+        </div>
+
+        <div class="accessibility-note">
+            <strong>♿ Accessibility:</strong> Tab to buttons/boxes • Use Enter to check • Use Reset to try a new quadratic • Drag tiles or click to place them
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="coeff-a">a =</label>
+                <input type="number" id="coeff-a" value="2" min="2" max="9">
+            </div>
+            <div class="input-group">
+                <label for="coeff-b">b =</label>
+                <input type="number" id="coeff-b" value="7" min="-20" max="20">
+            </div>
+            <div class="input-group">
+                <label for="coeff-c">c =</label>
+                <input type="number" id="coeff-c" value="3" min="-20" max="20">
+            </div>
+            <button class="btn btn-primary" onclick="generateQuadratic()">📝 Generate</button>
+            <button class="btn btn-warning" onclick="randomizeQuadratic()">🎲 Random</button>
+            <button class="btn btn-success" onclick="checkAnswer()">✅ Check Answer</button>
+            <button class="btn btn-primary" onclick="resetSteps()">🔄 Reset Steps</button>
+        </div>
+
+        <div class="quadratic-display" id="quadratic-display">
+            2x² + 7x + 3
+        </div>
+
+        <div class="steps-container">
+            <!-- Step 1: Calculate a×c -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    Calculate a × c
+                </div>
+                <div class="step-content">
+                    <p>First, multiply the coefficient of x² by the constant term:</p>
+                    <p><strong>a × c = <span id="a-value">2</span> × <span id="c-value">3</span> = <span id="ac-product">6</span></strong></p>
+                </div>
+            </div>
+
+            <!-- Step 2: Find factor pairs -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    Find two numbers that multiply to <span id="ac-display">6</span> and add to <span id="b-display">7</span>
+                </div>
+                <div class="step-content">
+                    <p>Available factor pairs of <span id="ac-display2">6</span>:</p>
+                    <div class="factor-tiles" id="factor-tiles">
+                        <div class="tile" draggable="true" onclick="selectTile(this, 1)" ondragstart="drag(event)">1</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, 6)" ondragstart="drag(event)">6</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, 2)" ondragstart="drag(event)">2</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, 3)" ondragstart="drag(event)">3</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, -1)" ondragstart="drag(event)">-1</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, -6)" ondragstart="drag(event)">-6</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, -2)" ondragstart="drag(event)">-2</div>
+                        <div class="tile" draggable="true" onclick="selectTile(this, -3)" ondragstart="drag(event)">-3</div>
+                    </div>
+                    <p>Drag the correct pair that adds to <strong><span id="b-display2">7</span></strong>:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div class="drop-zone" data-step="2" data-position="1" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                        <span style="font-size: 1.5em; margin: 0 10px;">and</span>
+                        <div class="drop-zone" data-step="2" data-position="2" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Rewrite middle term -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    Rewrite the middle term
+                </div>
+                <div class="step-content">
+                    <p>Split <span id="middle-term">7x</span> using your chosen factors:</p>
+                    <div style="text-align: center; font-size: 1.3em; margin: 20px 0;">
+                        <span id="rewritten-expression">2x² + ?x + ?x + 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Factor by grouping -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    Factor by grouping
+                </div>
+                <div class="step-content">
+                    <p>Group the terms and factor out common factors:</p>
+                    <div class="grouping-visual">
+                        <div class="group">
+                            <div>Group 1:</div>
+                            <div id="group1">2x² + ?x</div>
+                            <div>= 
+                                <div class="drop-zone" data-step="4" data-position="factor1" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                                (
+                                <div class="drop-zone" data-step="4" data-position="term1" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                                )
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div>Group 2:</div>
+                            <div id="group2">?x + 3</div>
+                            <div>= 
+                                <div class="drop-zone" data-step="4" data-position="factor2" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                                (
+                                <div class="drop-zone" data-step="4" data-position="term2" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                                )
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 20px 0; font-size: 1.2em;">
+                        <p>Final factorization (notice the common factor in brackets):</p>
+                        <div style="font-size: 1.5em; font-weight: bold;">
+                            (
+                            <div class="drop-zone" data-step="4" data-position="final1" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                            )(
+                            <div class="drop-zone" data-step="4" data-position="final2" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>
+                            )
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px;">Available factors and terms:</p>
+                    <div class="factor-tiles" id="grouping-tiles">
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, 'x')" ondragstart="drag(event)">x</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '1')" ondragstart="drag(event)">1</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '2')" ondragstart="drag(event)">2</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '3')" ondragstart="drag(event)">3</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '2x')" ondragstart="drag(event)">2x</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, 'x + 1')" ondragstart="drag(event)">x + 1</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '2x + 3')" ondragstart="drag(event)">2x + 3</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, 'x + 3')" ondragstart="drag(event)">x + 3</div>
+                        <div class="tile" draggable="true" onclick="selectGroupingTile(this, '2x + 1')" ondragstart="drag(event)">2x + 1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="final-answer" id="final-answer" style="display: none;">
+            Final Answer: (2x + 3)(x + 1)
+        </div>
+
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        let currentA = 2, currentB = 7, currentC = 3;
+        let selectedFactors = { first: null, second: null };
+        let factorPairs = [];
+
+        function generateQuadratic() {
+            currentA = parseInt(document.getElementById('coeff-a').value);
+            currentB = parseInt(document.getElementById('coeff-b').value);
+            currentC = parseInt(document.getElementById('coeff-c').value);
+            
+            updateDisplay();
+            resetSteps();
+        }
+
+        function randomizeQuadratic() {
+            // Generate factorable non-monic quadratics
+            const examples = [
+                [2, 7, 3], [3, 10, 3], [2, 5, 2], [4, 12, 5],
+                [6, 11, 3], [2, 9, 4], [3, 7, 2], [5, 13, 6],
+                [2, -7, 3], [3, -10, 3], [2, -5, 2], [4, -9, 2]
+            ];
+            
+            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+            currentA = randomExample[0];
+            currentB = randomExample[1];
+            currentC = randomExample[2];
+            
+            document.getElementById('coeff-a').value = currentA;
+            document.getElementById('coeff-b').value = currentB;
+            document.getElementById('coeff-c').value = currentC;
+            
+            updateDisplay();
+            resetSteps();
+        }
+
+        function updateDisplay() {
+            const bSign = currentB >= 0 ? '+' : '';
+            const cSign = currentC >= 0 ? '+' : '';
+            
+            document.getElementById('quadratic-display').textContent = 
+                `${currentA}x² ${bSign} ${currentB}x ${cSign} ${currentC}`;
+            
+            document.getElementById('a-value').textContent = currentA;
+            document.getElementById('c-value').textContent = currentC;
+            
+            const acProduct = currentA * currentC;
+            document.getElementById('ac-product').textContent = acProduct;
+            document.getElementById('ac-display').textContent = acProduct;
+            document.getElementById('ac-display2').textContent = acProduct;
+            document.getElementById('b-display').textContent = currentB;
+            document.getElementById('b-display2').textContent = currentB;
+            document.getElementById('middle-term').textContent = `${currentB}x`;
+            
+            generateFactorTiles();
+        }
+
+        function generateFactorTiles() {
+            const acProduct = currentA * currentC;
+            factorPairs = [];
+            
+            // Find all factor pairs of ac
+            for (let i = 1; i <= Math.abs(acProduct); i++) {
+                if (acProduct % i === 0) {
+                    const pair1 = [i, acProduct / i];
+                    const pair2 = [-i, -acProduct / i];
+                    factorPairs.push(pair1);
+                    if (i !== acProduct / i) {
+                        factorPairs.push(pair2);
+                    }
+                }
+            }
+            
+            // Add mixed sign pairs for negative products
+            if (acProduct < 0) {
+                for (let i = 1; i <= Math.abs(acProduct); i++) {
+                    if (acProduct % i === 0) {
+                        factorPairs.push([i, acProduct / i]);
+                        factorPairs.push([-i, -acProduct / i]);
+                    }
+                }
+            }
+            
+            // Remove duplicates and create tiles
+            const uniqueFactors = [...new Set(factorPairs.flat())];
+            const tilesContainer = document.getElementById('factor-tiles');
+            tilesContainer.innerHTML = '';
+            
+            uniqueFactors.forEach(factor => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = factor;
+                tile.draggable = true;
+                tile.ondragstart = drag;
+                tile.onclick = () => selectTile(tile, factor);
+                tilesContainer.appendChild(tile);
+            });
+        }
+
+        function selectTile(tile, factor) {
+            // Click to place functionality
+            const dropZones = document.querySelectorAll('.drop-zone[data-step="2"]');
+            const emptyZone = Array.from(dropZones).find(zone => !zone.classList.contains('filled'));
+            
+            if (emptyZone) {
+                emptyZone.textContent = factor;
+                emptyZone.classList.add('filled');
+                
+                const position = emptyZone.dataset.position;
+                selectedFactors[position === '1' ? 'first' : 'second'] = factor;
+                
+                tile.style.opacity = '0.3';
+                
+                updateRewrittenExpression();
+            }
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.textContent);
+            event.target.classList.add('dragging');
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+            event.target.classList.add('drag-over');
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            event.target.classList.remove('drag-over');
+            
+            const data = event.dataTransfer.getData("text");
+            const dropZone = event.target;
+            
+            if (dropZone.classList.contains('drop-zone') && !dropZone.classList.contains('filled')) {
+                dropZone.textContent = data;
+                dropZone.classList.add('filled');
+                
+                const step = dropZone.dataset.step;
+                const position = dropZone.dataset.position;
+                
+                // Only update selectedFactors for step 2
+                if (step === '2') {
+                    selectedFactors[position === '1' ? 'first' : 'second'] = parseInt(data);
+                    updateRewrittenExpression();
+                }
+                
+                // Hide the dragged tile
+                const tiles = document.querySelectorAll('.tile');
+                tiles.forEach(tile => {
+                    if (tile.textContent === data) {
+                        tile.style.opacity = '0.3';
+                        tile.classList.remove('dragging');
+                    }
+                });
+                
+                // Check if step 4 is complete
+                if (step === '4') {
+                    checkGroupingComplete();
+                }
+            }
+        }
+
+        function updateRewrittenExpression() {
+            if (selectedFactors.first !== null && selectedFactors.second !== null) {
+                const f1 = parseInt(selectedFactors.first);
+                const f2 = parseInt(selectedFactors.second);
+                
+                // Ensure we have valid numbers
+                if (isNaN(f1) || isNaN(f2)) return;
+                
+                // Format signs properly
+                const f1Text = f1 >= 0 ? `+ ${f1}x` : `- ${Math.abs(f1)}x`;
+                const f2Text = f2 >= 0 ? `+ ${f2}x` : `- ${Math.abs(f2)}x`;
+                const cText = currentC >= 0 ? `+ ${currentC}` : `- ${Math.abs(currentC)}`;
+                
+                document.getElementById('rewritten-expression').textContent = 
+                    `${currentA}x² ${f1Text} ${f2Text} ${cText}`;
+                
+                updateGrouping();
+            }
+        }
+
+        function updateGrouping() {
+            if (selectedFactors.first !== null && selectedFactors.second !== null) {
+                const f1 = parseInt(selectedFactors.first);
+                const f2 = parseInt(selectedFactors.second);
+                
+                // Ensure we have valid numbers
+                if (isNaN(f1) || isNaN(f2)) return;
+                
+                // Format group 1
+                const f1Text = f1 >= 0 ? `+ ${f1}x` : `- ${Math.abs(f1)}x`;
+                document.getElementById('group1').textContent = `${currentA}x² ${f1Text}`;
+                
+                // Format group 2
+                const f2Text = f2 >= 0 ? `${f2}x` : `-${Math.abs(f2)}x`;
+                const cText = currentC >= 0 ? `+ ${currentC}` : `- ${Math.abs(currentC)}`;
+                document.getElementById('group2').textContent = `${f2Text} ${cText}`;
+                
+                generateGroupingTiles();
+            }
+        }
+
+        function generateGroupingTiles() {
+            const f1 = parseInt(selectedFactors.first);
+            const f2 = parseInt(selectedFactors.second);
+            
+            if (f1 === null || f2 === null || isNaN(f1) || isNaN(f2)) return;
+            
+            // Create comprehensive list of available tiles for step 4
+            const groupingOptions = [];
+            
+            // Individual components (both positive and negative)
+            groupingOptions.push('x', '1', '-1', '-x');
+            
+            // Add common values (both positive and negative)
+            for (let i = 1; i <= 9; i++) {
+                groupingOptions.push(`${i}`, `-${i}`, `${i}x`, `-${i}x`);
+            }
+            
+            // Add comprehensive bracket expressions for all cases
+            for (let coeff = 1; coeff <= Math.max(currentA, Math.abs(currentC)); coeff++) {
+                for (let const_val = 1; const_val <= Math.max(Math.abs(currentB), Math.abs(currentC)); const_val++) {
+                    groupingOptions.push(`${coeff}x + ${const_val}`);
+                    groupingOptions.push(`${coeff}x - ${const_val}`);
+                    groupingOptions.push(`x + ${const_val}`);
+                    groupingOptions.push(`x - ${const_val}`);
+                    groupingOptions.push(`-${coeff}x + ${const_val}`);
+                    groupingOptions.push(`-${coeff}x - ${const_val}`);
+                    groupingOptions.push(`-x + ${const_val}`);
+                    groupingOptions.push(`-x - ${const_val}`);
+                }
+            }
+            
+            // Remove duplicates and filter out invalid options
+            const uniqueOptions = [...new Set(groupingOptions)]
+                .filter(option => {
+                    const str = String(option);
+                    return !str.includes('NaN') && !str.includes('undefined') && 
+                           str !== 'null' && str !== '' && str.length > 0 &&
+                           !str.includes('0x') && str !== '0';
+                })
+                .sort((a, b) => {
+                    const aStr = String(a);
+                    const bStr = String(b);
+                    // Sort by complexity: simple terms first, then complex expressions
+                    const aComplex = aStr.includes('+') || (aStr.includes('-') && aStr.indexOf('-') > 0);
+                    const bComplex = bStr.includes('+') || (bStr.includes('-') && bStr.indexOf('-') > 0);
+                    if (aComplex && !bComplex) return 1;
+                    if (!aComplex && bComplex) return -1;
+                    return aStr.localeCompare(bStr, undefined, { numeric: true });
+                });
+            
+            const tilesContainer = document.getElementById('grouping-tiles');
+            tilesContainer.innerHTML = '';
+            
+            uniqueOptions.forEach(option => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = option;
+                tile.draggable = true;
+                tile.ondragstart = drag;
+                tile.onclick = () => selectGroupingTile(tile, option);
+                tilesContainer.appendChild(tile);
+            });
+        }
+
+        function selectGroupingTile(tile, value) {
+            // Click to place functionality for step 4
+            const dropZones = document.querySelectorAll('.drop-zone[data-step="4"]');
+            const emptyZone = Array.from(dropZones).find(zone => !zone.classList.contains('filled'));
+            
+            if (emptyZone) {
+                emptyZone.textContent = value;
+                emptyZone.classList.add('filled');
+                tile.style.opacity = '0.3';
+                
+                // Don't update selectedFactors here - only check grouping completion
+                checkGroupingComplete();
+            }
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function checkGroupingComplete() {
+            const step4Zones = document.querySelectorAll('.drop-zone[data-step="4"]');
+            const allFilled = Array.from(step4Zones).every(zone => zone.classList.contains('filled'));
+            
+            if (allFilled) {
+                validateGrouping();
+            }
+        }
+
+        function validateGrouping() {
+            // Get all the filled values
+            const factor1 = document.querySelector('.drop-zone[data-position="factor1"]').textContent;
+            const term1 = document.querySelector('.drop-zone[data-position="term1"]').textContent;
+            const factor2 = document.querySelector('.drop-zone[data-position="factor2"]').textContent;
+            const term2 = document.querySelector('.drop-zone[data-position="term2"]').textContent;
+            const final1 = document.querySelector('.drop-zone[data-position="final1"]').textContent;
+            const final2 = document.querySelector('.drop-zone[data-position="final2"]').textContent;
+            
+            const feedback = document.getElementById('feedback');
+            
+            // Check if the final factorization expands correctly to our original quadratic
+            const isValidFactorization = checkFactorizationByExpansion(final1, final2);
+            
+            if (isValidFactorization) {
+                feedback.innerHTML = '<div class="feedback success">🎉 Perfect! You have successfully factored the quadratic completely!</div>';
+                
+                // Show final answer in the dedicated area
+                const finalAnswer = `(${final1})(${final2})`;
+                document.getElementById('final-answer').textContent = `Final Answer: ${finalAnswer}`;
+                document.getElementById('final-answer').style.display = 'block';
+            } else {
+                // Check individual grouping steps for more specific feedback
+                const group1Valid = checkGroupFactoring(factor1, term1, 'group1');
+                const group2Valid = checkGroupFactoring(factor2, term2, 'group2');
+                
+                let errorMsg = '❌ Check your work: ';
+                if (!group1Valid) errorMsg += 'Group 1 factoring needs correction. ';
+                if (!group2Valid) errorMsg += 'Group 2 factoring needs correction. ';
+                if (group1Valid && group2Valid) errorMsg += 'Final factorization needs correction - make sure both factors have the same expression in brackets.';
+                
+                feedback.innerHTML = `<div class="feedback error">${errorMsg}</div>`;
+            }
+        }
+        
+        function checkFactorizationByExpansion(factor1, factor2) {
+            // Parse the factors and expand to check if they equal our original quadratic
+            try {
+                const parsed1 = parseFactor(factor1);
+                const parsed2 = parseFactor(factor2);
+                
+                if (!parsed1 || !parsed2) return false;
+                
+                // Expand (ax + b)(cx + d) = acx² + (ad + bc)x + bd
+                const expandedA = parsed1.coeff * parsed2.coeff;
+                const expandedB = parsed1.coeff * parsed2.const + parsed1.const * parsed2.coeff;
+                const expandedC = parsed1.const * parsed2.const;
+                
+                return expandedA === currentA && expandedB === currentB && expandedC === currentC;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function parseFactor(factorStr) {
+            // Parse expressions like "x + 3", "2x + 1", "x - 2", etc.
+            const str = factorStr.trim();
+            
+            // Handle patterns like "2x + 1", "x + 3", "3x - 2", etc.
+            const match = str.match(/^(-?\d*)x\s*([+-])\s*(\d+)$/) || str.match(/^(-?\d+)\s*([+-])\s*(-?\d*)x$/);
+            
+            if (match) {
+                let coeff, constant;
+                
+                if (str.includes('x') && str.indexOf('x') < str.length / 2) {
+                    // x term comes first: "2x + 1"
+                    coeff = match[1] === '' ? 1 : (match[1] === '-' ? -1 : parseInt(match[1]));
+                    constant = match[2] === '+' ? parseInt(match[3]) : -parseInt(match[3]);
+                } else {
+                    // constant comes first: "3 + 2x" (less common but possible)
+                    constant = parseInt(match[1]);
+                    coeff = match[3] === '' ? 1 : (match[3] === '-' ? -1 : parseInt(match[3]));
+                    if (match[2] === '-') coeff = -coeff;
+                }
+                
+                return { coeff: coeff, const: constant };
+            }
+            
+            // Handle single terms like "x", "2x", "3", etc.
+            if (str === 'x') return { coeff: 1, const: 0 };
+            if (str.match(/^-?\d+x$/)) {
+                const coeff = str.replace('x', '');
+                return { coeff: coeff === '' ? 1 : (coeff === '-' ? -1 : parseInt(coeff)), const: 0 };
+            }
+            if (str.match(/^-?\d+$/)) {
+                return { coeff: 0, const: parseInt(str) };
+            }
+            
+            return null;
+        }
+        
+        function checkGroupFactoring(factor, term, groupId) {
+            // This is a more lenient check - we mainly care about the final result
+            // but we can provide some guidance on the grouping steps
+            
+            // Get the actual expression from the group
+            const groupText = document.getElementById(groupId).textContent;
+            
+            // For now, we'll be lenient on the grouping steps since there can be multiple valid ways
+            // to factor the same expression. The main validation is in the final factorization.
+            return true;
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            
+            if (selectedFactors.first === null || selectedFactors.second === null) {
+                feedback.innerHTML = '<div class="feedback error">❌ Please complete Step 2 by selecting both factors first!</div>';
+                return;
+            }
+            
+            const f1 = selectedFactors.first;
+            const f2 = selectedFactors.second;
+            
+            // Check if the factors multiply to ac and add to b
+            if (f1 * f2 === currentA * currentC && f1 + f2 === currentB) {
+                feedback.innerHTML = '<div class="feedback success">✅ Step 2 is correct! Now complete Step 4 by dragging the factors and terms.</div>';
+                
+                // Don't show final answer until step 4 is complete
+                const step4Zones = document.querySelectorAll('.drop-zone[data-step="4"]');
+                const step4Complete = Array.from(step4Zones).every(zone => zone.classList.contains('filled'));
+                
+                if (step4Complete) {
+                    validateGrouping();
+                }
+            } else {
+                feedback.innerHTML = '<div class="feedback error">❌ Not quite right. Check that your factors multiply to ' + 
+                    (currentA * currentC) + ' and add to ' + currentB + '.</div>';
+            }
+        }
+
+        function calculateFinalFactorization() {
+            // This is a simplified calculation - in practice, you'd need more complex logic
+            // for the complete factorization process
+            const f1 = selectedFactors.first;
+            const f2 = selectedFactors.second;
+            
+            // Find the actual factors (this is simplified)
+            const gcd1 = gcd(currentA, Math.abs(f1));
+            const remaining1 = currentA / gcd1;
+            const term1 = f1 / gcd1;
+            
+            const gcd2 = gcd(Math.abs(f2), Math.abs(currentC));
+            const remaining2 = Math.abs(currentC) / gcd2;
+            const term2 = f2 / gcd2;
+            
+            return `(${gcd1}x + ${gcd2})(${remaining1}x + ${remaining2})`;
+        }
+
+        function resetSteps() {
+            selectedFactors = { first: null, second: null };
+            
+            // Reset drop zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.textContent = '?';
+                zone.classList.remove('filled');
+            });
+            
+            // Reset tiles
+            const tiles = document.querySelectorAll('.tile');
+            tiles.forEach(tile => {
+                tile.style.opacity = '1';
+            });
+            
+            // Reset displays
+            const cSign = currentC >= 0 ? '+' : '';
+            document.getElementById('rewritten-expression').textContent = `${currentA}x² + ?x + ?x ${cSign} ${currentC}`;
+            document.getElementById('group1').textContent = `${currentA}x² + ?x`;
+            document.getElementById('group2').textContent = `?x ${cSign} ${currentC}`;
+            document.getElementById('final-answer').style.display = 'none';
+            document.getElementById('feedback').innerHTML = '';
+            
+            // Clear grouping tiles
+            document.getElementById('grouping-tiles').innerHTML = '';
+        }
+
+        // Initialize on page load with multiple fallbacks for iframe environments
+        function initializeApp() {
+            updateDisplay();
+        }
+
+        // Multiple initialization methods to ensure it works in iframe environments
+        window.onload = initializeApp;
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // Fallback initialization with delay for iframe loading
+        setTimeout(function() {
+            if (document.getElementById('factor-tiles').children.length === 0) {
+                initializeApp();
+            }
+        }, 100);
+
+        // Additional fallback for very slow loading environments
+        setTimeout(function() {
+            if (document.getElementById('factor-tiles').children.length === 0) {
+                initializeApp();
+            }
+        }, 500);
+
+        // Prevent drag over default behavior
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('dragleave', function(e) {
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.remove('drag-over');
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99294473834a4135',t:'MTc2MTEzODk2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
