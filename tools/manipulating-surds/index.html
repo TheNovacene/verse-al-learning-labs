@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipulating Surds Interactive Tool</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .section h2 {
+            color: #2d3748;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            font-size: 1.2rem;
+        }
+
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .problem-start {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .step {
+            font-size: 1.1rem;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .drop-zone {
+            min-height: 40px;
+            min-width: 60px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            color: #718096;
+            padding: 5px 10px;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .drop-zone.filled {
+            background: #e6fffa;
+            border-color: #38b2ac;
+            color: #2d3748;
+        }
+
+        .tiles-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            min-height: 50px;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 10px;
+        }
+
+        .tile {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tile:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        .tile.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #dd6b20;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span class="icon">√</span>
+                Manipulating Surds Interactive Tool
+                <span class="icon">📐</span>
+            </h1>
+            <p>Drag and drop the correct answers to complete each surd manipulation</p>
+        </div>
+
+        <div class="sections">
+            <!-- Section 1: Simplifying Surds -->
+            <div class="section" id="section1">
+                <h2><span class="icon">🔧</span> Simplifying Surds</h2>
+                <div class="question" id="question1">
+                    <div class="step-container">
+                        <div class="problem-start">√50</div>
+                        <div class="step">
+                            √50 = √(<span class="drop-zone" data-answer="25">?</span> × <span class="drop-zone" data-answer="2">?</span>)
+                        </div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="5">?</span>√2
+                        </div>
+                    </div>
+                </div>
+                <div class="tiles-container" id="tiles1">
+                    <div class="tile" draggable="true">5</div>
+                    <div class="tile" draggable="true">25</div>
+                    <div class="tile" draggable="true">2</div>
+                    <div class="tile" draggable="true">√2</div>
+                    <div class="tile" draggable="true">10</div>
+                    <div class="tile" draggable="true">√50</div>
+                    <div class="tile" draggable="true">√25</div>
+                    <div class="tile" draggable="true">50</div>
+                </div>
+                <div class="feedback" id="feedback1"></div>
+            </div>
+
+            <!-- Section 2: Adding/Subtracting Surds -->
+            <div class="section" id="section2">
+                <h2><span class="icon">➕</span> Adding/Subtracting Surds</h2>
+                <div class="question" id="question2">
+                    <div class="step-container">
+                        <div class="problem-start">√8 + √18</div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="2">?</span>√2 + <span class="drop-zone" data-answer="3">?</span>√2
+                        </div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="5">?</span>√2
+                        </div>
+                    </div>
+                </div>
+                <div class="tiles-container" id="tiles2">
+                    <div class="tile" draggable="true">2</div>
+                    <div class="tile" draggable="true">3</div>
+                    <div class="tile" draggable="true">5</div>
+                    <div class="tile" draggable="true">4</div>
+                    <div class="tile" draggable="true">6</div>
+                    <div class="tile" draggable="true">1</div>
+                    <div class="tile" draggable="true">8</div>
+                    <div class="tile" draggable="true">18</div>
+                </div>
+                <div class="feedback" id="feedback2"></div>
+            </div>
+
+            <!-- Section 3: Multiplying Surds -->
+            <div class="section" id="section3">
+                <h2><span class="icon">✖️</span> Multiplying Surds</h2>
+                <div class="question" id="question3">
+                    <div class="step-container">
+                        <div class="problem-start">(2√3) × (√5)</div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="2">?</span> × √(<span class="drop-zone" data-answer="3">?</span> × <span class="drop-zone" data-answer="5">?</span>)
+                        </div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="2√15">?</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tiles-container" id="tiles3">
+                    <div class="tile" draggable="true">√3</div>
+                    <div class="tile" draggable="true">√5</div>
+                    <div class="tile" draggable="true">√15</div>
+                    <div class="tile" draggable="true">2√15</div>
+                    <div class="tile" draggable="true">√8</div>
+                    <div class="tile" draggable="true">6√5</div>
+                    <div class="tile" draggable="true">3</div>
+                    <div class="tile" draggable="true">15</div>
+                    <div class="tile" draggable="true">2</div>
+                    <div class="tile" draggable="true">5</div>
+                </div>
+                <div class="feedback" id="feedback3"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="checkAllAnswers()">Check Answers</button>
+            <button class="btn btn-secondary" onclick="generateNewQuestions()">Try Another</button>
+        </div>
+    </div>
+
+    <script>
+        // Question sets for each section with step-by-step format
+        const questionSets = {
+            1: [
+                { 
+                    start: "√50", 
+                    dropZones: [
+                        { answer: "25" }, { answer: "2" }, { answer: "5" }
+                    ],
+                    options: ["5", "25", "2", "10", "50", "6", "4", "√2"]
+                },
+                { 
+                    start: "√72", 
+                    dropZones: [
+                        { answer: "36" }, { answer: "2" }, { answer: "6" }
+                    ],
+                    options: ["6", "36", "2", "12", "72", "8", "9", "√2"]
+                },
+                { 
+                    start: "√98", 
+                    dropZones: [
+                        { answer: "49" }, { answer: "2" }, { answer: "7" }
+                    ],
+                    options: ["7", "49", "2", "14", "98", "9", "8", "√2"]
+                },
+                { 
+                    start: "√75", 
+                    dropZones: [
+                        { answer: "25" }, { answer: "3" }, { answer: "5" }
+                    ],
+                    options: ["5", "25", "3", "15", "75", "6", "4", "√3"]
+                }
+            ],
+            2: [
+                { 
+                    start: "√8 + √18", 
+                    dropZones: [
+                        { answer: "2" }, { answer: "3" }, { answer: "5" }
+                    ],
+                    options: ["2", "3", "5", "4", "6", "1", "8", "18"]
+                },
+                { 
+                    start: "√12 + √27", 
+                    dropZones: [
+                        { answer: "2" }, { answer: "3" }, { answer: "5" }
+                    ],
+                    options: ["2", "3", "5", "4", "6", "1", "12", "27"]
+                },
+                { 
+                    start: "√20 - √5", 
+                    dropZones: [
+                        { answer: "2" }, { answer: "1" }, { answer: "1" }
+                    ],
+                    options: ["2", "1", "3", "4", "5", "0", "20", "6"]
+                },
+                { 
+                    start: "√32 + √2", 
+                    dropZones: [
+                        { answer: "4" }, { answer: "1" }, { answer: "5" }
+                    ],
+                    options: ["4", "1", "5", "6", "3", "2", "32", "8"]
+                }
+            ],
+            3: [
+                { 
+                    start: "(2√3) × (√5)", 
+                    dropZones: [
+                        { answer: "2" }, { answer: "3" }, { answer: "5" }, { answer: "2√15" }
+                    ],
+                    options: ["2", "3", "5", "√3", "√5", "√15", "2√15", "6", "15"]
+                },
+                { 
+                    start: "(√6) × (√2)", 
+                    dropZones: [
+                        { answer: "6" }, { answer: "2" }, { answer: "√12" }
+                    ],
+                    options: ["6", "2", "12", "√12", "√6", "8", "4", "3"]
+                },
+                { 
+                    start: "(3√2) × (2√3)", 
+                    dropZones: [
+                        { answer: "6" }, { answer: "2" }, { answer: "3" }, { answer: "6√6" }
+                    ],
+                    options: ["6", "2", "3", "√2", "√3", "√6", "6√6", "12", "5"]
+                },
+                { 
+                    start: "(√7) × (√7)", 
+                    dropZones: [
+                        { answer: "7" }, { answer: "7" }, { answer: "7" }
+                    ],
+                    options: ["7", "7", "7", "49", "√7", "14", "2", "1"]
+                }
+            ]
+        };
+
+        let currentQuestions = [0, 0, 0]; // Track current question index for each section
+
+        // Initialize drag and drop functionality
+        function initializeDragAndDrop() {
+            const tiles = document.querySelectorAll('.tile');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            tiles.forEach(tile => {
+                tile.addEventListener('dragstart', handleDragStart);
+                tile.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.textContent);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData('text/plain');
+            const dropZone = e.target;
+            
+            dropZone.textContent = data;
+            dropZone.classList.remove('drag-over');
+            dropZone.classList.add('filled');
+            
+            // Remove the dragged tile
+            const tiles = document.querySelectorAll('.tile');
+            tiles.forEach(tile => {
+                if (tile.textContent === data && tile.classList.contains('dragging')) {
+                    tile.remove();
+                }
+            });
+        }
+
+        function checkAllAnswers() {
+            let allCorrect = true;
+            let totalSteps = 0;
+            let correctSteps = 0;
+            
+            for (let i = 1; i <= 3; i++) {
+                const dropZones = document.querySelectorAll(`#section${i} .drop-zone`);
+                const feedback = document.getElementById(`feedback${i}`);
+                let sectionCorrect = true;
+                
+                dropZones.forEach(zone => {
+                    totalSteps++;
+                    const correctAnswer = zone.dataset.answer;
+                    const userAnswer = zone.textContent.trim();
+                    
+                    if (userAnswer === correctAnswer) {
+                        correctSteps++;
+                        zone.style.borderColor = '#48bb78';
+                        zone.style.backgroundColor = '#c6f6d5';
+                    } else {
+                        zone.style.borderColor = '#e53e3e';
+                        zone.style.backgroundColor = '#fed7d7';
+                        sectionCorrect = false;
+                        allCorrect = false;
+                    }
+                });
+                
+                if (sectionCorrect) {
+                    feedback.textContent = "✅ All steps correct! Well done!";
+                    feedback.className = "feedback correct";
+                } else {
+                    feedback.textContent = `❌ Some steps need work. Check the highlighted areas.`;
+                    feedback.className = "feedback incorrect";
+                }
+                feedback.style.display = "block";
+            }
+            
+            if (allCorrect) {
+                setTimeout(() => {
+                    const celebration = document.createElement('div');
+                    celebration.innerHTML = "🎉 Perfect! You've completed all steps correctly! 🎉";
+                    celebration.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: #48bb78;
+                        color: white;
+                        padding: 20px;
+                        border-radius: 15px;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    `;
+                    document.body.appendChild(celebration);
+                    
+                    setTimeout(() => {
+                        celebration.remove();
+                    }, 3000);
+                }, 500);
+            }
+        }
+
+        function generateNewQuestions() {
+            // Update current question indices
+            currentQuestions = currentQuestions.map((current, index) => 
+                (current + 1) % questionSets[index + 1].length
+            );
+            
+            // Update each section
+            for (let i = 1; i <= 3; i++) {
+                const questionSet = questionSets[i][currentQuestions[i - 1]];
+                const questionDiv = document.getElementById(`question${i}`);
+                const tilesContainer = document.getElementById(`tiles${i}`);
+                const feedback = document.getElementById(`feedback${i}`);
+                
+                // Build step-by-step HTML based on section
+                let stepsHTML = `
+                    <div class="step-container">
+                        <div class="problem-start">${questionSet.start}</div>
+                `;
+                
+                if (i === 1) { // Simplifying surds
+                    const radicalPart = questionSet.start === "√75" ? "√3" : "√2";
+                    stepsHTML += `
+                        <div class="step">
+                            ${questionSet.start} = √(<span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span> × <span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span>)
+                        </div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>${radicalPart}
+                        </div>
+                    `;
+                } else if (i === 2) { // Adding/subtracting surds
+                    const operator = questionSet.start.includes('-') ? '-' : '+';
+                    stepsHTML += `
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span>√2 ${operator} <span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span>√2
+                        </div>
+                        <div class="step">
+                            = <span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>√2
+                        </div>
+                    `;
+                } else if (i === 3) { // Multiplying surds
+                    if (questionSet.start === "(√6) × (√2)") {
+                        stepsHTML += `
+                            <div class="step">
+                                = √(<span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span> × <span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span>)
+                            </div>
+                            <div class="step">
+                                = √<span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>
+                            </div>
+                        `;
+                    } else if (questionSet.start === "(√7) × (√7)") {
+                        stepsHTML += `
+                            <div class="step">
+                                = √(<span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span> × <span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span>)
+                            </div>
+                            <div class="step">
+                                = <span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>
+                            </div>
+                        `;
+                    } else if (questionSet.start === "(2√3) × (√5)") {
+                        stepsHTML += `
+                            <div class="step">
+                                = <span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span> × √(<span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span> × <span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>)
+                            </div>
+                            <div class="step">
+                                = <span class="drop-zone" data-answer="${questionSet.dropZones[3].answer}">?</span>
+                            </div>
+                        `;
+                    } else { // (3√2) × (2√3)
+                        stepsHTML += `
+                            <div class="step">
+                                = <span class="drop-zone" data-answer="${questionSet.dropZones[0].answer}">?</span> × √(<span class="drop-zone" data-answer="${questionSet.dropZones[1].answer}">?</span> × <span class="drop-zone" data-answer="${questionSet.dropZones[2].answer}">?</span>)
+                            </div>
+                            <div class="step">
+                                = <span class="drop-zone" data-answer="${questionSet.dropZones[3].answer}">?</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                stepsHTML += '</div>';
+                questionDiv.innerHTML = stepsHTML;
+                
+                // Clear and update tiles
+                tilesContainer.innerHTML = '';
+                questionSet.options.forEach(option => {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.draggable = true;
+                    tile.textContent = option;
+                    tilesContainer.appendChild(tile);
+                });
+                
+                // Hide feedback and reset drop zone styles
+                feedback.style.display = "none";
+                const dropZones = questionDiv.querySelectorAll('.drop-zone');
+                dropZones.forEach(zone => {
+                    zone.style.borderColor = '#cbd5e0';
+                    zone.style.backgroundColor = '#f7fafc';
+                });
+            }
+            
+            // Reinitialize drag and drop
+            initializeDragAndDrop();
+        }
+
+        // Initialize the tool
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928f472e35b99f8',t:'MTc2MTEzNTY5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
