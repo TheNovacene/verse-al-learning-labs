@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Rearranging Formulae Practice</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .difficulty-section {
+            margin-bottom: 30px;
+        }
+
+        .difficulty-section label {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .formula-display {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .formula-text {
+            font-size: 2rem;
+            font-family: 'Times New Roman', serif;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .target-section {
+            margin: 25px 0;
+        }
+
+        .target-section label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .target-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .answer-section {
+            margin: 25px 0;
+        }
+
+        .answer-section label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone {
+            min-height: 80px;
+            border: 3px dashed #4facfe;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f8f9ff;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: scale(1.02);
+        }
+
+        .drop-placeholder {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 1.1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .symbol-bank {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .bank-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .symbols-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .symbol-item {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1.3rem;
+            font-family: 'Times New Roman', serif;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .symbol-item:hover {
+            background: #e3f2fd;
+            border-color: #4facfe;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .symbol-item:active {
+            cursor: grabbing;
+        }
+
+        .symbol-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .dropped-symbol {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            font-family: 'Times New Roman', serif;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin: 2px;
+        }
+
+        .fraction-container {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            font-family: 'Times New Roman', serif;
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2px;
+            min-width: 60px;
+        }
+
+        .fraction-numerator {
+            min-height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2px;
+            padding: 2px 4px;
+            border: 1px dashed #28a745;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .fraction-line {
+            width: 100%;
+            height: 2px;
+            background: #333;
+            margin: 2px 0;
+        }
+
+        .fraction-denominator {
+            min-height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2px;
+            padding: 2px 4px;
+            border: 1px dashed #28a745;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .fraction-part {
+            font-size: 0.9rem;
+            background: white;
+            border: 1px solid #28a745;
+            border-radius: 3px;
+            padding: 2px 4px;
+            margin: 1px;
+        }
+
+        .fraction-placeholder {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.8rem;
+        }
+
+        .clear-all-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-all-btn:hover {
+            background: #5a6268;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b4513;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(252, 182, 159, 0.3);
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .hints {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .hints h3 {
+            margin: 0 0 15px 0;
+            color: #856404;
+            font-size: 1.2rem;
+        }
+
+        .hints ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+
+        .hints li {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .placeholder-text {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .formula-text {
+                font-size: 1.5rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>GCSE Rearranging Formulae Practice</h1>
+            <p>Master the art of making any variable the subject of a formula</p>
+        </header>
+        
+        <main class="main-content">
+            <div class="difficulty-section">
+                <label for="difficulty">Choose Difficulty Level:</label>
+                <select id="difficulty" class="difficulty-select">
+                    <option value="">Select a difficulty level...</option>
+                    <option value="easy">Easy - Simple linear formulae</option>
+                    <option value="moderate">Moderate - Quadratic and fraction formulae</option>
+                    <option value="hard">Hard - Complex multi-step formulae</option>
+                </select>
+            </div>
+
+            <div class="formula-display" id="formulaDisplay">
+                <div class="placeholder-text">Select a difficulty level to start practicing!</div>
+            </div>
+
+            <div class="target-section" id="targetSection" style="display: none;">
+                <label for="targetVariable">Make this variable the subject:</label>
+                <select id="targetVariable" class="target-select">
+                    <option value="">Choose a variable...</option>
+                </select>
+            </div>
+
+            <div class="answer-section" id="answerSection" style="display: none;">
+                <label for="answerInput">Drag and drop to build your rearranged formula:</label>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-placeholder">Drag symbols here to build your formula</div>
+                </div>
+                <button class="clear-all-btn" id="clearAllBtn" style="display: none;">Clear All</button>
+                <div class="symbol-bank" id="symbolBank">
+                    <div class="bank-title">Available Symbols:</div>
+                    <div class="symbols-container" id="symbolsContainer"></div>
+                </div>
+            </div>
+
+            <div class="button-group" id="buttonGroup" style="display: none;">
+                <button class="btn btn-primary" id="checkBtn">Check Answer</button>
+                <button class="btn btn-secondary" id="newQuestionBtn">New Question</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="hints" id="hints" style="display: none;">
+                <h3>💡 Helpful Tips:</h3>
+                <ul id="hintsList"></ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const formulae = {
+            easy: [
+                { formula: 'A = bh', variables: ['A', 'b', 'h'], answers: { 'b': 'b = A/h', 'h': 'h = A/b' } },
+                { formula: 'v = ir', variables: ['v', 'i', 'r'], answers: { 'i': 'i = v/r', 'r': 'r = v/i' } },
+                { formula: 'P = IV', variables: ['P', 'I', 'V'], answers: { 'I': 'I = P/V', 'V': 'V = P/I' } },
+                { formula: 'F = ma', variables: ['F', 'm', 'a'], answers: { 'm': 'm = F/a', 'a': 'a = F/m' } },
+                { formula: 'C = 2πr', variables: ['C', 'r'], answers: { 'r': 'r = C/(2π)' } },
+                { formula: 'd = st', variables: ['d', 's', 't'], answers: { 's': 's = d/t', 't': 't = d/s' } }
+            ],
+            moderate: [
+                { formula: 's = ut + ½at²', variables: ['s', 'u', 't', 'a'], answers: { 'u': 'u = (s - ½at²)/t', 't': 't = (-u ± √(u² + 2as))/a', 'a': 'a = 2(s - ut)/t²' } },
+                { formula: 'A = πr²', variables: ['A', 'r'], answers: { 'r': 'r = √(A/π)' } },
+                { formula: 'V = ⅓πr²h', variables: ['V', 'r', 'h'], answers: { 'r': 'r = √(3V/(πh))', 'h': 'h = 3V/(πr²)' } },
+                { formula: 'E = ½mv²', variables: ['E', 'm', 'v'], answers: { 'm': 'm = 2E/v²', 'v': 'v = √(2E/m)' } },
+                { formula: 'a² + b² = c²', variables: ['a', 'b', 'c'], answers: { 'a': 'a = √(c² - b²)', 'b': 'b = √(c² - a²)', 'c': 'c = √(a² + b²)' } }
+            ],
+            hard: [
+                { formula: 'v² = u² + 2as', variables: ['v', 'u', 'a', 's'], answers: { 'u': 'u = √(v² - 2as)', 'a': 'a = (v² - u²)/(2s)', 's': 's = (v² - u²)/(2a)' } },
+                { formula: '1/f = 1/u + 1/v', variables: ['f', 'u', 'v'], answers: { 'u': 'u = fv/(v - f)', 'v': 'v = fu/(u - f)', 'f': 'f = uv/(u + v)' } },
+                { formula: 'T = 2π√(l/g)', variables: ['T', 'l', 'g'], answers: { 'l': 'l = gT²/(4π²)', 'g': 'g = 4π²l/T²' } },
+                { formula: 'R = (ρl)/A', variables: ['R', 'ρ', 'l', 'A'], answers: { 'ρ': 'ρ = RA/l', 'l': 'l = RA/ρ', 'A': 'A = ρl/R' } }
+            ]
+        };
+
+        const hints = {
+            easy: [
+                "Start by identifying what you want to isolate",
+                "Use inverse operations: if multiplying, divide both sides",
+                "If dividing, multiply both sides",
+                "Always do the same operation to both sides"
+            ],
+            moderate: [
+                "Look for squares and square roots - remember to consider ± when taking square roots",
+                "When dealing with fractions, multiply both sides by the denominator",
+                "For quadratic terms, you might need to complete the square or use the quadratic formula",
+                "Take your time with multi-step rearrangements"
+            ],
+            hard: [
+                "Break complex formulae into smaller steps",
+                "For reciprocal formulae (1/x), find common denominators first",
+                "Square root formulae: square both sides to eliminate the root",
+                "Check your answer by substituting back into the original formula"
+            ]
+        };
+
+        let currentQuestion = null;
+        let currentTarget = null;
+        let droppedSymbols = [];
+
+        const difficultySelect = document.getElementById('difficulty');
+        const formulaDisplay = document.getElementById('formulaDisplay');
+        const targetSection = document.getElementById('targetSection');
+        const targetVariable = document.getElementById('targetVariable');
+        const answerSection = document.getElementById('answerSection');
+        const dropZone = document.getElementById('dropZone');
+        const symbolsContainer = document.getElementById('symbolsContainer');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const buttonGroup = document.getElementById('buttonGroup');
+        const checkBtn = document.getElementById('checkBtn');
+        const newQuestionBtn = document.getElementById('newQuestionBtn');
+        const feedback = document.getElementById('feedback');
+        const hintsSection = document.getElementById('hints');
+        const hintsList = document.getElementById('hintsList');
+
+        difficultySelect.addEventListener('change', function() {
+            const difficulty = this.value;
+            if (difficulty) {
+                showHints(difficulty);
+                generateQuestion(difficulty);
+            } else {
+                hideAllSections();
+            }
+        });
+
+        targetVariable.addEventListener('change', function() {
+            currentTarget = this.value;
+            if (currentTarget) {
+                generateSymbolBank();
+                answerSection.style.display = 'block';
+                buttonGroup.style.display = 'flex';
+            }
+        });
+
+        clearAllBtn.addEventListener('click', function() {
+            clearDropZone();
+        });
+
+        checkBtn.addEventListener('click', checkAnswer);
+        newQuestionBtn.addEventListener('click', function() {
+            generateQuestion(difficultySelect.value);
+        });
+
+        function generateQuestion(difficulty) {
+            const questions = formulae[difficulty];
+            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            
+            formulaDisplay.innerHTML = `<div class="formula-text">${currentQuestion.formula}</div>`;
+            
+            // Populate target variable options
+            targetVariable.innerHTML = '<option value="">Choose a variable...</option>';
+            currentQuestion.variables.forEach(variable => {
+                if (currentQuestion.answers[variable]) {
+                    const option = document.createElement('option');
+                    option.value = variable;
+                    option.textContent = variable;
+                    targetVariable.appendChild(option);
+                }
+            });
+            
+            targetSection.style.display = 'block';
+            answerSection.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            feedback.style.display = 'none';
+            clearDropZone();
+            currentTarget = null;
+        }
+
+        function generateSymbolBank() {
+            const symbols = getSymbolsForQuestion();
+            symbolsContainer.innerHTML = '';
+            
+            symbols.forEach(symbol => {
+                const symbolElement = document.createElement('div');
+                symbolElement.className = 'symbol-item';
+                symbolElement.textContent = symbol;
+                symbolElement.draggable = true;
+                
+                symbolElement.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', symbol);
+                    this.classList.add('dragging');
+                });
+                
+                symbolElement.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+                
+                symbolsContainer.appendChild(symbolElement);
+            });
+            
+            setupDropZone();
+        }
+
+        function getSymbolsForQuestion() {
+            const baseSymbols = ['=', '+', '-', '×', '÷', '/', '―', '(', ')', '²', '√', 'π'];
+            const variables = [...new Set(currentQuestion.variables)];
+            const numbers = ['1', '2', '3', '4', '½', '⅓', '¼'];
+            
+            return [...baseSymbols, ...variables, ...numbers];
+        }
+
+        function setupDropZone() {
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            
+            dropZone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                const symbol = e.dataTransfer.getData('text/plain');
+                addSymbolToDropZone(symbol);
+            });
+        }
+
+        function addSymbolToDropZone(symbol) {
+            const placeholder = dropZone.querySelector('.drop-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            if (symbol === '―') {
+                // Create a fraction container
+                const fractionElement = document.createElement('div');
+                fractionElement.className = 'fraction-container';
+                fractionElement.innerHTML = `
+                    <div class="fraction-numerator">
+                        <span class="fraction-placeholder">numerator</span>
+                    </div>
+                    <div class="fraction-line"></div>
+                    <div class="fraction-denominator">
+                        <span class="fraction-placeholder">denominator</span>
+                    </div>
+                `;
+                
+                // Set up drag and drop for numerator and denominator
+                setupFractionDropZones(fractionElement);
+                
+                dropZone.appendChild(fractionElement);
+                droppedSymbols.push('fraction');
+            } else {
+                const symbolElement = document.createElement('div');
+                symbolElement.className = 'dropped-symbol';
+                symbolElement.textContent = symbol;
+                
+                dropZone.appendChild(symbolElement);
+                droppedSymbols.push(symbol);
+            }
+            
+            clearAllBtn.style.display = 'block';
+        }
+
+        function setupFractionDropZones(fractionElement) {
+            const numerator = fractionElement.querySelector('.fraction-numerator');
+            const denominator = fractionElement.querySelector('.fraction-denominator');
+            
+            [numerator, denominator].forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.style.background = 'rgba(79, 172, 254, 0.2)';
+                });
+                
+                zone.addEventListener('dragleave', function(e) {
+                    e.stopPropagation();
+                    this.style.background = 'rgba(255,255,255,0.3)';
+                });
+                
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.style.background = 'rgba(255,255,255,0.3)';
+                    
+                    const symbol = e.dataTransfer.getData('text/plain');
+                    addSymbolToFraction(this, symbol);
+                });
+            });
+        }
+
+        function addSymbolToFraction(zone, symbol) {
+            // Remove placeholder if it exists
+            const placeholder = zone.querySelector('.fraction-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            const symbolElement = document.createElement('span');
+            symbolElement.className = 'fraction-part';
+            symbolElement.textContent = symbol;
+            
+            zone.appendChild(symbolElement);
+        }
+
+
+
+        function clearDropZone() {
+            dropZone.innerHTML = '';
+            droppedSymbols = [];
+            showDropPlaceholder();
+            clearAllBtn.style.display = 'none';
+        }
+
+        function showDropPlaceholder() {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'drop-placeholder';
+            placeholder.textContent = 'Drag symbols here to build your formula';
+            dropZone.appendChild(placeholder);
+        }
+
+        function checkAnswer() {
+            if (!currentTarget || droppedSymbols.length === 0) {
+                showFeedback('Please build your formula first by dragging symbols!', false);
+                return;
+            }
+
+            const userAnswer = buildAnswerString();
+            const correctAnswer = currentQuestion.answers[currentTarget];
+            
+            // Normalize both answers for comparison
+            const normalizedUser = normalizeAnswer(userAnswer);
+            const normalizedCorrect = normalizeAnswer(correctAnswer);
+            
+            // Also check common alternative formats
+            const alternatives = generateAlternatives(correctAnswer);
+            const normalizedAlternatives = alternatives.map(alt => normalizeAnswer(alt));
+            
+            const isCorrect = normalizedAlternatives.some(alt => alt === normalizedUser) || 
+                             normalizedCorrect === normalizedUser;
+
+            if (isCorrect) {
+                showFeedback(`🎉 Excellent! The correct answer is: ${correctAnswer}`, true);
+            } else {
+                showFeedback(`❌ Not quite right. The correct answer is: ${correctAnswer}. Try building it again!`, false);
+            }
+        }
+
+        function buildAnswerString() {
+            let answerString = '';
+            const children = dropZone.children;
+            
+            for (let child of children) {
+                if (child.classList.contains('dropped-symbol')) {
+                    answerString += child.textContent;
+                } else if (child.classList.contains('fraction-container')) {
+                    const numeratorParts = child.querySelector('.fraction-numerator').querySelectorAll('.fraction-part');
+                    const denominatorParts = child.querySelector('.fraction-denominator').querySelectorAll('.fraction-part');
+                    
+                    let numerator = '';
+                    let denominator = '';
+                    
+                    numeratorParts.forEach(part => numerator += part.textContent);
+                    denominatorParts.forEach(part => denominator += part.textContent);
+                    
+                    if (numerator && denominator) {
+                        answerString += `(${numerator})/(${denominator})`;
+                    }
+                }
+            }
+            
+            return answerString;
+        }
+
+        function normalizeAnswer(answer) {
+            return answer
+                .toLowerCase()
+                .replace(/\s/g, '')
+                .replace(/sqrt/g, '√')
+                .replace(/\*/g, '×')
+                .replace(/\÷/g, '/')
+                .replace(/\(/g, '')
+                .replace(/\)/g, '');
+        }
+
+        function generateAlternatives(answer) {
+            const alternatives = [answer];
+            
+            // Add version without spaces
+            alternatives.push(answer.replace(/\s/g, ''));
+            
+            // Add version with √ instead of sqrt
+            alternatives.push(answer.replace(/sqrt/g, '√'));
+            
+            // Add version with different fraction formats
+            if (answer.includes('/')) {
+                alternatives.push(answer.replace(/\//g, '÷'));
+            }
+            
+            // Add version with different multiplication formats
+            alternatives.push(answer.replace(/\*/g, '×'));
+            
+            // Add version without parentheses for simple cases
+            alternatives.push(answer.replace(/\(/g, '').replace(/\)/g, ''));
+            
+            // Combine all transformations
+            const baseAnswer = answer.replace(/\s/g, '').replace(/sqrt/g, '√');
+            alternatives.push(baseAnswer);
+            alternatives.push(baseAnswer.replace(/\(/g, '').replace(/\)/g, ''));
+            
+            return alternatives;
+        }
+
+        function showFeedback(message, isCorrect) {
+            feedback.textContent = message;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.style.display = 'block';
+        }
+
+        function showHints(difficulty) {
+            const hintItems = hints[difficulty];
+            hintsList.innerHTML = '';
+            hintItems.forEach(hint => {
+                const li = document.createElement('li');
+                li.textContent = hint;
+                hintsList.appendChild(li);
+            });
+            hintsSection.style.display = 'block';
+        }
+
+        function hideAllSections() {
+            formulaDisplay.innerHTML = '<div class="placeholder-text">Select a difficulty level to start practicing!</div>';
+            targetSection.style.display = 'none';
+            answerSection.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            feedback.style.display = 'none';
+            hintsSection.style.display = 'none';
+        }
+
+
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928e6cf62c599f8',t:'MTc2MTEzNTEzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
