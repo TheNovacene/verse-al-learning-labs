@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadratic Factorization Whiteboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .drop-zone {
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+        
+        .factor-pair {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .equation-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-900 mb-2">🧮 Quadratic Factorization Whiteboard</h1>
+            <p class="text-gray-600 text-lg">Tab between inputs • Use Enter to check • Drag to pair m, n</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <button id="monicBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+                        📚 Monic (x²)
+                    </button>
+                    <button id="nonMonicBtn" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold">
+                        🚀 Non-Monic (ax²)
+                    </button>
+                </div>
+                
+                <button id="generateBtn" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold">
+                    🎲 New Quadratic
+                </button>
+            </div>
+            
+            <!-- Hidden inputs for internal use -->
+            <div class="hidden">
+                <div id="aInput" class="hidden items-center gap-1">
+                    <input type="number" id="a" value="1" min="1" max="5" class="w-16 p-2 border-2 border-gray-300 rounded-lg text-center font-bold text-lg">
+                </div>
+                <input type="number" id="b" value="5" min="-10" max="10" class="w-16 p-2 border-2 border-gray-300 rounded-lg text-center font-bold text-lg">
+                <input type="number" id="c" value="6" min="-20" max="20" class="w-16 p-2 border-2 border-gray-300 rounded-lg text-center font-bold text-lg">
+            </div>
+            
+            <!-- Equation Display -->
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <div id="equationDisplay" class="equation-display text-indigo-900"></div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Factor Pairs Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">🔢 Factor Pairs of <span id="cValue">6</span></h2>
+                <p class="text-gray-600 mb-4">Drag a pair (m, n) where m × n = c</p>
+                <div id="factorPairs" class="grid grid-cols-2 gap-3"></div>
+            </div>
+
+            <!-- Guess Box Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">🎯 Your Factorization</h2>
+                
+                <!-- Drop Zones -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-center gap-2 mb-4">
+                        <span class="text-xl font-bold">(x +</span>
+                        <div id="dropZone1" class="drop-zone w-16 h-16 border-4 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-2xl font-bold">
+                            ?
+                        </div>
+                        <span class="text-xl font-bold">)(x +</span>
+                        <div id="dropZone2" class="drop-zone w-16 h-16 border-4 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-2xl font-bold">
+                            ?
+                        </div>
+                        <span class="text-xl font-bold">)</span>
+                    </div>
+                    
+                    <div class="text-center space-y-3">
+                        <button id="checkBtn" class="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            ✓ Check Answer
+                        </button>
+                        <div class="text-sm text-gray-600">OR</div>
+                        <button id="cannotFactorBtn" class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold">
+                            🚫 Cannot be factored (over integers)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback" class="hidden p-4 rounded-lg mb-4"></div>
+
+                <!-- Step-by-Step Solution Process -->
+                <div id="solutionSteps" class="hidden space-y-4">
+                    <!-- Step 1: Show factorization -->
+                    <div id="step1" class="hidden bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-green-800 mb-2">🎉 Step 1: Correct Factorization!</h3>
+                        <div id="factorizationDisplay" class="text-green-700 font-semibold text-xl mb-3"></div>
+                        <button id="nextStep1" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                            Next: Apply Zero Product Property →
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Zero Product Property -->
+                    <div id="step2" class="hidden bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-2">📐 Step 2: Zero Product Property</h3>
+                        <p class="text-blue-700 mb-3">If (x + m)(x + n) = 0, then either factor must equal zero:</p>
+                        <div id="zeroProductDisplay" class="space-y-2 mb-3"></div>
+                        <button id="nextStep2" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            Next: Solve Each Equation →
+                        </button>
+                    </div>
+
+                    <!-- Step 3: Interactive Solving -->
+                    <div id="step3" class="hidden bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-purple-800 mb-2">🔍 Step 3: Solve Each Equation</h3>
+                        <div class="space-y-4">
+                            <div class="bg-white rounded-lg p-3 border">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span id="equation1" class="text-lg font-semibold"></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">x = </span>
+                                    <input type="number" id="solution1Input" class="w-20 p-2 border-2 border-gray-300 rounded-lg text-center font-bold">
+                                    <button id="check1" class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm">Check</button>
+                                    <span id="feedback1" class="ml-2"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg p-3 border">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span id="equation2" class="text-lg font-semibold"></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">x = </span>
+                                    <input type="number" id="solution2Input" class="w-20 p-2 border-2 border-gray-300 rounded-lg text-center font-bold">
+                                    <button id="check2" class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm">Check</button>
+                                    <span id="feedback2" class="ml-2"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="step3Complete" class="hidden mt-4 p-3 bg-green-100 rounded-lg">
+                            <button id="showFinalAnswer" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                                Show Final Answer →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Final Solution -->
+                    <div id="step4" class="hidden bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-yellow-800 mb-2">🏆 Final Answer</h3>
+                        <div id="finalSolutionDisplay" class="text-yellow-700 font-semibold text-xl"></div>
+                        <div class="mt-3 text-sm text-yellow-600">
+                            <p>✓ Check: Substitute these values back into the original equation to verify!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="text-center mt-6">
+            <button id="resetBtn" class="px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold text-lg">
+                🔄 Reset Current Problem
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class QuadraticFactorizer {
+            constructor() {
+                this.currentA = 1;
+                this.currentB = 5;
+                this.currentC = 6;
+                this.isAdvancedMode = false;
+                this.draggedElement = null;
+                this.dropZone1Value = null;
+                this.dropZone2Value = null;
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.setMonicMode(); // Initialize in monic mode
+                this.updateDisplay();
+                this.generateFactorPairs();
+            }
+            
+            initializeElements() {
+                this.aInput = document.getElementById('a');
+                this.bInput = document.getElementById('b');
+                this.cInput = document.getElementById('c');
+                this.equationDisplay = document.getElementById('equationDisplay');
+                this.factorPairs = document.getElementById('factorPairs');
+                this.dropZone1 = document.getElementById('dropZone1');
+                this.dropZone2 = document.getElementById('dropZone2');
+                this.checkBtn = document.getElementById('checkBtn');
+                this.feedback = document.getElementById('feedback');
+                this.monicBtn = document.getElementById('monicBtn');
+                this.nonMonicBtn = document.getElementById('nonMonicBtn');
+                this.aInputDiv = document.getElementById('aInput');
+                
+                // Step-by-step elements
+                this.solutionSteps = document.getElementById('solutionSteps');
+                this.step1 = document.getElementById('step1');
+                this.step2 = document.getElementById('step2');
+                this.step3 = document.getElementById('step3');
+                this.step4 = document.getElementById('step4');
+                this.factorizationDisplay = document.getElementById('factorizationDisplay');
+                this.zeroProductDisplay = document.getElementById('zeroProductDisplay');
+                this.equation1 = document.getElementById('equation1');
+                this.equation2 = document.getElementById('equation2');
+                this.solution1Input = document.getElementById('solution1Input');
+                this.solution2Input = document.getElementById('solution2Input');
+                this.finalSolutionDisplay = document.getElementById('finalSolutionDisplay');
+                
+                // Step tracking
+                this.currentStep = 0;
+                this.correctSolutions = { sol1: null, sol2: null };
+                this.userSolutions = { sol1: false, sol2: false };
+            }
+            
+            setupEventListeners() {
+                // Input changes
+                this.aInput.addEventListener('input', () => this.updateFromInputs());
+                this.bInput.addEventListener('input', () => this.updateFromInputs());
+                this.cInput.addEventListener('input', () => this.updateFromInputs());
+                
+                // Enter key support
+                [this.aInput, this.bInput, this.cInput].forEach(input => {
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.checkAnswer();
+                        }
+                    });
+                });
+                
+                // Buttons
+                document.getElementById('generateBtn').addEventListener('click', () => this.generateNewQuadratic());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetProblem());
+                this.checkBtn.addEventListener('click', () => this.checkAnswer());
+                this.monicBtn.addEventListener('click', () => this.setMonicMode());
+                this.nonMonicBtn.addEventListener('click', () => this.setNonMonicMode());
+                document.getElementById('cannotFactorBtn').addEventListener('click', () => this.checkCannotFactor());
+                
+                // Step navigation buttons
+                document.getElementById('nextStep1').addEventListener('click', () => this.showStep2());
+                document.getElementById('nextStep2').addEventListener('click', () => this.showStep3());
+                document.getElementById('showFinalAnswer').addEventListener('click', () => this.showStep4());
+                
+                // Solution checking buttons
+                document.getElementById('check1').addEventListener('click', () => this.checkSolution(1));
+                document.getElementById('check2').addEventListener('click', () => this.checkSolution(2));
+                
+                // Enter key support for solution inputs
+                this.solution1Input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.checkSolution(1);
+                });
+                this.solution2Input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.checkSolution(2);
+                });
+                
+                // Drop zones
+                this.setupDropZones();
+            }
+            
+            setMonicMode() {
+                this.isAdvancedMode = false;
+                this.aInputDiv.classList.add('hidden');
+                this.aInputDiv.classList.remove('flex');
+                this.aInput.value = 1;
+                
+                // Update button states
+                this.monicBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold border-2 border-blue-700';
+                this.nonMonicBtn.className = 'px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-semibold';
+                
+                this.updateFromInputs();
+            }
+            
+            setNonMonicMode() {
+                this.isAdvancedMode = true;
+                this.aInputDiv.classList.remove('hidden');
+                this.aInputDiv.classList.add('flex');
+                
+                // Update button states
+                this.nonMonicBtn.className = 'px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold border-2 border-purple-700';
+                this.monicBtn.className = 'px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-semibold';
+                
+                this.updateFromInputs();
+            }
+            
+            updateFromInputs() {
+                this.currentA = parseInt(this.aInput.value) || 1;
+                this.currentB = parseInt(this.bInput.value) || 0;
+                this.currentC = parseInt(this.cInput.value) || 0;
+                
+                this.updateDisplay();
+                this.generateFactorPairs();
+                this.resetDropZones();
+            }
+            
+            updateDisplay() {
+                const a = this.currentA;
+                const b = this.currentB;
+                const c = this.currentC;
+                
+                let equation = '';
+                
+                if (a !== 1) {
+                    equation += `${a}x²`;
+                } else {
+                    equation += 'x²';
+                }
+                
+                if (b > 0) {
+                    equation += ` + ${b}x`;
+                } else if (b < 0) {
+                    equation += ` - ${Math.abs(b)}x`;
+                }
+                
+                if (c > 0) {
+                    equation += ` + ${c}`;
+                } else if (c < 0) {
+                    equation += ` - ${Math.abs(c)}`;
+                }
+                
+                equation += ' = 0';
+                
+                this.equationDisplay.textContent = equation;
+                document.getElementById('cValue').textContent = this.isAdvancedMode ? `${a}×${c} = ${a * c}` : c;
+            }
+            
+            generateFactorPairs() {
+                const target = this.isAdvancedMode ? this.currentA * this.currentC : this.currentC;
+                
+                this.factorPairs.innerHTML = '';
+                
+                // Special case: when c = 0, the equation is x² + bx = 0 which factors as x(x + b) = 0
+                if (this.currentC === 0) {
+                    const specialDiv = document.createElement('div');
+                    specialDiv.className = 'factor-pair draggable bg-green-100 border-2 border-green-300 rounded-lg p-3 text-center font-bold text-lg hover:bg-green-200 cursor-grab';
+                    specialDiv.innerHTML = `<div class="text-sm text-green-700 mb-1">Special case: c = 0</div>(0, ${this.currentB})`;
+                    specialDiv.dataset.m = 0;
+                    specialDiv.dataset.n = this.currentB;
+                    
+                    this.setupDraggable(specialDiv);
+                    this.factorPairs.appendChild(specialDiv);
+                    
+                    // Add explanation
+                    const explanationDiv = document.createElement('div');
+                    explanationDiv.className = 'col-span-2 bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 text-sm text-yellow-800';
+                    explanationDiv.innerHTML = `
+                        <strong>💡 Tip:</strong> When c = 0, factor out x first:<br>
+                        x² + ${this.currentB}x = x(x + ${this.currentB}) = 0
+                    `;
+                    this.factorPairs.appendChild(explanationDiv);
+                    return;
+                }
+                
+                const pairs = this.findFactorPairs(target);
+                
+                pairs.forEach((pair, index) => {
+                    const pairDiv = document.createElement('div');
+                    pairDiv.className = 'factor-pair draggable bg-blue-100 border-2 border-blue-300 rounded-lg p-3 text-center font-bold text-lg hover:bg-blue-200 cursor-grab';
+                    pairDiv.textContent = `(${pair[0]}, ${pair[1]})`;
+                    pairDiv.dataset.m = pair[0];
+                    pairDiv.dataset.n = pair[1];
+                    
+                    this.setupDraggable(pairDiv);
+                    this.factorPairs.appendChild(pairDiv);
+                });
+            }
+            
+            findFactorPairs(n) {
+                const pairs = [];
+                const absN = Math.abs(n);
+                
+                for (let i = 1; i <= Math.sqrt(absN); i++) {
+                    if (absN % i === 0) {
+                        const j = absN / i;
+                        
+                        if (n > 0) {
+                            pairs.push([i, j]);
+                            if (i !== j) pairs.push([-i, -j]);
+                        } else {
+                            pairs.push([i, -j]);
+                            pairs.push([-i, j]);
+                        }
+                    }
+                }
+                
+                // Remove duplicate pairs where order doesn't matter for our purposes
+                // Keep only unique pairs based on their sum and product
+                const uniquePairs = [];
+                const seen = new Set();
+                
+                for (const pair of pairs) {
+                    const sum = pair[0] + pair[1];
+                    const product = pair[0] * pair[1];
+                    const key = `${sum},${product}`;
+                    
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uniquePairs.push(pair);
+                    }
+                }
+                
+                return uniquePairs;
+            }
+            
+            canBeFactored() {
+                // Check if the quadratic can be factored over integers
+                const a = this.currentA;
+                const b = this.currentB;
+                const c = this.currentC;
+                
+                // Calculate discriminant
+                const discriminant = b * b - 4 * a * c;
+                
+                // If discriminant is negative, no real solutions
+                if (discriminant < 0) return false;
+                
+                // If discriminant is not a perfect square, cannot factor over integers
+                const sqrtDiscriminant = Math.sqrt(discriminant);
+                if (sqrtDiscriminant !== Math.floor(sqrtDiscriminant)) return false;
+                
+                // For basic mode (a = 1), check if there exist integers m, n such that:
+                // m + n = b and m * n = c
+                if (!this.isAdvancedMode) {
+                    const target = c;
+                    const pairs = this.findFactorPairs(target);
+                    return pairs.some(pair => pair[0] + pair[1] === b);
+                }
+                
+                // For advanced mode, it's more complex but we'll use discriminant check
+                return true;
+            }
+            
+            setupDraggable(element) {
+                element.addEventListener('dragstart', (e) => {
+                    this.draggedElement = element;
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                element.addEventListener('dragend', () => {
+                    this.draggedElement = null;
+                });
+                
+                element.draggable = true;
+            }
+            
+            setupDropZones() {
+                [this.dropZone1, this.dropZone2].forEach((zone, index) => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
+                    
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+                    
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        
+                        if (this.draggedElement) {
+                            const m = parseInt(this.draggedElement.dataset.m);
+                            const n = parseInt(this.draggedElement.dataset.n);
+                            
+                            if (index === 0) {
+                                this.dropZone1Value = m;
+                                zone.textContent = m;
+                                zone.className = 'drop-zone w-16 h-16 border-4 border-blue-500 rounded-lg flex items-center justify-center bg-blue-100 text-2xl font-bold';
+                            } else {
+                                this.dropZone2Value = n;
+                                zone.textContent = n;
+                                zone.className = 'drop-zone w-16 h-16 border-4 border-blue-500 rounded-lg flex items-center justify-center bg-blue-100 text-2xl font-bold';
+                            }
+                            
+                            this.updateCheckButton();
+                        }
+                    });
+                });
+            }
+            
+            updateCheckButton() {
+                const canCheck = this.dropZone1Value !== null && this.dropZone2Value !== null;
+                this.checkBtn.disabled = !canCheck;
+            }
+            
+            checkAnswer() {
+                if (this.dropZone1Value === null || this.dropZone2Value === null) return;
+                
+                const m = this.dropZone1Value;
+                const n = this.dropZone2Value;
+                
+                let isCorrect = false;
+                
+                if (this.isAdvancedMode) {
+                    // For ax² + bx + c, we need to check if the factorization works
+                    // This is more complex and would require additional logic
+                    // For now, we'll use a simplified check
+                    isCorrect = (m * n === this.currentA * this.currentC) && 
+                               (m + n === this.currentB);
+                } else {
+                    // For x² + bx + c, check if m + n = b and m * n = c
+                    isCorrect = (m + n === this.currentB) && (m * n === this.currentC);
+                }
+                
+                this.showFeedback(isCorrect, m, n);
+            }
+            
+            checkCannotFactor() {
+                const canFactor = this.canBeFactored();
+                
+                this.feedback.classList.remove('hidden');
+                this.solutionSteps.classList.add('hidden');
+                
+                if (!canFactor) {
+                    this.feedback.className = 'p-4 rounded-lg mb-4 bg-green-100 border-2 border-green-300';
+                    this.feedback.innerHTML = `
+                        <div class="text-green-800 font-semibold">✅ Correct!</div>
+                        <div class="text-green-700 mb-3">This quadratic cannot be factored over the integers.</div>
+                        <div class="text-green-600 text-sm">
+                            <strong>Why?</strong> The discriminant b² - 4ac = ${this.currentB}² - 4(${this.currentA})(${this.currentC}) = ${this.currentB * this.currentB - 4 * this.currentA * this.currentC}
+                            ${this.currentB * this.currentB - 4 * this.currentA * this.currentC < 0 ? ' is negative (no real solutions)' : ' is not a perfect square'}
+                        </div>
+                    `;
+                } else {
+                    this.feedback.className = 'p-4 rounded-lg mb-4 bg-red-100 border-2 border-red-300';
+                    this.feedback.innerHTML = `
+                        <div class="text-red-800 font-semibold">❌ Not quite right</div>
+                        <div class="text-red-700">This quadratic CAN be factored! Look for factor pairs that multiply to ${this.isAdvancedMode ? this.currentA * this.currentC : this.currentC} and add to ${this.currentB}.</div>
+                    `;
+                }
+            }
+            
+            showFeedback(isCorrect, m, n) {
+                this.feedback.classList.remove('hidden');
+                this.solutionSteps.classList.add('hidden');
+                
+                if (isCorrect) {
+                    this.feedback.className = 'p-4 rounded-lg mb-4 bg-green-100 border-2 border-green-300';
+                    this.feedback.innerHTML = `
+                        <div class="text-green-800 font-semibold">✅ Correct!</div>
+                        <div class="text-green-700">Perfect factorization: (x + ${m})(x + ${n})</div>
+                    `;
+                    
+                    // Store the correct solutions for step-by-step process
+                    this.correctSolutions.sol1 = -m;
+                    this.correctSolutions.sol2 = -n;
+                    
+                    // Start step-by-step process
+                    this.showStep1(m, n);
+                    
+                } else {
+                    this.feedback.className = 'p-4 rounded-lg mb-4 bg-red-100 border-2 border-red-300';
+                    
+                    const productCheck = m * n === (this.isAdvancedMode ? this.currentA * this.currentC : this.currentC);
+                    const sumCheck = m + n === this.currentB;
+                    
+                    let hint = '';
+                    if (!productCheck && !sumCheck) {
+                        hint = `Try again! You need m × n = ${this.isAdvancedMode ? this.currentA * this.currentC : this.currentC} AND m + n = ${this.currentB}`;
+                    } else if (!productCheck) {
+                        hint = `Close! But m × n should equal ${this.isAdvancedMode ? this.currentA * this.currentC : this.currentC}, not ${m * n}`;
+                    } else if (!sumCheck) {
+                        hint = `Close! But m + n should equal ${this.currentB}, not ${m + n}`;
+                    }
+                    
+                    this.feedback.innerHTML = `
+                        <div class="text-red-800 font-semibold">❌ Not quite right</div>
+                        <div class="text-red-700">${hint}</div>
+                    `;
+                }
+            }
+            
+            showStep1(m, n) {
+                this.solutionSteps.classList.remove('hidden');
+                this.step1.classList.remove('hidden');
+                this.step2.classList.add('hidden');
+                this.step3.classList.add('hidden');
+                this.step4.classList.add('hidden');
+                
+                // Special display for c = 0 case
+                if (this.currentC === 0) {
+                    this.factorizationDisplay.textContent = `x(x + ${n}) = 0`;
+                } else {
+                    this.factorizationDisplay.textContent = `(x + ${m})(x + ${n}) = 0`;
+                }
+                this.currentStep = 1;
+            }
+            
+            showStep2() {
+                this.step1.classList.add('hidden');
+                this.step2.classList.remove('hidden');
+                
+                const m = this.dropZone1Value;
+                const n = this.dropZone2Value;
+                
+                // Special display for c = 0 case
+                if (this.currentC === 0) {
+                    this.zeroProductDisplay.innerHTML = `
+                        <div class="text-lg font-semibold">x = 0  <span class="text-blue-600">OR</span>  x + ${n} = 0</div>
+                    `;
+                } else {
+                    this.zeroProductDisplay.innerHTML = `
+                        <div class="text-lg font-semibold">x + ${m} = 0  <span class="text-blue-600">OR</span>  x + ${n} = 0</div>
+                    `;
+                }
+                this.currentStep = 2;
+            }
+            
+            showStep3() {
+                this.step2.classList.add('hidden');
+                this.step3.classList.remove('hidden');
+                
+                const m = this.dropZone1Value;
+                const n = this.dropZone2Value;
+                
+                // Special display for c = 0 case
+                if (this.currentC === 0) {
+                    this.equation1.textContent = `x = 0`;
+                    this.equation2.textContent = `x + ${n} = 0`;
+                } else {
+                    this.equation1.textContent = `x + ${m} = 0`;
+                    this.equation2.textContent = `x + ${n} = 0`;
+                }
+                
+                // Reset solution inputs and feedback
+                this.solution1Input.value = '';
+                this.solution2Input.value = '';
+                document.getElementById('feedback1').textContent = '';
+                document.getElementById('feedback2').textContent = '';
+                this.userSolutions = { sol1: false, sol2: false };
+                document.getElementById('step3Complete').classList.add('hidden');
+                
+                this.currentStep = 3;
+            }
+            
+            checkSolution(solutionNumber) {
+                const input = solutionNumber === 1 ? this.solution1Input : this.solution2Input;
+                const feedback = document.getElementById(`feedback${solutionNumber}`);
+                const userAnswer = parseInt(input.value);
+                const correctAnswer = solutionNumber === 1 ? this.correctSolutions.sol1 : this.correctSolutions.sol2;
+                
+                if (userAnswer === correctAnswer) {
+                    feedback.innerHTML = '<span class="text-green-600 font-semibold">✓ Correct!</span>';
+                    this.userSolutions[`sol${solutionNumber}`] = true;
+                    input.className = 'w-20 p-2 border-2 border-green-500 rounded-lg text-center font-bold bg-green-50';
+                } else {
+                    feedback.innerHTML = '<span class="text-red-600 font-semibold">✗ Try again</span>';
+                    this.userSolutions[`sol${solutionNumber}`] = false;
+                    input.className = 'w-20 p-2 border-2 border-red-500 rounded-lg text-center font-bold bg-red-50';
+                }
+                
+                // Check if both solutions are correct
+                if (this.userSolutions.sol1 && this.userSolutions.sol2) {
+                    document.getElementById('step3Complete').classList.remove('hidden');
+                }
+            }
+            
+            showStep4() {
+                this.step3.classList.add('hidden');
+                this.step4.classList.remove('hidden');
+                
+                const x1 = this.correctSolutions.sol1;
+                const x2 = this.correctSolutions.sol2;
+                
+                this.finalSolutionDisplay.innerHTML = `
+                    <div class="text-2xl mb-2">x = ${x1} or x = ${x2}</div>
+                    <div class="text-base">Solution set: {${x1}, ${x2}}</div>
+                `;
+                
+                this.currentStep = 4;
+            }
+            
+            resetDropZones() {
+                this.dropZone1Value = null;
+                this.dropZone2Value = null;
+                
+                this.dropZone1.textContent = '?';
+                this.dropZone1.className = 'drop-zone w-16 h-16 border-4 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-2xl font-bold';
+                
+                this.dropZone2.textContent = '?';
+                this.dropZone2.className = 'drop-zone w-16 h-16 border-4 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-2xl font-bold';
+                
+                this.feedback.classList.add('hidden');
+                this.solutionSteps.classList.add('hidden');
+                this.currentStep = 0;
+                this.userSolutions = { sol1: false, sol2: false };
+                this.updateCheckButton();
+            }
+            
+            resetProblem() {
+                this.resetDropZones();
+                this.generateFactorPairs();
+            }
+            
+            generateNewQuadratic() {
+                // Generate a mix of factorable and non-factorable quadratics
+                const shouldBeFactorable = Math.random() > 0.3; // 70% chance of being factorable
+                
+                if (shouldBeFactorable) {
+                    this.generateFactorableQuadratic();
+                } else {
+                    this.generateNonFactorableQuadratic();
+                }
+                
+                this.updateDisplay();
+                this.generateFactorPairs();
+                this.resetDropZones();
+            }
+            
+            generateFactorableQuadratic() {
+                if (this.isAdvancedMode) {
+                    this.currentA = Math.floor(Math.random() * 3) + 1; // 1-3
+                    this.aInput.value = this.currentA;
+                }
+                
+                // Generate by choosing two roots first, then expanding
+                const root1 = Math.floor(Math.random() * 11) - 5; // -5 to 5
+                const root2 = Math.floor(Math.random() * 11) - 5; // -5 to 5
+                
+                // From roots, the factored form is (x - root1)(x - root2)
+                // Expanding: x² - (root1 + root2)x + (root1 * root2)
+                this.currentB = -(root1 + root2);
+                this.currentC = root1 * root2;
+                
+                this.bInput.value = this.currentB;
+                this.cInput.value = this.currentC;
+            }
+            
+            generateNonFactorableQuadratic() {
+                if (this.isAdvancedMode) {
+                    this.currentA = Math.floor(Math.random() * 3) + 1; // 1-3
+                    this.aInput.value = this.currentA;
+                }
+                
+                // Generate coefficients that result in non-perfect square discriminant
+                let attempts = 0;
+                do {
+                    this.currentB = Math.floor(Math.random() * 21) - 10; // -10 to 10
+                    this.currentC = Math.floor(Math.random() * 21) - 10; // -10 to 10
+                    
+                    // Avoid c = 0 and b = 0 (these are always factorable)
+                    if (this.currentC === 0 || this.currentB === 0) {
+                        this.currentC = Math.random() > 0.5 ? 1 : -1;
+                        this.currentB = Math.floor(Math.random() * 10) + 1; // 1 to 10
+                    }
+                    
+                    attempts++;
+                } while (this.canBeFactored() && attempts < 20);
+                
+                this.bInput.value = this.currentB;
+                this.cInput.value = this.currentC;
+            }
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new QuadraticFactorizer();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99291effa4094135',t:'MTc2MTEzNzQzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
