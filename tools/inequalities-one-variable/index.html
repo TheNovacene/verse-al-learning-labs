@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Inequalities Tool</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .level-btn.level-1 {
+            background: #48bb78;
+            color: white;
+        }
+
+        .level-btn.level-2 {
+            background: #ed8936;
+            color: white;
+        }
+
+        .level-btn.level-3 {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .level-btn.active {
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+
+        .problem-section {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #4299e1;
+        }
+
+        .problem {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .symbol-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .symbol-btn {
+            padding: 10px 20px;
+            border: 2px solid #cbd5e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+
+        .symbol-btn:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        .symbol-btn.selected {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+
+        .number-line-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .number-line {
+            position: relative;
+            height: 80px;
+            margin: 20px 0;
+        }
+
+        .line {
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            right: 50px;
+            height: 3px;
+            background: #4a5568;
+            border-radius: 2px;
+        }
+
+        .tick {
+            position: absolute;
+            top: 30px;
+            width: 2px;
+            height: 20px;
+            background: #4a5568;
+        }
+
+        .tick-label {
+            position: absolute;
+            top: 55px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4a5568;
+            transform: translateX(-50%);
+        }
+
+        .solution-shading {
+            position: absolute;
+            top: 35px;
+            height: 10px;
+            background: linear-gradient(90deg, #48bb78, rgba(72, 187, 120, 0.3));
+            border-radius: 5px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .solution-dot {
+            position: absolute;
+            top: 32px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #48bb78;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: move;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .solution-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .solution-dot.open {
+            background: white;
+            border: 3px solid #48bb78;
+        }
+
+        .solution-dot.closed {
+            background: #48bb78;
+            border: 3px solid white;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .check-btn {
+            background: #4299e1;
+            color: white;
+        }
+
+        .reset-btn {
+            background: #718096;
+            color: white;
+        }
+
+        .randomize-btn {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+
+        .feedback.hidden {
+            display: none;
+        }
+
+        .instructions {
+            background: #ebf8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .instructions h3 {
+            color: #2b6cb0;
+            margin-top: 0;
+        }
+
+        .solution-steps {
+            background: #f0fff4;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #48bb78;
+        }
+
+        .solution-steps h4 {
+            color: #22543d;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .steps-content p {
+            margin: 8px 0;
+            color: #2f855a;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .steps-content p:last-child {
+            font-weight: 700;
+            color: #22543d;
+            background: #c6f6d5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .problem {
+                font-size: 1.2rem;
+            }
+
+            .level-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>🎯 Interactive Inequalities Tool</h1>
+            <p>Master GCSE inequalities with drag-and-drop number lines and instant feedback!</p>
+        </header>
+
+        <section class="level-selector">
+            <button class="level-btn level-1 active" onclick="setLevel(1)">
+                Level 1: Simple
+            </button>
+            <button class="level-btn level-2" onclick="setLevel(2)">
+                Level 2: Multi-step
+            </button>
+            <button class="level-btn level-3" onclick="setLevel(3)">
+                Level 3: Compound
+            </button>
+        </section>
+
+        <section class="instructions">
+            <h3>How to Use:</h3>
+            <p>1. Choose your difficulty level above</p>
+            <p>2. Solve the inequality on paper first</p>
+            <p>3. Select the correct inequality symbol (&lt;, ≤, &gt;, ≥)</p>
+            <p>4. <strong>Drag the green dot</strong> to the correct position on the number line</p>
+            <p>5. The dot will be <strong>filled (●)</strong> for ≤ or ≥, and <strong>open (○)</strong> for &lt; or &gt;</p>
+            <p>6. The green shading shows all values that satisfy your inequality</p>
+            <p>7. Click "Check Answer" to see if you're correct!</p>
+        </section>
+
+        <section class="problem-section">
+            <div class="problem" id="problem">
+                Solve: 2x + 3 > 7
+            </div>
+
+
+
+            <div class="symbol-selector">
+                <button class="symbol-btn" onclick="selectSymbol('<')">&lt;</button>
+                <button class="symbol-btn" onclick="selectSymbol('≤')">≤</button>
+                <button class="symbol-btn" onclick="selectSymbol('>')">&gt;</button>
+                <button class="symbol-btn selected" onclick="selectSymbol('≥')">≥</button>
+            </div>
+
+            <div class="number-line-container">
+                <div class="number-line" id="numberLine">
+                    <div class="line"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="controls">
+            <button class="btn check-btn" onclick="checkAnswer()">Check Answer</button>
+            <button class="btn reset-btn" onclick="resetProblem()">Reset</button>
+            <button class="btn randomize-btn" onclick="generateNewProblem()">New Problem</button>
+        </section>
+
+        <div class="feedback hidden" id="feedback"></div>
+    </main>
+
+    <script>
+        let currentLevel = 1;
+        let selectedSymbol = '≥';
+        let currentProblem = {};
+        let solutionRange = null;
+        let isDragging = false;
+        let dragOffset = 0;
+
+        const problems = {
+            1: [
+                { 
+                    equation: 'x + 3 > 7', 
+                    solution: 4, 
+                    symbol: '>', 
+                    type: 'open',
+                    steps: [
+                        'x + 3 > 7',
+                        'x > 7 - 3 (subtract 3 from both sides)',
+                        'x > 4'
+                    ]
+                },
+                { 
+                    equation: '2x ≤ 8', 
+                    solution: 4, 
+                    symbol: '≤', 
+                    type: 'closed',
+                    steps: [
+                        '2x ≤ 8',
+                        'x ≤ 8 ÷ 2 (divide both sides by 2)',
+                        'x ≤ 4'
+                    ]
+                },
+                { 
+                    equation: 'x - 5 ≥ -2', 
+                    solution: 3, 
+                    symbol: '≥', 
+                    type: 'closed',
+                    steps: [
+                        'x - 5 ≥ -2',
+                        'x ≥ -2 + 5 (add 5 to both sides)',
+                        'x ≥ 3'
+                    ]
+                },
+                { 
+                    equation: '3x < 12', 
+                    solution: 4, 
+                    symbol: '<', 
+                    type: 'open',
+                    steps: [
+                        '3x < 12',
+                        'x < 12 ÷ 3 (divide both sides by 3)',
+                        'x < 4'
+                    ]
+                },
+                { 
+                    equation: 'x + 1 ≤ 6', 
+                    solution: 5, 
+                    symbol: '≤', 
+                    type: 'closed',
+                    steps: [
+                        'x + 1 ≤ 6',
+                        'x ≤ 6 - 1 (subtract 1 from both sides)',
+                        'x ≤ 5'
+                    ]
+                }
+            ],
+            2: [
+                { 
+                    equation: '2x + 3 > 7', 
+                    solution: 2, 
+                    symbol: '>', 
+                    type: 'open',
+                    steps: [
+                        '2x + 3 > 7',
+                        '2x > 7 - 3 (subtract 3 from both sides)',
+                        '2x > 4',
+                        'x > 2 (divide both sides by 2)'
+                    ]
+                },
+                { 
+                    equation: '3x - 4 ≤ 8', 
+                    solution: 4, 
+                    symbol: '≤', 
+                    type: 'closed',
+                    steps: [
+                        '3x - 4 ≤ 8',
+                        '3x ≤ 8 + 4 (add 4 to both sides)',
+                        '3x ≤ 12',
+                        'x ≤ 4 (divide both sides by 3)'
+                    ]
+                },
+                { 
+                    equation: '5 - 2x ≥ 1', 
+                    solution: 2, 
+                    symbol: '≤', 
+                    type: 'closed',
+                    steps: [
+                        '5 - 2x ≥ 1',
+                        '-2x ≥ 1 - 5 (subtract 5 from both sides)',
+                        '-2x ≥ -4',
+                        'x ≤ 2 (divide by -2, flip the inequality sign!)'
+                    ]
+                },
+                { 
+                    equation: '4x + 1 < 13', 
+                    solution: 3, 
+                    symbol: '<', 
+                    type: 'open',
+                    steps: [
+                        '4x + 1 < 13',
+                        '4x < 13 - 1 (subtract 1 from both sides)',
+                        '4x < 12',
+                        'x < 3 (divide both sides by 4)'
+                    ]
+                },
+                { 
+                    equation: '6 - x ≥ 2', 
+                    solution: 4, 
+                    symbol: '≤', 
+                    type: 'closed',
+                    steps: [
+                        '6 - x ≥ 2',
+                        '-x ≥ 2 - 6 (subtract 6 from both sides)',
+                        '-x ≥ -4',
+                        'x ≤ 4 (divide by -1, flip the inequality sign!)'
+                    ]
+                }
+            ],
+            3: [
+                { 
+                    equation: '-2 < x + 1 ≤ 5', 
+                    solution: [-3, 4], 
+                    symbol: 'compound', 
+                    type: 'mixed',
+                    steps: [
+                        '-2 < x + 1 ≤ 5',
+                        '-2 - 1 < x ≤ 5 - 1 (subtract 1 from all parts)',
+                        '-3 < x ≤ 4'
+                    ]
+                },
+                { 
+                    equation: '1 ≤ 2x - 1 < 7', 
+                    solution: [1, 4], 
+                    symbol: 'compound', 
+                    type: 'mixed',
+                    steps: [
+                        '1 ≤ 2x - 1 < 7',
+                        '1 + 1 ≤ 2x < 7 + 1 (add 1 to all parts)',
+                        '2 ≤ 2x < 8',
+                        '1 ≤ x < 4 (divide all parts by 2)'
+                    ]
+                },
+                { 
+                    equation: '-1 ≤ 3x + 2 ≤ 8', 
+                    solution: [-1, 2], 
+                    symbol: 'compound', 
+                    type: 'mixed',
+                    steps: [
+                        '-1 ≤ 3x + 2 ≤ 8',
+                        '-1 - 2 ≤ 3x ≤ 8 - 2 (subtract 2 from all parts)',
+                        '-3 ≤ 3x ≤ 6',
+                        '-1 ≤ x ≤ 2 (divide all parts by 3)'
+                    ]
+                },
+                { 
+                    equation: '0 < x - 2 ≤ 3', 
+                    solution: [2, 5], 
+                    symbol: 'compound', 
+                    type: 'mixed',
+                    steps: [
+                        '0 < x - 2 ≤ 3',
+                        '0 + 2 < x ≤ 3 + 2 (add 2 to all parts)',
+                        '2 < x ≤ 5'
+                    ]
+                }
+            ]
+        };
+
+        function setLevel(level) {
+            currentLevel = level;
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.level-${level}`).classList.add('active');
+            
+            // Show/hide symbol selector for compound inequalities
+            const symbolSelector = document.querySelector('.symbol-selector');
+            if (level === 3) {
+                symbolSelector.style.display = 'none';
+            } else {
+                symbolSelector.style.display = 'flex';
+            }
+            
+            generateNewProblem();
+        }
+
+        function selectSymbol(symbol) {
+            selectedSymbol = symbol;
+            document.querySelectorAll('.symbol-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Update dot appearance and shading when symbol changes
+            if (currentLevel !== 3) {
+                updateDotAppearance();
+                updateShadingFromDot();
+            }
+        }
+
+        function generateNewProblem() {
+            const levelProblems = problems[currentLevel];
+            currentProblem = levelProblems[Math.floor(Math.random() * levelProblems.length)];
+            
+            document.getElementById('problem').textContent = `Solve: ${currentProblem.equation}`;
+            
+            if (currentLevel !== 3) {
+                // Reset symbol selection for levels 1 and 2
+                selectedSymbol = '>';
+                document.querySelectorAll('.symbol-btn').forEach(btn => btn.classList.remove('selected'));
+                document.querySelector('.symbol-btn').classList.add('selected');
+            }
+            
+            setupNumberLine();
+            hideFeedback();
+        }
+
+
+
+        function setupNumberLine() {
+            const numberLine = document.getElementById('numberLine');
+            numberLine.innerHTML = '<div class="line"></div>';
+            
+            // Create ticks and labels
+            const range = currentLevel === 3 ? [-5, 8] : [-2, 8];
+            const tickCount = range[1] - range[0] + 1;
+            
+            for (let i = 0; i < tickCount; i++) {
+                const value = range[0] + i;
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = `${50 + (i * (numberLine.offsetWidth - 100) / (tickCount - 1))}px`;
+                
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.textContent = value;
+                label.style.left = `${50 + (i * (numberLine.offsetWidth - 100) / (tickCount - 1))}px`;
+                
+                numberLine.appendChild(tick);
+                numberLine.appendChild(label);
+            }
+            
+            // Create draggable solution range
+            createSolutionRange();
+        }
+
+        function createSolutionRange() {
+            const numberLine = document.getElementById('numberLine');
+            
+            // Remove existing elements
+            if (solutionRange) {
+                solutionRange.remove();
+            }
+            const existingShading = numberLine.querySelector('.solution-shading');
+            if (existingShading) {
+                existingShading.remove();
+            }
+            
+            if (currentLevel === 3) {
+                // Compound inequality - create two dots with shading between
+                createCompoundInequality(numberLine);
+            } else {
+                // Single inequality - create one dot with shading extending in one direction
+                createSingleInequality(numberLine);
+            }
+        }
+
+        function createSingleInequality(numberLine) {
+            // Create the draggable dot
+            solutionRange = document.createElement('div');
+            solutionRange.className = 'solution-dot closed';
+            solutionRange.style.left = '200px';
+            
+            // Create the shading that extends from the dot
+            const shading = document.createElement('div');
+            shading.className = 'solution-shading';
+            shading.id = 'solutionShading';
+            
+            numberLine.appendChild(shading);
+            numberLine.appendChild(solutionRange);
+            
+            updateShadingFromDot();
+            updateDotAppearance();
+            
+            // Add drag functionality
+            solutionRange.addEventListener('mousedown', startDrag);
+            solutionRange.addEventListener('touchstart', startDrag);
+        }
+
+        function createCompoundInequality(numberLine) {
+            // Create shading between two points
+            const shading = document.createElement('div');
+            shading.className = 'solution-shading';
+            shading.style.left = '150px';
+            shading.style.width = '200px';
+            shading.style.background = '#48bb78';
+            shading.style.opacity = '0.7';
+            
+            // Create left dot
+            const leftDot = document.createElement('div');
+            leftDot.className = 'solution-dot closed';
+            leftDot.style.left = '142px';
+            leftDot.id = 'leftDot';
+            
+            // Create right dot  
+            const rightDot = document.createElement('div');
+            rightDot.className = 'solution-dot closed';
+            rightDot.style.left = '342px';
+            rightDot.id = 'rightDot';
+            
+            numberLine.appendChild(shading);
+            numberLine.appendChild(leftDot);
+            numberLine.appendChild(rightDot);
+            
+            // Add drag functionality to both dots
+            leftDot.addEventListener('mousedown', (e) => startCompoundDrag(e, 'left'));
+            rightDot.addEventListener('mousedown', (e) => startCompoundDrag(e, 'right'));
+            leftDot.addEventListener('touchstart', (e) => startCompoundDrag(e, 'left'));
+            rightDot.addEventListener('touchstart', (e) => startCompoundDrag(e, 'right'));
+            
+            solutionRange = { left: leftDot, right: rightDot, shading: shading };
+        }
+
+        function updateShadingFromDot() {
+            if (currentLevel === 3) return;
+            
+            const shading = document.getElementById('solutionShading');
+            const dotLeft = parseInt(solutionRange.style.left);
+            const numberLine = document.getElementById('numberLine');
+            const lineWidth = numberLine.offsetWidth - 100;
+            
+            // Determine direction based on selected symbol
+            if (selectedSymbol === '>' || selectedSymbol === '≥') {
+                // Shade to the right
+                shading.style.left = `${dotLeft + 8}px`;
+                shading.style.width = `${50 + lineWidth - dotLeft}px`;
+                shading.style.background = 'linear-gradient(90deg, #48bb78, rgba(72, 187, 120, 0.3))';
+            } else {
+                // Shade to the left
+                shading.style.left = '50px';
+                shading.style.width = `${dotLeft - 42}px`;
+                shading.style.background = 'linear-gradient(270deg, #48bb78, rgba(72, 187, 120, 0.3))';
+            }
+        }
+
+        function updateDotAppearance() {
+            if (currentLevel === 3) return;
+            
+            // Update dot appearance based on selected symbol
+            if (selectedSymbol === '≤' || selectedSymbol === '≥') {
+                solutionRange.className = 'solution-dot closed';
+            } else {
+                solutionRange.className = 'solution-dot open';
+            }
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            const rect = solutionRange.getBoundingClientRect();
+            const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            dragOffset = clientX - rect.left;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', stopDrag);
+            
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const numberLine = document.getElementById('numberLine');
+            const rect = numberLine.getBoundingClientRect();
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            
+            let newLeft = clientX - rect.left - dragOffset;
+            newLeft = Math.max(42, Math.min(newLeft, rect.width - 58));
+            
+            solutionRange.style.left = `${newLeft}px`;
+            updateShadingFromDot();
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+
+        let currentCompoundDot = null;
+
+        function startCompoundDrag(e, dotType) {
+            isDragging = true;
+            currentCompoundDot = dotType;
+            const dot = dotType === 'left' ? solutionRange.left : solutionRange.right;
+            const rect = dot.getBoundingClientRect();
+            const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            dragOffset = clientX - rect.left;
+            
+            document.addEventListener('mousemove', dragCompound);
+            document.addEventListener('mouseup', stopCompoundDrag);
+            document.addEventListener('touchmove', dragCompound);
+            document.addEventListener('touchend', stopCompoundDrag);
+            
+            e.preventDefault();
+        }
+
+        function dragCompound(e) {
+            if (!isDragging) return;
+            
+            const numberLine = document.getElementById('numberLine');
+            const rect = numberLine.getBoundingClientRect();
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            
+            let newLeft = clientX - rect.left - dragOffset;
+            newLeft = Math.max(42, Math.min(newLeft, rect.width - 58));
+            
+            const dot = currentCompoundDot === 'left' ? solutionRange.left : solutionRange.right;
+            dot.style.left = `${newLeft}px`;
+            
+            updateCompoundShading();
+        }
+
+        function stopCompoundDrag() {
+            isDragging = false;
+            currentCompoundDot = null;
+            document.removeEventListener('mousemove', dragCompound);
+            document.removeEventListener('mouseup', stopCompoundDrag);
+            document.removeEventListener('touchmove', dragCompound);
+            document.removeEventListener('touchend', stopCompoundDrag);
+        }
+
+        function updateCompoundShading() {
+            const leftPos = parseInt(solutionRange.left.style.left);
+            const rightPos = parseInt(solutionRange.right.style.left);
+            
+            const minPos = Math.min(leftPos, rightPos);
+            const maxPos = Math.max(leftPos, rightPos);
+            
+            solutionRange.shading.style.left = `${minPos + 8}px`;
+            solutionRange.shading.style.width = `${maxPos - minPos}px`;
+        }
+
+        function checkAnswer() {
+            const numberLine = document.getElementById('numberLine');
+            const range = currentLevel === 3 ? [-5, 8] : [-2, 8];
+            const tickSpacing = (numberLine.offsetWidth - 100) / (range[1] - range[0]);
+            
+            let isCorrect = false;
+            
+            if (currentLevel === 3) {
+                // Compound inequality
+                const leftPos = parseInt(solutionRange.left.style.left);
+                const rightPos = parseInt(solutionRange.right.style.left);
+                
+                const leftValue = Math.round((leftPos - 50) / tickSpacing + range[0]);
+                const rightValue = Math.round((rightPos - 50) / tickSpacing + range[0]);
+                
+                // Check if the positions match the expected solution range
+                const expectedLeft = currentProblem.solution[0];
+                const expectedRight = currentProblem.solution[1];
+                
+                isCorrect = (leftValue === expectedLeft && rightValue === expectedRight) ||
+                           (leftValue === expectedRight && rightValue === expectedLeft);
+            } else {
+                // Single inequality
+                const dotPos = parseInt(solutionRange.style.left);
+                const solutionValue = Math.round((dotPos - 50) / tickSpacing + range[0]);
+                const symbolCorrect = selectedSymbol === currentProblem.symbol;
+                const positionCorrect = solutionValue === currentProblem.solution;
+                
+                isCorrect = symbolCorrect && positionCorrect;
+            }
+            
+            showFeedback(isCorrect);
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden', 'correct', 'incorrect');
+            
+            if (isCorrect) {
+                feedback.classList.add('correct');
+                feedback.textContent = '🎉 Excellent! You solved it correctly!';
+            } else {
+                feedback.classList.add('incorrect');
+                if (currentLevel === 3) {
+                    feedback.textContent = '❌ Not quite right. Check your range placement on the number line.';
+                } else {
+                    feedback.textContent = '❌ Not quite right. Check both your inequality symbol and range placement.';
+                }
+            }
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        function resetProblem() {
+            setupNumberLine();
+            hideFeedback();
+            
+            if (currentLevel !== 3) {
+                selectedSymbol = '>';
+                document.querySelectorAll('.symbol-btn').forEach(btn => btn.classList.remove('selected'));
+                document.querySelector('.symbol-btn').classList.add('selected');
+            }
+        }
+
+        // Initialize the tool
+        window.addEventListener('load', () => {
+            generateNewProblem();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            setupNumberLine();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928e017212d4135',t:'MTc2MTEzNDg1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
