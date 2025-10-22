@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tool: Word Problems to Equations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-success {
+            animation: pulseSuccess 0.6s ease-in-out;
+        }
+        
+        @keyframes pulseSuccess {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-full">
+    <main class="container mx-auto px-4 py-6 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                🧮 Interactive Tool: Word Problems to Equations
+            </h1>
+            <p class="text-gray-600 text-lg">Practice translating real-world problems into algebraic equations</p>
+        </header>
+
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6">
+            <!-- Level Selection -->
+            <div class="mb-8">
+                <label for="levelSelect" class="block text-lg font-semibold text-gray-700 mb-3">
+                    ✏️ Choose Your Challenge Level:
+                </label>
+                <select id="levelSelect" class="w-full md:w-auto px-4 py-3 text-lg border-2 border-purple-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors bg-white">
+                    <option value="1">Level 1: One-step problems</option>
+                    <option value="2">Level 2: Two-step linear problems</option>
+                    <option value="3">Level 3: Quadratic word problems</option>
+                </select>
+            </div>
+
+            <!-- Problem Display -->
+            <div class="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    🧠 Word Problem:
+                </h2>
+                <div id="problemText" class="text-lg text-gray-700 leading-relaxed bg-white rounded-lg p-4 shadow-sm">
+                    A number plus 5 equals 12. What is the number?
+                </div>
+            </div>
+
+            <!-- Input Fields -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label for="variableInput" class="block text-lg font-semibold text-gray-700 mb-3">
+                        🧩 Define Your Variable:
+                    </label>
+                    <input type="text" id="variableInput" placeholder="e.g., Let x = the number" 
+                           class="w-full px-4 py-3 text-lg border-2 border-green-200 rounded-xl focus:border-green-400 focus:outline-none transition-colors">
+                </div>
+                <div>
+                    <label for="equationInput" class="block text-lg font-semibold text-gray-700 mb-3">
+                        📝 Write Your Equation:
+                    </label>
+                    <input type="text" id="equationInput" placeholder="e.g., x + 5 = 12" 
+                           class="w-full px-4 py-3 text-lg border-2 border-blue-200 rounded-xl focus:border-blue-400 focus:outline-none transition-colors">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <button id="solveBtn" class="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    🧮 Solve It!
+                </button>
+                <button id="newProblemBtn" class="flex-1 bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:from-green-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    🔁 New Problem
+                </button>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedbackArea" class="hidden">
+                <div class="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">✅ Feedback:</h3>
+                    <div id="feedbackMessage" class="text-lg text-gray-700"></div>
+                </div>
+            </div>
+
+            <!-- Interactive Solving Area -->
+            <div id="interactiveSolveArea" class="hidden">
+                <div class="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🎯 Now Solve Your Equation Step by Step:</h3>
+                    <div id="currentEquation" class="text-2xl font-mono bg-white p-4 rounded-lg mb-4 text-center border-2 border-indigo-200"></div>
+                    
+                    <div id="solvingSteps" class="space-y-4">
+                        <!-- Dynamic solving steps will be added here -->
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                        <button id="showHintBtn" class="flex-1 bg-yellow-500 text-white px-4 py-3 rounded-xl font-semibold hover:bg-yellow-600 transition-colors">
+                            💡 Show Hint
+                        </button>
+                        <button id="skipToSolutionBtn" class="flex-1 bg-gray-500 text-white px-4 py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
+                            ⏭️ Skip to Full Solution
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solution Area -->
+            <div id="solutionArea" class="hidden">
+                <div class="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">📚 Complete Step-by-Step Solution:</h3>
+                    <div id="solutionSteps" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const problems = {
+            1: [
+                {
+                    text: "A number plus 5 equals 12. What is the number?",
+                    variable: "Let x = the number",
+                    equation: "x + 5 = 12",
+                    steps: [
+                        "Start with: x + 5 = 12",
+                        "Subtract 5 from both sides: x + 5 - 5 = 12 - 5",
+                        "Simplify: x = 7",
+                        "Check: 7 + 5 = 12 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "x + 5 = 12",
+                            hint: "To isolate x, we need to get rid of the +5. What should we do?",
+                            operation: "Subtract 5 from both sides",
+                            nextEquation: "x = 7"
+                        }
+                    ]
+                },
+                {
+                    text: "Sarah has 8 more stickers than Tom. If Sarah has 15 stickers, how many does Tom have?",
+                    variable: "Let x = number of Tom's stickers",
+                    equation: "x + 8 = 15",
+                    steps: [
+                        "Start with: x + 8 = 15",
+                        "Subtract 8 from both sides: x + 8 - 8 = 15 - 8",
+                        "Simplify: x = 7",
+                        "Check: Tom has 7 stickers, Sarah has 7 + 8 = 15 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "x + 8 = 15",
+                            hint: "Tom's stickers plus 8 equals Sarah's 15 stickers. What should we do to isolate x?",
+                            operation: "Subtract 8 from both sides",
+                            nextEquation: "x = 7"
+                        }
+                    ]
+                },
+                {
+                    text: "A pizza is cut into equal slices. After eating 3 slices, there are 5 slices left. How many slices was the pizza cut into?",
+                    variable: "Let x = total number of slices",
+                    equation: "x - 3 = 5",
+                    steps: [
+                        "Start with: x - 3 = 5",
+                        "Add 3 to both sides: x - 3 + 3 = 5 + 3",
+                        "Simplify: x = 8",
+                        "Check: 8 - 3 = 5 slices left ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "x - 3 = 5",
+                            hint: "We subtracted 3 slices from the total. How can we isolate x?",
+                            operation: "Add 3 to both sides",
+                            nextEquation: "x = 8"
+                        }
+                    ]
+                }
+            ],
+            2: [
+                {
+                    text: "Twice a number minus 4 equals 10. What is the number?",
+                    variable: "Let x = the number",
+                    equation: "2x - 4 = 10",
+                    steps: [
+                        "Start with: 2x - 4 = 10",
+                        "Add 4 to both sides: 2x - 4 + 4 = 10 + 4",
+                        "Simplify: 2x = 14",
+                        "Divide both sides by 2: x = 7",
+                        "Check: 2(7) - 4 = 14 - 4 = 10 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "2x - 4 = 10",
+                            hint: "First, let's get rid of the -4. What should we do?",
+                            operation: "Add 4 to both sides",
+                            nextEquation: "2x = 14"
+                        },
+                        {
+                            equation: "2x = 14",
+                            hint: "Now x is multiplied by 2. How can we isolate x?",
+                            operation: "Divide both sides by 2",
+                            nextEquation: "x = 7"
+                        }
+                    ]
+                },
+                {
+                    text: "The cost of 3 notebooks plus a $2 pen is $11. How much does each notebook cost?",
+                    variable: "Let x = cost of one notebook",
+                    equation: "3x + 2 = 11",
+                    steps: [
+                        "Start with: 3x + 2 = 11",
+                        "Subtract 2 from both sides: 3x + 2 - 2 = 11 - 2",
+                        "Simplify: 3x = 9",
+                        "Divide both sides by 3: x = 3",
+                        "Check: 3($3) + $2 = $9 + $2 = $11 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "3x + 2 = 11",
+                            hint: "First, let's isolate the term with x. What should we do with the +2?",
+                            operation: "Subtract 2 from both sides",
+                            nextEquation: "3x = 9"
+                        },
+                        {
+                            equation: "3x = 9",
+                            hint: "Now x is multiplied by 3. How do we isolate x?",
+                            operation: "Divide both sides by 3",
+                            nextEquation: "x = 3"
+                        }
+                    ]
+                },
+                {
+                    text: "A taxi charges $3 for the first mile and $2 for each additional mile. If the total fare is $13, how many miles was the trip?",
+                    variable: "Let x = total miles of the trip",
+                    equation: "3 + 2(x - 1) = 13",
+                    steps: [
+                        "Start with: 3 + 2(x - 1) = 13",
+                        "Expand: 3 + 2x - 2 = 13",
+                        "Simplify: 1 + 2x = 13",
+                        "Subtract 1: 2x = 12",
+                        "Divide by 2: x = 6 miles",
+                        "Check: $3 + 2(6-1) = $3 + $10 = $13 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "3 + 2(x - 1) = 13",
+                            hint: "First, let's deal with the parentheses. What should we do with 2(x - 1)?",
+                            operation: "Expand: 2(x - 1) = 2x - 2",
+                            nextEquation: "3 + 2x - 2 = 13"
+                        },
+                        {
+                            equation: "3 + 2x - 2 = 13",
+                            hint: "We can combine like terms on the left side. What can we simplify?",
+                            operation: "Simplify: 3 - 2 = 1",
+                            nextEquation: "1 + 2x = 13"
+                        },
+                        {
+                            equation: "1 + 2x = 13",
+                            hint: "Now isolate the term with x. What should we do with the +1?",
+                            operation: "Subtract 1 from both sides",
+                            nextEquation: "2x = 12"
+                        },
+                        {
+                            equation: "2x = 12",
+                            hint: "Finally, how can we solve for x?",
+                            operation: "Divide both sides by 2",
+                            nextEquation: "x = 6"
+                        }
+                    ]
+                }
+            ],
+            3: [
+                {
+                    text: "The area of a rectangle is 30 square meters. Its length is 2 meters more than its width. Find the dimensions.",
+                    variable: "Let x = width in meters",
+                    equation: "x(x + 2) = 30",
+                    steps: [
+                        "Start with: x(x + 2) = 30",
+                        "Expand: x² + 2x = 30",
+                        "Rearrange: x² + 2x - 30 = 0",
+                        "Factor: (x - 5)(x + 6) = 0",
+                        "Solve: x = 5 or x = -6",
+                        "Since width must be positive: x = 5 meters",
+                        "Width = 5m, Length = 7m",
+                        "Check: 5 × 7 = 35 ≠ 30... Let me recalculate",
+                        "Actually, let's check our factoring: x² + 2x - 30",
+                        "We need two numbers that multiply to -30 and add to 2",
+                        "Those numbers are 6 and -5: 6 × (-5) = -30, 6 + (-5) = 1",
+                        "Wait, we need numbers that add to 2, not 1",
+                        "Let me try again: we need factors of -30 that add to 2",
+                        "Trying systematically: 1×(-30)=-30, 1+(-30)=-29 ❌",
+                        "2×(-15)=-30, 2+(-15)=-13 ❌",
+                        "3×(-10)=-30, 3+(-10)=-7 ❌", 
+                        "5×(-6)=-30, 5+(-6)=-1 ❌",
+                        "6×(-5)=-30, 6+(-5)=1 ❌",
+                        "10×(-3)=-30, 10+(-3)=7 ❌",
+                        "15×(-2)=-30, 15+(-2)=13 ❌",
+                        "30×(-1)=-30, 30+(-1)=29 ❌",
+                        "Hmm, let me double-check the problem setup...",
+                        "If width = x and length = x+2, then area = x(x+2) = 30",
+                        "Let's use the quadratic formula: x = (-2 ± √(4+120))/2 = (-2 ± √124)/2",
+                        "x = (-2 ± 11.14)/2, so x ≈ 4.57 or x ≈ -6.57",
+                        "Taking the positive solution: width ≈ 4.57m, length ≈ 6.57m"
+                    ],
+                    interactive: [
+                        {
+                            equation: "x(x + 2) = 30",
+                            hint: "First, let's deal with the left side. What should we do with x(x + 2)?",
+                            operation: "Expand: x(x + 2) = x² + 2x",
+                            nextEquation: "x² + 2x = 30"
+                        },
+                        {
+                            equation: "x² + 2x = 30",
+                            hint: "To solve a quadratic equation, we need it in standard form. What should we do with the 30?",
+                            operation: "Subtract 30 from both sides",
+                            nextEquation: "x² + 2x - 30 = 0"
+                        },
+                        {
+                            equation: "x² + 2x - 30 = 0",
+                            hint: "This is a quadratic equation in the form ax² + bx + c = 0. What are the values of a, b, and c?",
+                            operation: "Identify coefficients: a = 1, b = 2, c = -30",
+                            nextEquation: "Ready for quadratic formula: x = (-b ± √(b²-4ac))/2a",
+                            interactive: true,
+                            type: "coefficients",
+                            correctAnswers: { a: "1", b: "2", c: "-30" }
+                        },
+                        {
+                            equation: "x = (-b ± √(b²-4ac))/2a",
+                            hint: "Now substitute the values into the quadratic formula:",
+                            operation: "Substitute: x = (-2 ± √(2²-4(1)(-30)))/2(1)",
+                            nextEquation: "x = (-2 ± √(4-(-120)))/2",
+                            interactive: true,
+                            type: "substitution",
+                            correctAnswers: { negB: "-2", bSquared: "4", fourAC: "-120", twoA: "2" }
+                        },
+                        {
+                            equation: "x = (-2 ± √(4-(-120)))/2",
+                            hint: "Let's simplify under the square root. What is 4 - (-120)?",
+                            operation: "Simplify: 4 - (-120) = 4 + 120 = 124",
+                            nextEquation: "x = (-2 ± √124)/2",
+                            acceptDirectAnswer: "124"
+                        },
+                        {
+                            equation: "x = (-2 ± √124)/2",
+                            hint: "Now we need to evaluate √124. What is √124 approximately?",
+                            operation: "Calculate: √124 ≈ 11.14",
+                            nextEquation: "x = (-2 ± 11.14)/2"
+                        },
+                        {
+                            equation: "x = (-2 ± 11.14)/2",
+                            hint: "Finally, solve for both values. What are x = (-2 + 11.14)/2 and x = (-2 - 11.14)/2?",
+                            operation: "Calculate both solutions",
+                            nextEquation: "x ≈ 4.57 or x ≈ -6.57"
+                        }
+                    ]
+                },
+                {
+                    text: "A ball is thrown upward. Its height h (in feet) after t seconds is given by h = -16t² + 32t + 6. When does the ball hit the ground?",
+                    variable: "Let t = time in seconds",
+                    equation: "-16t² + 32t + 6 = 0",
+                    steps: [
+                        "Start with: -16t² + 32t + 6 = 0",
+                        "Divide by -2: 8t² - 16t - 3 = 0",
+                        "Use quadratic formula: t = (16 ± √(256 + 96))/16",
+                        "Simplify: t = (16 ± √352)/16 = (16 ± 18.76)/16",
+                        "t ≈ 2.17 seconds or t ≈ -0.17 seconds",
+                        "Since time must be positive: t ≈ 2.17 seconds"
+                    ],
+                    interactive: [
+                        {
+                            equation: "-16t² + 32t + 6 = 0",
+                            hint: "This equation has large coefficients. How can we simplify it?",
+                            operation: "Divide all terms by -2",
+                            nextEquation: "8t² - 16t - 3 = 0"
+                        },
+                        {
+                            equation: "8t² - 16t - 3 = 0",
+                            hint: "Now we have a quadratic equation in the form at² + bt + c = 0. What are the values of a, b, and c?",
+                            operation: "Identify coefficients: a = 8, b = -16, c = -3",
+                            nextEquation: "Ready for quadratic formula: t = (-b ± √(b²-4ac))/2a",
+                            interactive: true,
+                            type: "coefficients",
+                            correctAnswers: { a: "8", b: "-16", c: "-3" }
+                        },
+                        {
+                            equation: "t = (-b ± √(b²-4ac))/2a",
+                            hint: "Now substitute the values into the quadratic formula:",
+                            operation: "Substitute: t = (-(-16) ± √((-16)²-4(8)(-3)))/2(8)",
+                            nextEquation: "t = (16 ± √(256+96))/16",
+                            interactive: true,
+                            type: "substitution",
+                            correctAnswers: { negB: "16", bSquared: "256", fourAC: "96", twoA: "16" }
+                        },
+                        {
+                            equation: "t = (16 ± √(256+96))/16",
+                            hint: "Let's simplify under the square root. What is 256 + 96?",
+                            operation: "Simplify: 256 + 96 = 352",
+                            nextEquation: "t = (16 ± √352)/16"
+                        },
+                        {
+                            equation: "t = (16 ± √352)/16",
+                            hint: "Now we need to evaluate √352. What is √352 approximately?",
+                            operation: "Calculate: √352 ≈ 18.76",
+                            nextEquation: "t = (16 ± 18.76)/16"
+                        },
+                        {
+                            equation: "t = (16 ± 18.76)/16",
+                            hint: "Finally, solve for both values. What are t = (16 + 18.76)/16 and t = (16 - 18.76)/16?",
+                            operation: "Calculate both solutions",
+                            nextEquation: "t ≈ 2.17 or t ≈ -0.17"
+                        }
+                    ]
+                },
+                {
+                    text: "The product of two consecutive integers is 132. Find the integers.",
+                    variable: "Let x = the first integer",
+                    equation: "x(x + 1) = 132",
+                    steps: [
+                        "Start with: x(x + 1) = 132",
+                        "Expand: x² + x = 132",
+                        "Rearrange: x² + x - 132 = 0",
+                        "Factor: (x + 12)(x - 11) = 0",
+                        "Solve: x = -12 or x = 11",
+                        "Two solutions: (-12, -11) or (11, 12)",
+                        "Check: 11 × 12 = 132 ✓ and (-12) × (-11) = 132 ✓"
+                    ],
+                    interactive: [
+                        {
+                            equation: "x(x + 1) = 132",
+                            hint: "First, what should we do with the left side?",
+                            operation: "Expand: x(x + 1) = x² + x",
+                            nextEquation: "x² + x = 132"
+                        },
+                        {
+                            equation: "x² + x = 132",
+                            hint: "To get this in standard form, what should we do with the 132?",
+                            operation: "Subtract 132 from both sides",
+                            nextEquation: "x² + x - 132 = 0"
+                        },
+                        {
+                            equation: "x² + x - 132 = 0",
+                            hint: "This quadratic can be factored. What two numbers multiply to -132 and add to 1?",
+                            operation: "Factor: (x + 12)(x - 11) = 0",
+                            nextEquation: "x = -12 or x = 11"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let currentLevel = 1;
+        let currentProblem = 0;
+        let currentStep = 0;
+        let isInteractiveSolving = false;
+
+        const levelSelect = document.getElementById('levelSelect');
+        const problemText = document.getElementById('problemText');
+        const variableInput = document.getElementById('variableInput');
+        const equationInput = document.getElementById('equationInput');
+        const solveBtn = document.getElementById('solveBtn');
+        const newProblemBtn = document.getElementById('newProblemBtn');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const interactiveSolveArea = document.getElementById('interactiveSolveArea');
+        const currentEquation = document.getElementById('currentEquation');
+        const solvingSteps = document.getElementById('solvingSteps');
+        const showHintBtn = document.getElementById('showHintBtn');
+        const skipToSolutionBtn = document.getElementById('skipToSolutionBtn');
+        const solutionArea = document.getElementById('solutionArea');
+        const solutionSteps = document.getElementById('solutionSteps');
+
+        function loadProblem() {
+            const problem = problems[currentLevel][currentProblem];
+            problemText.textContent = problem.text;
+            problemText.classList.add('fade-in');
+            
+            // Clear inputs and hide all areas
+            variableInput.value = '';
+            equationInput.value = '';
+            feedbackArea.classList.add('hidden');
+            interactiveSolveArea.classList.add('hidden');
+            solutionArea.classList.add('hidden');
+            
+            // Reset interactive solving state
+            currentStep = 0;
+            isInteractiveSolving = false;
+        }
+
+        function startInteractiveSolving() {
+            const problem = problems[currentLevel][currentProblem];
+            isInteractiveSolving = true;
+            currentStep = 0;
+            
+            // Show interactive solving area
+            interactiveSolveArea.classList.remove('hidden');
+            interactiveSolveArea.classList.add('fade-in');
+            
+            // Display the starting equation
+            currentEquation.textContent = problem.equation;
+            solvingSteps.innerHTML = '';
+            
+            // Create first step
+            createInteractiveStep();
+        }
+
+        function createInteractiveStep() {
+            const problem = problems[currentLevel][currentProblem];
+            const step = problem.interactive[currentStep];
+            
+            if (!step) {
+                // No more steps, show completion
+                showCompletionMessage();
+                return;
+            }
+            
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'bg-white p-4 rounded-lg border-2 border-purple-200 mb-4';
+            
+            // Check if this is an interactive substitution step
+            if (step.interactive && step.type === 'coefficients') {
+                stepDiv.innerHTML = `
+                    <div class="mb-3">
+                        <p class="text-lg font-semibold text-purple-800 mb-2">Step ${currentStep + 1}:</p>
+                        <p class="text-gray-700 mb-3">${step.hint}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Value of a:</label>
+                            <input type="text" id="coeffA${currentStep}" placeholder="Enter a" 
+                                   class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Value of b:</label>
+                            <input type="text" id="coeffB${currentStep}" placeholder="Enter b" 
+                                   class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Value of c:</label>
+                            <input type="text" id="coeffC${currentStep}" placeholder="Enter c" 
+                                   class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                        </div>
+                    </div>
+                    <button onclick="checkStep(${currentStep})" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+                        ✓ Check Coefficients
+                    </button>
+                    <div id="stepFeedback${currentStep}" class="mt-3 hidden"></div>
+                `;
+            } else if (step.interactive && step.type === 'substitution') {
+                stepDiv.innerHTML = `
+                    <div class="mb-3">
+                        <p class="text-lg font-semibold text-purple-800 mb-2">Step ${currentStep + 1}:</p>
+                        <p class="text-gray-700 mb-3">${step.hint}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <p class="text-center text-lg font-mono mb-4">x = (-b ± √(b²-4ac))/2a</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">-b =</label>
+                                <input type="text" id="negB${currentStep}" placeholder="Enter -b" 
+                                       class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">b² =</label>
+                                <input type="text" id="bSquared${currentStep}" placeholder="Enter b²" 
+                                       class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">4ac =</label>
+                                <input type="text" id="fourAC${currentStep}" placeholder="Enter 4ac" 
+                                       class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">2a =</label>
+                                <input type="text" id="twoA${currentStep}" placeholder="Enter 2a" 
+                                       class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="checkStep(${currentStep})" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+                        ✓ Check Substitution
+                    </button>
+                    <div id="stepFeedback${currentStep}" class="mt-3 hidden"></div>
+                `;
+            } else {
+                // Regular step
+                stepDiv.innerHTML = `
+                    <div class="mb-3">
+                        <p class="text-lg font-semibold text-purple-800 mb-2">Step ${currentStep + 1}:</p>
+                        <p class="text-gray-700 mb-3">${step.hint}</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="stepInput${currentStep}" placeholder="Enter your next step..." 
+                               class="flex-1 px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none">
+                        <button onclick="checkStep(${currentStep})" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+                            ✓ Check Step
+                        </button>
+                    </div>
+                    <div id="stepFeedback${currentStep}" class="mt-3 hidden"></div>
+                `;
+            }
+            
+            solvingSteps.appendChild(stepDiv);
+        }
+
+        function checkStep(stepIndex) {
+            const problem = problems[currentLevel][currentProblem];
+            const step = problem.interactive[stepIndex];
+            const feedbackDiv = document.getElementById(`stepFeedback${stepIndex}`);
+            let isCorrect = false;
+            
+            // Check if this is an interactive step
+            if (step.interactive && step.type === 'coefficients') {
+                const userA = document.getElementById(`coeffA${stepIndex}`).value.trim();
+                const userB = document.getElementById(`coeffB${stepIndex}`).value.trim();
+                const userC = document.getElementById(`coeffC${stepIndex}`).value.trim();
+                
+                isCorrect = userA === step.correctAnswers.a && 
+                           userB === step.correctAnswers.b && 
+                           userC === step.correctAnswers.c;
+                           
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-green-100 p-3 rounded-lg border-l-4 border-green-400">
+                            <p class="text-green-800 font-semibold">✅ Correct!</p>
+                            <p class="text-green-700">Perfect! a = ${step.correctAnswers.a}, b = ${step.correctAnswers.b}, c = ${step.correctAnswers.c}</p>
+                            <p class="text-green-700 font-mono text-lg mt-2">${step.nextEquation}</p>
+                        </div>
+                    `;
+                } else {
+                    let feedback = "Check your coefficients: ";
+                    if (userA !== step.correctAnswers.a) feedback += `a should be ${step.correctAnswers.a}. `;
+                    if (userB !== step.correctAnswers.b) feedback += `b should be ${step.correctAnswers.b}. `;
+                    if (userC !== step.correctAnswers.c) feedback += `c should be ${step.correctAnswers.c}. `;
+                    
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-yellow-100 p-3 rounded-lg border-l-4 border-yellow-400">
+                            <p class="text-yellow-800 font-semibold">🤔 Not quite right.</p>
+                            <p class="text-yellow-700">${feedback}</p>
+                        </div>
+                    `;
+                }
+            } else if (step.interactive && step.type === 'substitution') {
+                const userNegB = document.getElementById(`negB${stepIndex}`).value.trim();
+                const userBSquared = document.getElementById(`bSquared${stepIndex}`).value.trim();
+                const userFourAC = document.getElementById(`fourAC${stepIndex}`).value.trim();
+                const userTwoA = document.getElementById(`twoA${stepIndex}`).value.trim();
+                
+                isCorrect = userNegB === step.correctAnswers.negB && 
+                           userBSquared === step.correctAnswers.bSquared && 
+                           userFourAC === step.correctAnswers.fourAC &&
+                           userTwoA === step.correctAnswers.twoA;
+                           
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-green-100 p-3 rounded-lg border-l-4 border-green-400">
+                            <p class="text-green-800 font-semibold">✅ Excellent substitution!</p>
+                            <p class="text-green-700">Perfect! All values substituted correctly.</p>
+                            <p class="text-green-700 font-mono text-lg mt-2">${step.nextEquation}</p>
+                        </div>
+                    `;
+                } else {
+                    let feedback = "Check your substitutions: ";
+                    if (userNegB !== step.correctAnswers.negB) feedback += `-b should be ${step.correctAnswers.negB}. `;
+                    if (userBSquared !== step.correctAnswers.bSquared) feedback += `b² should be ${step.correctAnswers.bSquared}. `;
+                    if (userFourAC !== step.correctAnswers.fourAC) feedback += `4ac should be ${step.correctAnswers.fourAC}. `;
+                    if (userTwoA !== step.correctAnswers.twoA) feedback += `2a should be ${step.correctAnswers.twoA}. `;
+                    
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-yellow-100 p-3 rounded-lg border-l-4 border-yellow-400">
+                            <p class="text-yellow-800 font-semibold">🤔 Not quite right.</p>
+                            <p class="text-yellow-700">${feedback}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                // Regular step checking
+                const userInput = document.getElementById(`stepInput${stepIndex}`).value.trim().toLowerCase();
+                
+                // Check for direct answer first if specified
+                if (step.acceptDirectAnswer && userInput === step.acceptDirectAnswer.toLowerCase()) {
+                    isCorrect = true;
+                } else {
+                    isCorrect = checkAnswerPatterns(userInput, step, stepIndex);
+                }
+                
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-green-100 p-3 rounded-lg border-l-4 border-green-400">
+                            <p class="text-green-800 font-semibold">✅ Correct!</p>
+                            <p class="text-green-700">${step.operation}</p>
+                            <p class="text-green-700 font-mono text-lg mt-2">${step.nextEquation}</p>
+                        </div>
+                    `;
+                } else {
+                    feedbackDiv.innerHTML = `
+                        <div class="bg-yellow-100 p-3 rounded-lg border-l-4 border-yellow-400">
+                            <p class="text-yellow-800 font-semibold">🤔 Not quite right.</p>
+                            <p class="text-yellow-700">Think about: ${step.hint}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            feedbackDiv.classList.remove('hidden');
+            
+            if (isCorrect) {
+                // Update current equation display
+                currentEquation.textContent = step.nextEquation;
+                
+                // Move to next step after a delay
+                setTimeout(() => {
+                    currentStep++;
+                    createInteractiveStep();
+                }, 2000);
+            }
+        }
+
+        function checkAnswerPatterns(userInput, step, stepIndex) {
+            const problem = problems[currentLevel][currentProblem];
+            
+            // Define acceptable answer patterns for different types of operations
+            const patterns = {
+                // Addition patterns
+                add: [
+                    'add', 'addition', 'plus', '+', 'adding',
+                    'add 3', 'add three', 'plus 3', 'plus three',
+                    'add 3 to both sides', 'add three to both sides',
+                    'adding 3 to both sides', 'adding three to both sides',
+                    '+ 3', 'x + 3 + 3', 'both sides', 'add to both'
+                ],
+                // Subtraction patterns
+                subtract: [
+                    'subtract', 'subtraction', 'minus', '-', 'subtracting',
+                    'subtract 5', 'subtract five', 'minus 5', 'minus five',
+                    'subtract 5 from both sides', 'subtract five from both sides',
+                    'subtracting 5 from both sides', 'subtracting five from both sides',
+                    '- 5', 'x - 5', 'both sides', 'subtract from both'
+                ],
+                // Division patterns
+                divide: [
+                    'divide', 'division', '÷', '/', 'dividing',
+                    'divide by 2', 'divide by two', 'divided by 2', 'divided by two',
+                    'divide both sides by 2', 'divide both sides by two',
+                    'dividing both sides by 2', 'dividing both sides by two',
+                    '/2', '÷2', 'both sides', 'divide both'
+                ],
+                // Multiplication patterns
+                multiply: [
+                    'multiply', 'multiplication', '×', '*', 'multiplying', 'times',
+                    'multiply by', 'times', 'multiplying by',
+                    'multiply both sides', 'multiplying both sides',
+                    'both sides', 'multiply both'
+                ],
+                // Expansion patterns
+                expand: [
+                    'expand', 'expanding', 'distribute', 'distributing', 'foil',
+                    'multiply out', 'multiplying out', 'open brackets', 'open parentheses',
+                    '2x - 2', '2(x-1)', 'distributive', 'distribution'
+                ],
+                // Factoring patterns
+                factor: [
+                    'factor', 'factoring', 'factorize', 'factorizing',
+                    '(x + 12)(x - 11)', '(x - 5)(x + 6)', 'factors',
+                    'two numbers', 'multiply to', 'add to'
+                ],
+                // Quadratic formula patterns
+                quadratic: [
+                    'quadratic formula', 'quadratic', 'formula',
+                    'x = (-b ± √(b²-4ac))/2a', '±', 'plus or minus',
+                    'discriminant', 'square root'
+                ],
+                // Final answer patterns
+                answer: [
+                    'x = 7', 'x = 5', 'x = 3', 'x = 6', 'x = 8', 'x = 11', 'x = -12',
+                    't = 2.17', 't = 6', 'x = 4.57', 'x ≈ 4.57',
+                    '7', '5', '3', '6', '8', '11', '-12', '2.17'
+                ]
+            };
+
+            // Determine what type of operation this step expects
+            const operation = step.operation.toLowerCase();
+            let expectedPatterns = [];
+
+            if (operation.includes('add') || operation.includes('+')) {
+                expectedPatterns = patterns.add;
+            } else if (operation.includes('subtract') || operation.includes('-')) {
+                expectedPatterns = patterns.subtract;
+            } else if (operation.includes('divide') || operation.includes('/')) {
+                expectedPatterns = patterns.divide;
+            } else if (operation.includes('multiply') || operation.includes('×') || operation.includes('*')) {
+                expectedPatterns = patterns.multiply;
+            } else if (operation.includes('expand') || operation.includes('distribute')) {
+                expectedPatterns = patterns.expand;
+            } else if (operation.includes('factor')) {
+                expectedPatterns = patterns.factor;
+            } else if (operation.includes('quadratic') || operation.includes('formula')) {
+                expectedPatterns = patterns.quadratic;
+            }
+
+            // Also check if the user provided the final answer directly
+            expectedPatterns = expectedPatterns.concat(patterns.answer);
+
+            // Check if user input matches any expected pattern
+            for (let pattern of expectedPatterns) {
+                if (userInput.includes(pattern)) {
+                    return true;
+                }
+            }
+
+            // Special case: check if user provided the next equation directly
+            const nextEq = step.nextEquation.toLowerCase().replace(/\s/g, '');
+            const userEq = userInput.replace(/\s/g, '');
+            if (userEq.includes(nextEq.substring(0, Math.min(4, nextEq.length)))) {
+                return true;
+            }
+
+            // Additional specific checks based on the current problem and step
+            return checkSpecificCases(userInput, problem, stepIndex, step);
+        }
+
+        function checkSpecificCases(userInput, problem, stepIndex, step) {
+            // Handle specific cases for different problems and steps
+            const equation = problem.equation.toLowerCase();
+            
+            // For x + 5 = 12 type problems
+            if (equation.includes('x + 5') && stepIndex === 0) {
+                return userInput.includes('5') && (userInput.includes('subtract') || userInput.includes('minus') || userInput.includes('-'));
+            }
+            
+            // For x + 8 = 15 type problems  
+            if (equation.includes('x + 8') && stepIndex === 0) {
+                return userInput.includes('8') && (userInput.includes('subtract') || userInput.includes('minus') || userInput.includes('-'));
+            }
+            
+            // For x - 3 = 5 type problems
+            if (equation.includes('x - 3') && stepIndex === 0) {
+                return userInput.includes('3') && (userInput.includes('add') || userInput.includes('plus') || userInput.includes('+'));
+            }
+            
+            // For 2x - 4 = 10 type problems
+            if (equation.includes('2x - 4')) {
+                if (stepIndex === 0) {
+                    return userInput.includes('4') && (userInput.includes('add') || userInput.includes('plus') || userInput.includes('+'));
+                } else if (stepIndex === 1) {
+                    return userInput.includes('2') && (userInput.includes('divide') || userInput.includes('/') || userInput.includes('÷'));
+                }
+            }
+            
+            // For 3x + 2 = 11 type problems
+            if (equation.includes('3x + 2')) {
+                if (stepIndex === 0) {
+                    return userInput.includes('2') && (userInput.includes('subtract') || userInput.includes('minus') || userInput.includes('-'));
+                } else if (stepIndex === 1) {
+                    return userInput.includes('3') && (userInput.includes('divide') || userInput.includes('/') || userInput.includes('÷'));
+                }
+            }
+            
+            return false;
+        }
+
+        function showHint() {
+            const problem = problems[currentLevel][currentProblem];
+            const step = problem.interactive[currentStep];
+            
+            if (step) {
+                const feedbackDiv = document.getElementById(`stepFeedback${currentStep}`);
+                feedbackDiv.innerHTML = `
+                    <div class="bg-blue-100 p-3 rounded-lg border-l-4 border-blue-400">
+                        <p class="text-blue-800 font-semibold">💡 Hint:</p>
+                        <p class="text-blue-700">${step.operation}</p>
+                    </div>
+                `;
+                feedbackDiv.classList.remove('hidden');
+            }
+        }
+
+        function showCompletionMessage() {
+            const completionDiv = document.createElement('div');
+            completionDiv.className = 'bg-gradient-to-r from-green-100 to-blue-100 p-6 rounded-xl border-2 border-green-300';
+            completionDiv.innerHTML = `
+                <div class="text-center">
+                    <p class="text-2xl mb-2">🎉</p>
+                    <p class="text-xl font-bold text-green-800 mb-2">Excellent Work!</p>
+                    <p class="text-green-700 mb-4">You've successfully solved the equation step by step!</p>
+                    <button onclick="showFullSolution()" class="bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                        📚 View Complete Solution
+                    </button>
+                </div>
+            `;
+            solvingSteps.appendChild(completionDiv);
+        }
+
+        function checkAnswer() {
+            const problem = problems[currentLevel][currentProblem];
+            const userVariable = variableInput.value.trim().toLowerCase();
+            const userEquation = equationInput.value.trim().toLowerCase();
+            const correctVariable = problem.variable.toLowerCase();
+            const correctEquation = problem.equation.toLowerCase();
+
+            let feedback = '';
+            let isCorrect = false;
+
+            // Simple checking - in a real app, this would be more sophisticated
+            const variableMatch = userVariable.includes('x') && (userVariable.includes('number') || userVariable.includes('width') || userVariable.includes('time') || userVariable.includes('integer') || userVariable.includes('notebook') || userVariable.includes('mile') || userVariable.includes('sticker'));
+            const equationSimilar = userEquation.replace(/\s/g, '').includes(correctEquation.replace(/\s/g, '').substring(0, 5));
+
+            if (variableMatch && equationSimilar) {
+                feedback = '🎉 Excellent work! Your variable definition and equation are correct. Now let\'s solve it step by step!';
+                isCorrect = true;
+                feedbackMessage.style.background = 'linear-gradient(to right, #dcfce7, #bbf7d0)';
+                feedbackMessage.classList.add('pulse-success');
+            } else if (variableMatch && !equationSimilar) {
+                feedback = '👍 Good variable definition! However, check your equation. Make sure it represents the relationship described in the problem.';
+                feedbackMessage.style.background = 'linear-gradient(to right, #fef3c7, #fde68a)';
+            } else if (!variableMatch && equationSimilar) {
+                feedback = '📝 Your equation looks good! But make sure your variable definition clearly states what x represents in this problem.';
+                feedbackMessage.style.background = 'linear-gradient(to right, #fef3c7, #fde68a)';
+            } else {
+                feedback = '🤔 Let\'s try again! Read the problem carefully and think about what quantity you need to find. That will be your variable.';
+                feedbackMessage.style.background = 'linear-gradient(to right, #fee2e2, #fecaca)';
+                feedbackMessage.classList.add('shake');
+            }
+
+            feedbackMessage.textContent = feedback;
+            feedbackArea.classList.remove('hidden');
+            feedbackArea.classList.add('fade-in');
+
+            // If correct, start interactive solving after a delay
+            if (isCorrect) {
+                setTimeout(() => {
+                    startInteractiveSolving();
+                }, 2000);
+            }
+        }
+
+        function showSolution() {
+            const problem = problems[currentLevel][currentProblem];
+            solutionSteps.innerHTML = '';
+            
+            // Add correct variable and equation first
+            const correctAnswer = document.createElement('div');
+            correctAnswer.className = 'bg-blue-50 p-4 rounded-lg mb-4';
+            correctAnswer.innerHTML = `
+                <p class="font-semibold text-blue-800 mb-2">Correct Translation:</p>
+                <p class="text-blue-700">Variable: ${problem.variable}</p>
+                <p class="text-blue-700">Equation: ${problem.equation}</p>
+            `;
+            solutionSteps.appendChild(correctAnswer);
+
+            // Add solution steps
+            problem.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'bg-white p-3 rounded-lg border-l-4 border-green-400 shadow-sm';
+                stepDiv.innerHTML = `<span class="font-semibold text-green-600">Step ${index + 1}:</span> ${step}`;
+                solutionSteps.appendChild(stepDiv);
+            });
+
+            solutionArea.classList.remove('hidden');
+            solutionArea.classList.add('fade-in');
+        }
+
+        function showFullSolution() {
+            showSolution();
+        }
+
+        function newProblem() {
+            currentProblem = Math.floor(Math.random() * problems[currentLevel].length);
+            loadProblem();
+        }
+
+        // Event listeners
+        levelSelect.addEventListener('change', (e) => {
+            currentLevel = parseInt(e.target.value);
+            currentProblem = 0;
+            loadProblem();
+        });
+
+        solveBtn.addEventListener('click', () => {
+            if (variableInput.value.trim() === '' || equationInput.value.trim() === '') {
+                feedbackMessage.textContent = '📝 Please fill in both the variable definition and equation before solving!';
+                feedbackMessage.style.background = 'linear-gradient(to right, #fee2e2, #fecaca)';
+                feedbackArea.classList.remove('hidden');
+                feedbackMessage.classList.add('shake');
+                return;
+            }
+            checkAnswer();
+        });
+
+        newProblemBtn.addEventListener('click', newProblem);
+
+        showHintBtn.addEventListener('click', showHint);
+
+        skipToSolutionBtn.addEventListener('click', () => {
+            interactiveSolveArea.classList.add('hidden');
+            showSolution();
+        });
+
+        // Remove animation classes after animation completes
+        document.addEventListener('animationend', (e) => {
+            e.target.classList.remove('pulse-success', 'shake', 'fade-in');
+        });
+
+        // Initialize with first problem
+        loadProblem();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99290ad123d0deb0',t:'MTc2MTEzNjYwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
