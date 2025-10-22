@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanding Brackets - Interactive Whiteboard</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #2d3748;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .mascot {
+            font-size: 3rem;
+            margin: 10px 0;
+        }
+
+        .encouragement {
+            font-size: 1.2rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .level-btn.active {
+            background: #4299e1;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .level-btn:not(.active) {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .level-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .problem-area {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 3px solid #e2e8f0;
+        }
+
+        .problem-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .expression {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 20px 0;
+        }
+
+        .bracket {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .multiplication-arrow {
+            color: #38a169;
+            font-size: 2rem;
+            margin: 0 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .drag-area {
+            background: white;
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .drag-area.correct {
+            border-color: #38a169;
+            background: #f0fff4;
+        }
+
+        .drag-area.incorrect {
+            border-color: #e53e3e;
+            background: #fff5f5;
+        }
+
+        .term-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .term {
+            background: #4299e1;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .term:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        .term.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .term.placed {
+            background: #38a169;
+            cursor: default;
+        }
+
+        .term.incorrect {
+            background: #e53e3e;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 40px;
+        }
+
+        .feedback.correct {
+            color: #38a169;
+        }
+
+        .feedback.incorrect {
+            color: #e53e3e;
+        }
+
+        .step-display {
+            background: #edf2f7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .expression {
+                font-size: 2rem;
+            }
+            
+            .term {
+                font-size: 1.1rem;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1 class="title">Expanding Brackets Whiteboard</h1>
+            <div class="mascot">🧮</div>
+            <p class="encouragement">Drag and drop to expand the brackets!</p>
+        </header>
+
+        <nav class="level-selector">
+            <button class="level-btn active" data-level="1">Level 1: Single Brackets</button>
+            <button class="level-btn" data-level="2">Level 2: Double Brackets</button>
+            <button class="level-btn" data-level="3">Level 3: Advanced</button>
+        </nav>
+
+        <section class="problem-area">
+            <div class="problem-display">
+                <div class="expression" id="problem-expression"></div>
+                <div class="step-display" id="step-display"></div>
+            </div>
+
+            <div class="drag-area" id="answer-area">
+                <span style="color: #a0aec0; font-size: 1.2rem;">Drop terms here to build your answer</span>
+            </div>
+
+            <div class="simplification-section" id="simplification-section" style="display: none;">
+                <div style="text-align: center; margin: 20px 0;">
+                    <h3 style="color: #4a5568; font-size: 1.3rem;">Now simplify by combining like terms:</h3>
+                </div>
+                <div class="drag-area" id="simplified-area">
+                    <span style="color: #a0aec0; font-size: 1.2rem;">Drop simplified terms here</span>
+                </div>
+            </div>
+
+            <div class="term-bank" id="term-bank"></div>
+
+            <div class="feedback" id="feedback"></div>
+        </section>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="check-btn">Check Answer ✓</button>
+            <button class="btn btn-primary" id="simplify-btn" style="display: none;">Simplify ➡️</button>
+            <button class="btn btn-success" id="next-btn" style="display: none;">Next Problem ➡️</button>
+            <button class="btn btn-secondary" id="reset-btn">New Problem 🔄</button>
+            <button class="btn btn-success" id="reveal-btn">Show Answer 💡</button>
+        </div>
+    </main>
+
+    <script>
+        class BracketsGame {
+            constructor() {
+                this.currentLevel = 1;
+                this.currentProblem = null;
+                this.userAnswer = [];
+                this.simplifiedAnswer = [];
+                this.showingSimplification = false;
+                this.problems = {
+                    1: [
+                        { expression: "3(x + 4)", answer: ["3x", "+", "12"], steps: "3 × x = 3x, 3 × 4 = 12" },
+                        { expression: "-2(x - 7)", answer: ["-2x", "+", "14"], steps: "-2 × x = -2x, -2 × (-7) = +14" },
+                        { expression: "5(2x + 3)", answer: ["10x", "+", "15"], steps: "5 × 2x = 10x, 5 × 3 = 15" },
+                        { expression: "-4(3x - 2)", answer: ["-12x", "+", "8"], steps: "-4 × 3x = -12x, -4 × (-2) = +8" },
+                        { expression: "6(x - 5)", answer: ["6x", "-", "30"], steps: "6 × x = 6x, 6 × (-5) = -30" }
+                    ],
+                    2: [
+                        { expression: "(x + 3)(x - 5)", answer: ["x²", "-", "5x", "+", "3x", "-", "15"], simplified: ["x²", "-", "2x", "-", "15"], steps: "x×x = x², x×(-5) = -5x, 3×x = 3x, 3×(-5) = -15" },
+                        { expression: "(2x + 1)(x - 6)", answer: ["2x²", "-", "12x", "+", "x", "-", "6"], simplified: ["2x²", "-", "11x", "-", "6"], steps: "2x×x = 2x², 2x×(-6) = -12x, 1×x = x, 1×(-6) = -6" },
+                        { expression: "(x - 2)(x + 4)", answer: ["x²", "+", "4x", "-", "2x", "-", "8"], simplified: ["x²", "+", "2x", "-", "8"], steps: "x×x = x², x×4 = 4x, (-2)×x = -2x, (-2)×4 = -8" },
+                        { expression: "(3x + 2)(x - 1)", answer: ["3x²", "-", "3x", "+", "2x", "-", "2"], simplified: ["3x²", "-", "x", "-", "2"], steps: "3x×x = 3x², 3x×(-1) = -3x, 2×x = 2x, 2×(-1) = -2" },
+                        { expression: "(x + 5)(2x - 3)", answer: ["2x²", "-", "3x", "+", "10x", "-", "15"], simplified: ["2x²", "+", "7x", "-", "15"], steps: "x×2x = 2x², x×(-3) = -3x, 5×2x = 10x, 5×(-3) = -15" }
+                    ],
+                    3: [
+                        { expression: "(x - 3)²", answer: ["x²", "-", "3x", "-", "3x", "+", "9"], simplified: ["x²", "-", "6x", "+", "9"], steps: "(x-3)(x-3): x×x = x², x×(-3) = -3x, (-3)×x = -3x, (-3)×(-3) = 9" },
+                        { expression: "(-2x + 1)(x + 4)", answer: ["-2x²", "-", "8x", "+", "x", "+", "4"], simplified: ["-2x²", "-", "7x", "+", "4"], steps: "(-2x)×x = -2x², (-2x)×4 = -8x, 1×x = x, 1×4 = 4" },
+                        { expression: "(3x - 2)²", answer: ["9x²", "-", "6x", "-", "6x", "+", "4"], simplified: ["9x²", "-", "12x", "+", "4"], steps: "(3x-2)(3x-2): 3x×3x = 9x², 3x×(-2) = -6x, (-2)×3x = -6x, (-2)×(-2) = 4" },
+                        { expression: "(x + 2)(x² - 3)", answer: ["x³", "-", "3x", "+", "2x²", "-", "6"], simplified: ["x³", "+", "2x²", "-", "3x", "-", "6"], steps: "x×x² = x³, x×(-3) = -3x, 2×x² = 2x², 2×(-3) = -6" },
+                        { expression: "(-x + 4)(2x - 1)", answer: ["-2x²", "+", "x", "+", "8x", "-", "4"], simplified: ["-2x²", "+", "9x", "-", "4"], steps: "(-x)×2x = -2x², (-x)×(-1) = x, 4×2x = 8x, 4×(-1) = -4" }
+                    ]
+                };
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.generateProblem();
+            }
+
+            setupEventListeners() {
+                // Level selection
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentLevel = parseInt(e.target.dataset.level);
+                        this.generateProblem();
+                    });
+                });
+
+                // Control buttons
+                document.getElementById('check-btn').addEventListener('click', () => this.checkAnswer());
+                document.getElementById('simplify-btn').addEventListener('click', () => this.showSimplification());
+                document.getElementById('next-btn').addEventListener('click', () => this.generateProblem());
+                document.getElementById('reset-btn').addEventListener('click', () => this.generateProblem());
+                document.getElementById('reveal-btn').addEventListener('click', () => this.revealAnswer());
+
+                // Drag and drop
+                this.setupDragAndDrop();
+            }
+
+            setupDragAndDrop() {
+                const answerArea = document.getElementById('answer-area');
+                const simplifiedArea = document.getElementById('simplified-area');
+                
+                // Answer area drag and drop
+                answerArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    answerArea.style.borderColor = '#4299e1';
+                });
+
+                answerArea.addEventListener('dragleave', () => {
+                    answerArea.style.borderColor = '#cbd5e0';
+                });
+
+                answerArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    answerArea.style.borderColor = '#cbd5e0';
+                    
+                    const termText = e.dataTransfer.getData('text/plain');
+                    const termElement = document.querySelector(`[data-term="${termText}"]`);
+                    
+                    if (termElement && !termElement.classList.contains('placed')) {
+                        this.addTermToAnswer(termText, termElement);
+                    }
+                });
+
+                // Simplified area drag and drop
+                simplifiedArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    simplifiedArea.style.borderColor = '#4299e1';
+                });
+
+                simplifiedArea.addEventListener('dragleave', () => {
+                    simplifiedArea.style.borderColor = '#cbd5e0';
+                });
+
+                simplifiedArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    simplifiedArea.style.borderColor = '#cbd5e0';
+                    
+                    const termText = e.dataTransfer.getData('text/plain');
+                    const termElement = document.querySelector(`[data-term="${termText}"]`);
+                    
+                    if (termElement && !termElement.classList.contains('placed')) {
+                        this.addTermToSimplified(termText, termElement);
+                    }
+                });
+            }
+
+            generateProblem() {
+                const problems = this.problems[this.currentLevel];
+                this.currentProblem = problems[Math.floor(Math.random() * problems.length)];
+                this.userAnswer = [];
+                this.simplifiedAnswer = [];
+                this.showingSimplification = false;
+                
+                this.displayProblem();
+                this.generateTermBank();
+                this.clearFeedback();
+                this.clearAnswerArea();
+                this.hideSimplification();
+            }
+
+            displayProblem() {
+                const expressionEl = document.getElementById('problem-expression');
+                const stepEl = document.getElementById('step-display');
+                
+                // Add visual brackets and multiplication arrows
+                let displayExpression = this.currentProblem.expression;
+                displayExpression = displayExpression.replace(/\(/g, '<span class="bracket">(</span>');
+                displayExpression = displayExpression.replace(/\)/g, '<span class="bracket">)</span>');
+                
+                if (this.currentLevel === 2 || this.currentLevel === 3) {
+                    displayExpression = displayExpression.replace(/\)\(/g, ')</span><span class="multiplication-arrow">×</span><span class="bracket">(');
+                }
+                
+                expressionEl.innerHTML = displayExpression;
+                stepEl.textContent = `Expand: ${this.currentProblem.expression}`;
+            }
+
+            generateTermBank() {
+                const termBank = document.getElementById('term-bank');
+                termBank.innerHTML = '';
+                
+                // Create terms from the correct answer plus some distractors
+                const correctTerms = [...this.currentProblem.answer];
+                const distractors = this.generateDistractors();
+                const allTerms = [...correctTerms, ...distractors];
+                
+                // Shuffle terms
+                allTerms.sort(() => Math.random() - 0.5);
+                
+                allTerms.forEach(term => {
+                    const termEl = document.createElement('div');
+                    termEl.className = 'term';
+                    termEl.textContent = term;
+                    termEl.draggable = true;
+                    termEl.dataset.term = term;
+                    
+                    termEl.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', term);
+                        termEl.classList.add('dragging');
+                    });
+                    
+                    termEl.addEventListener('dragend', () => {
+                        termEl.classList.remove('dragging');
+                    });
+                    
+                    termEl.addEventListener('click', () => {
+                        if (!termEl.classList.contains('placed')) {
+                            this.addTermToAnswer(term, termEl);
+                        }
+                    });
+                    
+                    termBank.appendChild(termEl);
+                });
+            }
+
+            generateDistractors() {
+                const distractors = [];
+                const level = this.currentLevel;
+                
+                if (level === 1) {
+                    distractors.push('2x', '-3x', '5', '-8', '7x');
+                } else if (level === 2) {
+                    distractors.push('x', '2x²', '-x²', '5x', '-10');
+                } else {
+                    distractors.push('x³', '-x³', '6x²', '-4x', '16');
+                }
+                
+                return distractors.slice(0, 3);
+            }
+
+            addTermToAnswer(term, termElement) {
+                this.userAnswer.push(term);
+                termElement.classList.add('placed');
+                
+                this.updateAnswerDisplay();
+            }
+
+            updateAnswerDisplay() {
+                const answerArea = document.getElementById('answer-area');
+                answerArea.innerHTML = '';
+                
+                if (this.userAnswer.length === 0) {
+                    answerArea.innerHTML = '<span style="color: #a0aec0; font-size: 1.2rem;">Drop terms here to build your answer</span>';
+                    return;
+                }
+                
+                this.userAnswer.forEach((term, index) => {
+                    const termEl = document.createElement('span');
+                    termEl.className = 'term placed';
+                    termEl.textContent = term;
+                    termEl.style.margin = '5px';
+                    termEl.addEventListener('click', () => this.removeTerm(index));
+                    answerArea.appendChild(termEl);
+                });
+            }
+
+            removeTerm(index) {
+                const removedTerm = this.userAnswer[index];
+                this.userAnswer.splice(index, 1);
+                
+                // Re-enable the term in the bank
+                const termElement = document.querySelector(`[data-term="${removedTerm}"]`);
+                if (termElement) {
+                    termElement.classList.remove('placed');
+                }
+                
+                this.updateAnswerDisplay();
+                this.clearFeedback();
+            }
+
+            checkAnswer() {
+                const feedback = document.getElementById('feedback');
+                const answerArea = document.getElementById('answer-area');
+                const simplifiedArea = document.getElementById('simplified-area');
+                const simplifyBtn = document.getElementById('simplify-btn');
+                
+                // Check if we're in simplification mode
+                if (this.showingSimplification) {
+                    if (this.simplifiedAnswer.length === 0) {
+                        feedback.textContent = 'Please add some simplified terms first! 🤔';
+                        feedback.className = 'feedback incorrect';
+                        return;
+                    }
+                    
+                    const isCorrect = this.arraysEqual(this.simplifiedAnswer, this.currentProblem.simplified);
+                    
+                    if (isCorrect) {
+                        feedback.innerHTML = 'Perfect! 🌟 You successfully simplified the expression!';
+                        feedback.className = 'feedback correct';
+                        simplifiedArea.classList.add('correct');
+                        
+                        // Show next button after successful simplification
+                        document.getElementById('next-btn').style.display = 'inline-block';
+                        
+                        // Update mascot
+                        document.querySelector('.mascot').textContent = '🌟';
+                        document.querySelector('.encouragement').textContent = 'Amazing! You mastered expanding and simplifying!';
+                    } else {
+                        feedback.innerHTML = 'Not quite right. Remember to combine like terms! 🔍';
+                        feedback.className = 'feedback incorrect';
+                        simplifiedArea.classList.add('incorrect');
+                        
+                        setTimeout(() => {
+                            simplifiedArea.classList.remove('incorrect');
+                        }, 1000);
+                    }
+                    return;
+                }
+                
+                // Original expansion check
+                if (this.userAnswer.length === 0) {
+                    feedback.textContent = 'Please add some terms first! 🤔';
+                    feedback.className = 'feedback incorrect';
+                    return;
+                }
+                
+                const isCorrect = this.arraysEqual(this.userAnswer, this.currentProblem.answer);
+                
+                if (isCorrect) {
+                    feedback.innerHTML = 'Excellent work! 🎉 You expanded the brackets correctly!';
+                    feedback.className = 'feedback correct';
+                    answerArea.classList.add('correct');
+                    
+                    // Show simplify button for levels 2 and 3 (double brackets)
+                    if ((this.currentLevel === 2 || this.currentLevel === 3) && this.currentProblem.simplified) {
+                        simplifyBtn.style.display = 'inline-block';
+                        feedback.innerHTML += '<br>Now try simplifying by combining like terms!';
+                    } else {
+                        // Show next button for level 1 or when no simplification needed
+                        document.getElementById('next-btn').style.display = 'inline-block';
+                    }
+                    
+                    // Update mascot
+                    document.querySelector('.mascot').textContent = '🎉';
+                    document.querySelector('.encouragement').textContent = 'Fantastic! Try the next problem!';
+                } else {
+                    feedback.innerHTML = 'Not quite right. Check your terms and try again! 💪';
+                    feedback.className = 'feedback incorrect';
+                    answerArea.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        answerArea.classList.remove('incorrect');
+                    }, 1000);
+                }
+            }
+
+            revealAnswer() {
+                const answerArea = document.getElementById('answer-area');
+                const feedback = document.getElementById('feedback');
+                
+                // Clear current answer
+                this.userAnswer = [];
+                document.querySelectorAll('.term.placed').forEach(term => {
+                    term.classList.remove('placed');
+                });
+                
+                // Show correct answer
+                this.userAnswer = [...this.currentProblem.answer];
+                this.updateAnswerDisplay();
+                
+                // Show steps
+                feedback.innerHTML = `💡 ${this.currentProblem.steps}`;
+                feedback.className = 'feedback';
+                
+                answerArea.classList.add('correct');
+                
+                // Mark terms as placed
+                this.currentProblem.answer.forEach(term => {
+                    const termElement = document.querySelector(`[data-term="${term}"]`);
+                    if (termElement) {
+                        termElement.classList.add('placed');
+                    }
+                });
+            }
+
+            clearFeedback() {
+                const feedback = document.getElementById('feedback');
+                const answerArea = document.getElementById('answer-area');
+                
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+                answerArea.classList.remove('correct', 'incorrect');
+                
+                // Reset mascot
+                document.querySelector('.mascot').textContent = '🧮';
+                document.querySelector('.encouragement').textContent = 'Drag and drop to expand the brackets!';
+            }
+
+            clearAnswerArea() {
+                const answerArea = document.getElementById('answer-area');
+                answerArea.innerHTML = '<span style="color: #a0aec0; font-size: 1.2rem;">Drop terms here to build your answer</span>';
+                answerArea.classList.remove('correct', 'incorrect');
+            }
+
+            showSimplification() {
+                this.showingSimplification = true;
+                const simplificationSection = document.getElementById('simplification-section');
+                const simplifyBtn = document.getElementById('simplify-btn');
+                const checkBtn = document.getElementById('check-btn');
+                
+                simplificationSection.style.display = 'block';
+                simplifyBtn.style.display = 'none';
+                checkBtn.textContent = 'Check Simplified ✓';
+                
+                // Generate new term bank with simplified terms
+                this.generateSimplificationTermBank();
+                
+                // Update feedback
+                const feedback = document.getElementById('feedback');
+                feedback.innerHTML = 'Great! Now combine like terms to simplify your answer. 🔍';
+                feedback.className = 'feedback';
+            }
+
+            hideSimplification() {
+                const simplificationSection = document.getElementById('simplification-section');
+                const simplifyBtn = document.getElementById('simplify-btn');
+                const nextBtn = document.getElementById('next-btn');
+                const checkBtn = document.getElementById('check-btn');
+                const simplifiedArea = document.getElementById('simplified-area');
+                
+                simplificationSection.style.display = 'none';
+                simplifyBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                checkBtn.textContent = 'Check Answer ✓';
+                
+                // Clear simplified area
+                simplifiedArea.innerHTML = '<span style="color: #a0aec0; font-size: 1.2rem;">Drop simplified terms here</span>';
+                simplifiedArea.classList.remove('correct', 'incorrect');
+            }
+
+            generateSimplificationTermBank() {
+                const termBank = document.getElementById('term-bank');
+                termBank.innerHTML = '';
+                
+                // Create terms from the simplified answer plus some distractors
+                const correctTerms = [...this.currentProblem.simplified];
+                const distractors = this.generateSimplificationDistractors();
+                const allTerms = [...correctTerms, ...distractors];
+                
+                // Shuffle terms
+                allTerms.sort(() => Math.random() - 0.5);
+                
+                allTerms.forEach(term => {
+                    const termEl = document.createElement('div');
+                    termEl.className = 'term';
+                    termEl.textContent = term;
+                    termEl.draggable = true;
+                    termEl.dataset.term = term;
+                    
+                    termEl.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', term);
+                        termEl.classList.add('dragging');
+                    });
+                    
+                    termEl.addEventListener('dragend', () => {
+                        termEl.classList.remove('dragging');
+                    });
+                    
+                    termEl.addEventListener('click', () => {
+                        if (!termEl.classList.contains('placed')) {
+                            this.addTermToSimplified(term, termEl);
+                        }
+                    });
+                    
+                    termBank.appendChild(termEl);
+                });
+            }
+
+            generateSimplificationDistractors() {
+                const distractors = [];
+                const level = this.currentLevel;
+                
+                if (level === 2) {
+                    distractors.push('3x', '-4x', 'x³', '2x²', '-20');
+                } else if (level === 3) {
+                    distractors.push('2x³', '-5x²', '8x', '-12', 'x⁴');
+                }
+                
+                return distractors.slice(0, 3);
+            }
+
+            addTermToSimplified(term, termElement) {
+                this.simplifiedAnswer.push(term);
+                termElement.classList.add('placed');
+                
+                this.updateSimplifiedDisplay();
+            }
+
+            updateSimplifiedDisplay() {
+                const simplifiedArea = document.getElementById('simplified-area');
+                simplifiedArea.innerHTML = '';
+                
+                if (this.simplifiedAnswer.length === 0) {
+                    simplifiedArea.innerHTML = '<span style="color: #a0aec0; font-size: 1.2rem;">Drop simplified terms here</span>';
+                    return;
+                }
+                
+                this.simplifiedAnswer.forEach((term, index) => {
+                    const termEl = document.createElement('span');
+                    termEl.className = 'term placed';
+                    termEl.textContent = term;
+                    termEl.style.margin = '5px';
+                    termEl.addEventListener('click', () => this.removeSimplifiedTerm(index));
+                    simplifiedArea.appendChild(termEl);
+                });
+            }
+
+            removeSimplifiedTerm(index) {
+                const removedTerm = this.simplifiedAnswer[index];
+                this.simplifiedAnswer.splice(index, 1);
+                
+                // Re-enable the term in the bank
+                const termElement = document.querySelector(`[data-term="${removedTerm}"]`);
+                if (termElement) {
+                    termElement.classList.remove('placed');
+                }
+                
+                this.updateSimplifiedDisplay();
+            }
+
+            arraysEqual(a, b) {
+                return a.length === b.length && a.every((val, i) => val === b[i]);
+            }
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BracketsGame();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992904d477c899f8',t:'MTc2MTEzNjM2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
