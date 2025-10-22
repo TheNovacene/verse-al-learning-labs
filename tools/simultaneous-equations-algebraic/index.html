@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simultaneous Equations Practice Tool</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            color: #718096;
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 12px 24px;
+            border: 3px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .level-btn.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+
+        .level-btn:hover:not(.active) {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .problem-area {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .equations {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .equation {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        .word-problem {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .method-selector {
+            margin-bottom: 25px;
+        }
+
+        .method-selector h3 {
+            margin: 0 0 15px 0;
+            color: #4a5568;
+        }
+
+        .method-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .method-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .method-btn.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+
+        .method-btn:hover:not(.selected) {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-group input {
+            width: 80px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+        }
+
+        .btn-secondary {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #dd6b20;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: #f0fff4;
+            color: #22543d;
+            border: 2px solid #9ae6b4;
+        }
+
+        .feedback.incorrect {
+            background: #fff5f5;
+            color: #742a2a;
+            border: 2px solid #fed7d7;
+        }
+
+        .steps {
+            background: #edf2f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .steps h4 {
+            margin: 0 0 15px 0;
+            color: #4a5568;
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+            position: relative;
+        }
+
+        .step.completed {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .step.current {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+            box-shadow: 0 2px 8px rgba(237, 137, 54, 0.2);
+        }
+
+        .step-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .step-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            text-align: center;
+            background: #fff;
+        }
+
+        .step-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        }
+
+        .step-input.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .step-input.incorrect {
+            border-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .step-check-btn {
+            padding: 6px 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .step-check-btn:hover {
+            background: #3182ce;
+        }
+
+        .step-check-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .step-feedback {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .step-feedback.correct {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .step-feedback.incorrect {
+            background: #fff5f5;
+            color: #742a2a;
+            border: 1px solid #fed7d7;
+        }
+
+        .guided-mode {
+            background: #f0f8ff;
+            border: 2px solid #bee3f8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #f0f8ff;
+            border-color: #bee3f8;
+        }
+
+        .hint-btn {
+            background: #9f7aea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .hint-btn:hover {
+            background: #805ad5;
+        }
+
+        .hint {
+            background: #faf5ff;
+            border: 1px solid #d6bcfa;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            font-style: italic;
+            color: #553c9a;
+        }
+
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .equation {
+                font-size: 1.2em;
+            }
+
+            .level-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .level-btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>🧮 Simultaneous Equations Practice</h1>
+            <p>Master solving simultaneous equations with step-by-step guidance</p>
+        </header>
+
+        <div class="progress">
+            <span id="progress-text">Choose a level to begin</span>
+        </div>
+
+        <div class="level-selector">
+            <button class="level-btn" onclick="selectLevel(1)">
+                Level 1<br><small>Simple Linear</small>
+            </button>
+            <button class="level-btn" onclick="selectLevel(2)">
+                Level 2<br><small>Elimination Method</small>
+            </button>
+            <button class="level-btn" onclick="selectLevel(3)">
+                Level 3<br><small>Word Problems</small>
+            </button>
+        </div>
+
+        <div id="problem-container" class="problem-area" style="display: none;">
+            <div id="word-problem" class="word-problem" style="display: none;"></div>
+            
+            <div class="equations">
+                <div id="equation1" class="equation"></div>
+                <div id="equation2" class="equation"></div>
+            </div>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="selectMode('guided')">🎯 Guided Practice</button>
+                <button class="mode-btn" onclick="selectMode('direct')">⚡ Direct Answer</button>
+            </div>
+
+            <div class="method-selector">
+                <h3>Choose your solving method:</h3>
+                <div class="method-buttons">
+                    <button class="method-btn" onclick="selectMethod('elimination')">Elimination</button>
+                    <button class="method-btn" onclick="selectMethod('substitution')">Substitution</button>
+                </div>
+            </div>
+
+            <div id="guided-container" class="guided-mode">
+                <h3>📝 Step-by-Step Solution</h3>
+                <p>Fill in the blanks to solve this problem step by step!</p>
+                <div id="guided-steps"></div>
+            </div>
+
+            <div id="direct-container" class="input-area" style="display: none;">
+                <div class="input-group">
+                    <label for="x-input">x =</label>
+                    <input type="number" id="x-input" step="0.1" placeholder="?">
+                </div>
+                <div class="input-group">
+                    <label for="y-input">y =</label>
+                    <input type="number" id="y-input" step="0.1" placeholder="?">
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="check-answer-btn" class="btn btn-primary" onclick="checkAnswer()" style="display: none;">Check Answer</button>
+                <button id="show-steps-btn" class="btn btn-secondary" onclick="showSteps()" style="display: none;">Show Steps</button>
+                <button id="new-problem-btn" class="btn btn-success" onclick="newProblem()">New Problem</button>
+            </div>
+
+            <div id="feedback" style="display: none;"></div>
+            <div id="steps-container" style="display: none;"></div>
+        </div>
+    </main>
+
+    <script>
+        let currentLevel = 0;
+        let currentProblem = {};
+        let selectedMethod = '';
+        let problemCount = 0;
+        let correctCount = 0;
+        let currentMode = 'guided';
+        let currentStep = 0;
+        let guidedSteps = [];
+
+        function checkMathematicalEquivalence(userAnswer, expectedAnswer) {
+            // Clean up both answers - remove spaces and convert to lowercase
+            const cleanUser = userAnswer.replace(/\s+/g, '').toLowerCase();
+            const cleanExpected = expectedAnswer.replace(/\s+/g, '').toLowerCase();
+            
+            // Direct match
+            if (cleanUser === cleanExpected) return true;
+            
+            // Check for common algebraic equivalences
+            const equivalences = [
+                // x = y + 1 vs x = 1 + y
+                [/^x=y\+(\d+(?:\.\d+)?)$/, /^x=(\d+(?:\.\d+)?)\+y$/],
+                [/^y=x\+(\d+(?:\.\d+)?)$/, /^y=(\d+(?:\.\d+)?)\+x$/],
+                [/^x=(\d+(?:\.\d+)?)\+y$/, /^x=y\+(\d+(?:\.\d+)?)$/],
+                [/^y=(\d+(?:\.\d+)?)\+x$/, /^y=x\+(\d+(?:\.\d+)?)$/],
+                
+                // x = 8 - y vs y = 8 - x (for symmetric cases)
+                [/^y=(\d+(?:\.\d+)?)-x$/, /^x=(\d+(?:\.\d+)?)-y$/],
+                [/^x=(\d+(?:\.\d+)?)-y$/, /^y=(\d+(?:\.\d+)?)-x$/],
+                
+                // Handle negative coefficients: y = -1.5x + 8 vs y = 8 - 1.5x
+                [/^y=(-?\d+(?:\.\d+)?)x\+(\d+(?:\.\d+)?)$/, /^y=(\d+(?:\.\d+)?)\+(-?\d+(?:\.\d+)?)x$/],
+                [/^y=(\d+(?:\.\d+)?)\+(-?\d+(?:\.\d+)?)x$/, /^y=(-?\d+(?:\.\d+)?)x\+(\d+(?:\.\d+)?)$/],
+                [/^y=(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)x$/, /^y=-(\d+(?:\.\d+)?)x\+(\d+(?:\.\d+)?)$/],
+                [/^y=-(\d+(?:\.\d+)?)x\+(\d+(?:\.\d+)?)$/, /^y=(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)x$/],
+                
+                // o = 2.70 - 5a vs 5a + o = 2.70
+                [/^o=(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)a$/, /^(\d+(?:\.\d+)?)a\+o=(\d+(?:\.\d+)?)$/],
+                [/^(\d+(?:\.\d+)?)a\+o=(\d+(?:\.\d+)?)$/, /^o=(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)a$/],
+                
+                // More general patterns
+                [/^([a-z])=([a-z])\+(\d+(?:\.\d+)?)$/, /^([a-z])=(\d+(?:\.\d+)?)\+([a-z])$/],
+                [/^([a-z])=(\d+(?:\.\d+)?)\+([a-z])$/, /^([a-z])=([a-z])\+(\d+(?:\.\d+)?)$/]
+            ];
+            
+            // Check each equivalence pattern
+            for (let [pattern1, pattern2] of equivalences) {
+                const match1 = cleanUser.match(pattern1);
+                const match2 = cleanExpected.match(pattern2);
+                
+                if (match1 && match2) {
+                    // Compare the captured groups to see if they match
+                    if (match1.length === match2.length) {
+                        let allMatch = true;
+                        for (let i = 1; i < match1.length; i++) {
+                            if (match1[i] !== match2[i]) {
+                                allMatch = false;
+                                break;
+                            }
+                        }
+                        if (allMatch) return true;
+                    }
+                }
+                
+                // Also check the reverse
+                const match3 = cleanExpected.match(pattern1);
+                const match4 = cleanUser.match(pattern2);
+                
+                if (match3 && match4) {
+                    if (match3.length === match4.length) {
+                        let allMatch = true;
+                        for (let i = 1; i < match3.length; i++) {
+                            if (match3[i] !== match4[i]) {
+                                allMatch = false;
+                                break;
+                            }
+                        }
+                        if (allMatch) return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        const problems = {
+            1: [
+                {
+                    eq1: "x + y = 8", eq2: "x - y = 2", x: 5, y: 3,
+                    elimination: {
+                        steps: ["Add equations: (x + y) + (x - y) = 8 + 2", "2x = 10", "x = 5", "Substitute: 5 + y = 8", "y = 3"],
+                        guided: [
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 0, result: "Add the equations"},
+                            {text: "___x = ___", blanks: [2, 10], result: "2x = 10", hint: "When you add (x + y) + (x - y), the y terms cancel out"},
+                            {text: "Solve for x: x = ___", blanks: [5], result: "x = 5"},
+                            {text: "Substitute x = ___ into first equation: ___ + y = ___", blanks: [5, 5, 8], result: "5 + y = 8"},
+                            {text: "Solve for y: y = ___", blanks: [3], result: "y = 3"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From first equation: y = 8 - x", "Substitute into second: x - (8 - x) = 2", "x - 8 + x = 2", "2x = 10", "x = 5", "y = 8 - 5 = 3"],
+                        guided: [
+                            {text: "From first equation, solve for y: y = ___ - ___", blanks: [8, "x"], result: "y = 8 - x"},
+                            {text: "Substitute into second equation: x - (___ - ___) = ___", blanks: [8, "x", 2], result: "x - (8 - x) = 2"},
+                            {text: "Expand and simplify: ___x = ___", blanks: [2, 10], result: "2x = 10"},
+                            {text: "Solve for x: x = ___", blanks: [5], result: "x = 5"},
+                            {text: "Find y: y = 8 - ___ = ___", blanks: [5, 3], result: "y = 8 - 5 = 3"}
+                        ]
+                    }
+                },
+                {
+                    eq1: "2x + y = 11", eq2: "x - y = 1", x: 4, y: 3,
+                    elimination: {
+                        steps: ["Add equations: (2x + y) + (x - y) = 11 + 1", "3x = 12", "x = 4", "Substitute: 4 - y = 1", "y = 3"],
+                        guided: [
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 0, result: "Add the equations"},
+                            {text: "___x = ___", blanks: [3, 12], result: "3x = 12", hint: "When you add (2x + y) + (x - y), combine like terms"},
+                            {text: "Solve for x: x = ___", blanks: [4], result: "x = 4"},
+                            {text: "Substitute x = ___ into second equation: ___ - y = ___", blanks: [4, 4, 1], result: "4 - y = 1"},
+                            {text: "Solve for y: y = ___", blanks: [3], result: "y = 3"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From second equation: x = 1 + y", "Substitute into first: 2(1 + y) + y = 11", "2 + 2y + y = 11", "3y = 9", "y = 3", "x = 1 + 3 = 4"],
+                        guided: [
+                            {text: "From second equation, solve for x: x = ___ + ___", blanks: [1, "y"], result: "x = 1 + y"},
+                            {text: "Substitute into first equation: 2(___ + ___) + y = ___", blanks: [1, "y", 11], result: "2(1 + y) + y = 11"},
+                            {text: "Expand: 2 + 2y + y = 11, so ___y = ___", blanks: [3, 9], result: "3y = 9"},
+                            {text: "Solve for y: y = ___", blanks: [3], result: "y = 3"},
+                            {text: "Find x: x = 1 + ___ = ___", blanks: [3, 4], result: "x = 1 + 3 = 4"}
+                        ]
+                    }
+                }
+            ],
+            2: [
+                {
+                    eq1: "3x + 2y = 16", eq2: "5x - 4y = 6", x: 4, y: 2,
+                    elimination: {
+                        steps: ["Multiply first equation by 2: 6x + 4y = 32", "Add to second: (6x + 4y) + (5x - 4y) = 32 + 6", "11x = 38", "x = 4", "Substitute: 12 + 2y = 16", "y = 2"],
+                        guided: [
+                            {text: "Multiply first equation by ___: ___x + ___y = ___", blanks: [2, 6, 4, 32], result: "Multiply first equation by 2: 6x + 4y = 32"},
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 0, result: "Add the equations"},
+                            {text: "(_______) + (_______) = _____ + _____", blanks: ["6x+4y", "5x-4y", 32, 6], result: "(6x + 4y) + (5x - 4y) = 32 + 6"},
+                            {text: "Simplify: ___x = ___", blanks: [11, 38], result: "11x = 38"},
+                            {text: "Solve for x: x = ", blanks: [4], result: "x = 4", hint: "Divide 38 by 11"},
+                            {text: "Substitute x = ___ into first equation: 3(___) + 2y = 16, so ___ + 2y = ___", blanks: [4, 4, 12, 16], result: "Substitute x = 4 into first equation: 3(4) + 2y = 16, so 12 + 2y = 16"},
+                            {text: "Solve for y: y = ___", blanks: [2], result: "y = 2"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From first equation: 2y = 16 - 3x, so y = 8 - 1.5x", "Substitute into second: 5x - 4(8 - 1.5x) = 6", "5x - 32 + 6x = 6", "11x = 38", "x = 4", "y = 8 - 1.5(4) = 2"],
+                        guided: [
+                            {text: "From first equation, solve for y: 2y = 16 - 3x, so y = ___ - ___x", blanks: [8, 1.5], result: "y = 8 - 1.5x"},
+                            {text: "Substitute into second equation: 5x - 4(___ - ___x) = ___", blanks: [8, 1.5, 6], result: "5x - 4(8 - 1.5x) = 6"},
+                            {text: "Expand: 5x - 32 + 6x = 6, so ___x = ___", blanks: [11, 38], result: "11x = 38"},
+                            {text: "Solve for x: x = ___", blanks: [4], result: "x = 4"},
+                            {text: "Find y: y = 8 - 1.5(___)  = ___", blanks: [4, 2], result: "y = 8 - 1.5(4) = 2"}
+                        ]
+                    }
+                },
+                {
+                    eq1: "4x + 3y = 25", eq2: "2x - y = 3", x: 4, y: 5,
+                    elimination: {
+                        steps: ["Multiply second equation by 3: 6x - 3y = 9", "Add to first: (4x + 3y) + (6x - 3y) = 25 + 9", "10x = 34", "x = 4", "Substitute: 8 - y = 3", "y = 5"],
+                        guided: [
+                            {text: "Multiply second equation by ___: ___x - ___y = ___", blanks: [3, 6, 3, 9], result: "Multiply second equation by 3: 6x - 3y = 9"},
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 0, result: "Add the equations"},
+                            {text: "(___x + ___y) + (___x - ___y) = ___ + ___", blanks: [4, 3, 6, 3, 25, 9], result: "(4x + 3y) + (6x - 3y) = 25 + 9"},
+                            {text: "Simplify: ___x = ___", blanks: [10, 40], result: "10x = 40"},
+                            {text: "Solve for x: x = ___", blanks: [4], result: "x = 4"},
+                            {text: "Substitute x = ___ into second equation: 2(___) - y = 3, so ___ - y = ___", blanks: [4, 4, 8, 3], result: "Substitute x = 4 into second equation: 2(4) - y = 3, so 8 - y = 3"},
+                            {text: "Solve for y: y = ___", blanks: [5], result: "y = 5"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From second equation: y = 2x - 3", "Substitute into first: 4x + 3(2x - 3) = 25", "4x + 6x - 9 = 25", "10x = 34", "x = 4", "y = 2(4) - 3 = 5"],
+                        guided: [
+                            {text: "From second equation, solve for y: y = ___x - ___", blanks: [2, 3], result: "y = 2x - 3"},
+                            {text: "Substitute into first equation: 4x + 3(___x - ___) = ___", blanks: [2, 3, 25], result: "4x + 3(2x - 3) = 25"},
+                            {text: "Expand: 4x + 6x - 9 = 25, so ___x = ___", blanks: [10, 34], result: "10x = 34"},
+                            {text: "Solve for x: x = ___", blanks: [4], result: "x = 4"},
+                            {text: "Find y: y = 2(___) - 3 = ___", blanks: [4, 5], result: "y = 2(4) - 3 = 5"}
+                        ]
+                    }
+                },
+                {
+                    eq1: "5x + 2y = 19", eq2: "3x + 2y = 13", x: 3, y: 2,
+                    elimination: {
+                        steps: ["Subtract second from first: (5x + 2y) - (3x + 2y) = 19 - 13", "2x = 6", "x = 3", "Substitute: 15 + 2y = 19", "y = 2"],
+                        guided: [
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 1, result: "Subtract the equations"},
+                            {text: "(___x + ___y) - (___x + ___y) = ___ - ___", blanks: [5, 2, 3, 2, 19, 13], result: "(5x + 2y) - (3x + 2y) = 19 - 13"},
+                            {text: "Simplify: ___x = ___", blanks: [2, 6], result: "2x = 6"},
+                            {text: "Solve for x: x = ___", blanks: [3], result: "x = 3"},
+                            {text: "Substitute x = ___ into first equation: 5(___) + 2y = 19, so ___ + 2y = ___", blanks: [3, 3, 15, 19], result: "Substitute x = 3 into first equation: 5(3) + 2y = 19, so 15 + 2y = 19"},
+                            {text: "Solve for y: y = ___", blanks: [2], result: "y = 2"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From second equation: 2y = 13 - 3x, so y = 6.5 - 1.5x", "Substitute into first: 5x + 2(6.5 - 1.5x) = 19", "5x + 13 - 3x = 19", "2x = 6", "x = 3", "y = 6.5 - 1.5(3) = 2"],
+                        guided: [
+                            {text: "From second equation, solve for y: 2y = 13 - 3x, so y = ___ - ___x", blanks: [6.5, 1.5], result: "y = 6.5 - 1.5x"},
+                            {text: "Substitute into first equation: 5x + 2(___ - ___x) = ___", blanks: [6.5, 1.5, 19], result: "5x + 2(6.5 - 1.5x) = 19"},
+                            {text: "Expand: 5x + 13 - 3x = 19, so ___x = ___", blanks: [2, 6], result: "2x = 6"},
+                            {text: "Solve for x: x = ___", blanks: [3], result: "x = 3"},
+                            {text: "Find y: y = 6.5 - 1.5(___) = ___", blanks: [3, 2], result: "y = 6.5 - 1.5(3) = 2"}
+                        ]
+                    }
+                },
+                {
+                    eq1: "4x + 5y = 33", eq2: "2x + 5y = 23", x: 5, y: 2.6,
+                    elimination: {
+                        steps: ["Subtract second from first: (4x + 5y) - (2x + 5y) = 33 - 23", "2x = 10", "x = 5", "Substitute: 10 + 5y = 23", "y = 2.6"],
+                        guided: [
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 1, result: "Subtract the equations"},
+                            {text: "(___x + ___y) - (___x + ___y) = ___ - ___", blanks: [4, 5, 2, 5, 33, 23], result: "(4x + 5y) - (2x + 5y) = 33 - 23"},
+                            {text: "Simplify: ___x = ___", blanks: [2, 10], result: "2x = 10"},
+                            {text: "Solve for x: x = ___", blanks: [5], result: "x = 5"},
+                            {text: "Substitute x = ___ into second equation: 2(___) + 5y = 23, so ___ + 5y = ___", blanks: [5, 5, 10, 23], result: "Substitute x = 5 into second equation: 2(5) + 5y = 23, so 10 + 5y = 23"},
+                            {text: "Solve for y: y = ___", blanks: [2.6], result: "y = 2.6"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["From second equation: 5y = 23 - 2x, so y = 4.6 - 0.4x", "Substitute into first: 4x + 5(4.6 - 0.4x) = 33", "4x + 23 - 2x = 33", "2x = 10", "x = 5", "y = 4.6 - 0.4(5) = 2.6"],
+                        guided: [
+                            {text: "From second equation, solve for y: 5y = 23 - 2x, so y = ___ - ___x", blanks: [4.6, 0.4], result: "y = 4.6 - 0.4x"},
+                            {text: "Substitute into first equation: 4x + 5(___ - ___x) = ___", blanks: [4.6, 0.4, 33], result: "4x + 5(4.6 - 0.4x) = 33"},
+                            {text: "Expand: 4x + 23 - 2x = 33, so ___x = ___", blanks: [2, 10], result: "2x = 10"},
+                            {text: "Solve for x: x = ___", blanks: [5], result: "x = 5"},
+                            {text: "Find y: y = 4.6 - 0.4(___) = ___", blanks: [5, 2.6], result: "y = 4.6 - 0.4(5) = 2.6"}
+                        ]
+                    }
+                }
+            ],
+            3: [
+                {
+                    word: "Sarah buys 3 apples and 2 oranges for £2.40. Tom buys 5 apples and 1 orange for £2.70. Find the cost of one apple and one orange.",
+                    eq1: "3a + 2o = 2.40", eq2: "5a + o = 2.70", x: 0.4, y: 0.6,
+                    xLabel: "a (apple)", yLabel: "o (orange)",
+                    elimination: {
+                        steps: ["Let a = cost of apple, o = cost of orange", "Sarah: 3a + 2o = 2.40", "Tom: 5a + o = 2.70", "Multiply second equation by 2: 10a + 2o = 5.40", "Subtract first from this: (10a + 2o) - (3a + 2o) = 5.40 - 2.40", "7a = 3.00", "a = £0.43", "Substitute: 5(0.43) + o = 2.70", "o = £0.55"],
+                        guided: [
+                            {text: "Let a = cost of apple, o = cost of orange. Sarah buys 3 apples and 2 oranges for £2.40:", blanks: [], result: "Define variables"},
+                            {text: "Sarah's equation: ___a + ___o = ___", blanks: [3, 2, 2.40], result: "3a + 2o = 2.40", hint: "3 apples + 2 oranges = £2.40"},
+                            {text: "Tom buys 5 apples and 1 orange for £2.70:", blanks: [], result: "Tom's information"},
+                            {text: "Tom's equation: ___a + ___o = ___", blanks: [5, 1, 2.70], result: "5a + o = 2.70", hint: "5 apples + 1 orange = £2.70"},
+                            {text: "Multiply Tom's equation by ___: ___a + ___o = ___", blanks: [2, 10, 2, 5.40], result: "Multiply Tom's equation by 2: 10a + 2o = 5.40"},
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 1, result: "Subtract the equations"},
+                            {text: "(___a + ___o) - (___a + ___o) = ___ - ___", blanks: [10, 2, 3, 2, 5.40, 2.40], result: "(10a + 2o) - (3a + 2o) = 5.40 - 2.40"},
+                            {text: "Simplify: ___a = ___", blanks: [7, 3], result: "7a = 3.00"},
+                            {text: "Solve for a: a = £___", blanks: [0.43], result: "a = £0.43", hint: "Divide 3.00 by 7"},
+                            {text: "Substitute a = ___ into Tom's equation: 5(___) + o = ___, so ___ + o = ___", blanks: [0.43, 0.43, 2.70, 2.15, 2.70], result: "Substitute a = 0.43 into Tom's equation: 5(0.43) + o = 2.70, so 2.15 + o = 2.70"},
+                            {text: "Solve for o: o = £___", blanks: [0.55], result: "o = £0.55"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["Let a = cost of apple, o = cost of orange", "Sarah: 3a + 2o = 2.40", "Tom: 5a + o = 2.70", "From Tom's equation: o = 2.70 - 5a", "Substitute: 3a + 2(2.70 - 5a) = 2.40", "3a + 5.40 - 10a = 2.40", "-7a = -3.00", "a = £0.40", "o = 2.70 - 5(0.40) = £0.60"],
+                        guided: [
+                            {text: "Let a = cost of apple, o = cost of orange. Sarah buys 3 apples and 2 oranges for £2.40:", blanks: [], result: "Define variables"},
+                            {text: "Sarah's equation: ___a + ___o = ___", blanks: [3, 2, 2.40], result: "3a + 2o = 2.40", hint: "3 apples + 2 oranges = £2.40"},
+                            {text: "Tom buys 5 apples and 1 orange for £2.70:", blanks: [], result: "Tom's information"},
+                            {text: "Tom's equation: ___a + ___o = ___", blanks: [5, 1, 2.70], result: "5a + o = 2.70", hint: "5 apples + 1 orange = £2.70"},
+                            {text: "From Tom's equation, solve for o: o = ___ - ___a", blanks: [2.70, 5], result: "o = 2.70 - 5a"},
+                            {text: "Substitute into Sarah's equation: ___a + ___(___ - ___a) = ___", blanks: [3, 2, 2.70, 5, 2.40], result: "3a + 2(2.70 - 5a) = 2.40"},
+                            {text: "Expand: 3a + ___ - ___a = 2.40", blanks: [5.40, 10], result: "3a + 5.40 - 10a = 2.40"},
+                            {text: "Simplify: ___a = 2.40 - 5.40 = ___", blanks: [-7, -3], result: "-7a = -3.00"},
+                            {text: "Solve for a: a = £___", blanks: [0.4], result: "a = £0.40"},
+                            {text: "Find o: o = 2.70 - 5(___) = £___", blanks: [0.40, 0.6], result: "o = 2.70 - 5(0.40) = £0.60"}
+                        ]
+                    }
+                },
+                {
+                    word: "A cinema sells adult tickets for £a and child tickets for £c. On Monday, 4 adults and 6 children paid £42. On Tuesday, 3 adults and 2 children paid £23. Find the cost of each type of ticket.",
+                    eq1: "4a + 6c = 42", eq2: "3a + 2c = 23", x: 7.5, y: 2,
+                    xLabel: "a (adult)", yLabel: "c (child)",
+                    elimination: {
+                        steps: ["Let a = adult ticket cost, c = child ticket cost", "Monday: 4a + 6c = 42", "Tuesday: 3a + 2c = 23", "Multiply second equation by 3: 9a + 6c = 69", "Subtract first from this: (9a + 6c) - (4a + 6c) = 69 - 42", "5a = 27", "a = £5.40", "Substitute: 3(5.40) + 2c = 23", "c = £2.90"],
+                        guided: [
+                            {text: "Let a = adult ticket cost, c = child ticket cost. Monday: 4 adults and 6 children paid £42:", blanks: [], result: "Define variables"},
+                            {text: "Monday's equation: ___a + ___c = ___", blanks: [4, 6, 42], result: "4a + 6c = 42", hint: "4 adults + 6 children = £42"},
+                            {text: "Tuesday: 3 adults and 2 children paid £23:", blanks: [], result: "Tuesday's information"},
+                            {text: "Tuesday's equation: ___a + ___c = ___", blanks: [3, 2, 23], result: "3a + 2c = 23", hint: "3 adults + 2 children = £23"},
+                            {text: "Multiply Tuesday's equation by ___: ___a + ___c = ___", blanks: [3, 9, 6, 69], result: "Multiply Tuesday's equation by 3: 9a + 6c = 69"},
+                            {text: "Choose your operation:", type: "choice", choices: ["Add the equations", "Subtract the equations"], correct: 1, result: "Subtract the equations"},
+                            {text: "(___a + ___c) - (___a + ___c) = ___ - ___", blanks: [9, 6, 4, 6, 69, 42], result: "(9a + 6c) - (4a + 6c) = 69 - 42"},
+                            {text: "Simplify: ___a = ___", blanks: [5, 27], result: "5a = 27"},
+                            {text: "Solve for a: a = £___", blanks: [5.4], result: "a = £5.40"},
+                            {text: "Substitute a = ___ into Tuesday's equation: 3(___) + 2c = 23, so ___ + 2c = ___", blanks: [5.4, 5.4, 16.2, 23], result: "Substitute a = 5.4 into Tuesday's equation: 3(5.4) + 2c = 23, so 16.2 + 2c = 23"},
+                            {text: "Solve for c: c = £___", blanks: [3.4], result: "c = £3.40"}
+                        ]
+                    },
+                    substitution: {
+                        steps: ["Let a = adult ticket cost, c = child ticket cost", "Monday: 4a + 6c = 42", "Tuesday: 3a + 2c = 23", "From Tuesday's equation: c = (23 - 3a)/2", "Substitute: 4a + 6((23 - 3a)/2) = 42", "4a + 3(23 - 3a) = 42", "4a + 69 - 9a = 42", "-5a = -27", "a = £5.40", "c = (23 - 3(5.40))/2 = £3.40"],
+                        guided: [
+                            {text: "Let a = adult ticket cost, c = child ticket cost. Monday: 4 adults and 6 children paid £42:", blanks: [], result: "Define variables"},
+                            {text: "Monday's equation: ___a + ___c = ___", blanks: [4, 6, 42], result: "4a + 6c = 42", hint: "4 adults + 6 children = £42"},
+                            {text: "Tuesday: 3 adults and 2 children paid £23:", blanks: [], result: "Tuesday's information"},
+                            {text: "Tuesday's equation: ___a + ___c = ___", blanks: [3, 2, 23], result: "3a + 2c = 23", hint: "3 adults + 2 children = £23"},
+                            {text: "From Tuesday's equation, solve for c: 2c = 23 - 3a, so c = ___ - ___a", blanks: [11.5, 1.5], result: "c = 11.5 - 1.5a"},
+                            {text: "Substitute into Monday's equation: ___a + ___(___ - ___a) = ___", blanks: [4, 6, 11.5, 1.5, 42], result: "4a + 6(11.5 - 1.5a) = 42"},
+                            {text: "Expand: 4a + ___ - ___a = 42", blanks: [69, 9], result: "4a + 69 - 9a = 42"},
+                            {text: "Simplify: ___a = 42 - 69 = ___", blanks: [-5, -27], result: "-5a = -27"},
+                            {text: "Solve for a: a = £___", blanks: [5.4], result: "a = £5.40"},
+                            {text: "Find c: c = 11.5 - 1.5(___) = £___", blanks: [5.4, 3.4], result: "c = 11.5 - 1.5(5.4) = £3.40"}
+                        ]
+                    }
+                }
+            ]
+        };
+
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide appropriate containers
+            if (mode === 'guided') {
+                document.getElementById('guided-container').style.display = 'block';
+                document.getElementById('direct-container').style.display = 'none';
+                document.getElementById('check-answer-btn').style.display = 'none';
+                document.getElementById('show-steps-btn').style.display = 'none';
+            } else {
+                document.getElementById('guided-container').style.display = 'none';
+                document.getElementById('direct-container').style.display = 'flex';
+                document.getElementById('check-answer-btn').style.display = 'inline-block';
+                document.getElementById('show-steps-btn').style.display = 'inline-block';
+            }
+            
+            // Regenerate problem if one exists
+            if (currentLevel > 0) {
+                generateGuidedSteps();
+            }
+        }
+
+        function selectLevel(level) {
+            currentLevel = level;
+            problemCount = 0;
+            correctCount = 0;
+            
+            // Update level buttons
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show problem container
+            document.getElementById('problem-container').style.display = 'block';
+            
+            // Generate new problem
+            newProblem();
+            
+            updateProgress();
+        }
+
+        function generateGuidedSteps() {
+            if (currentMode !== 'guided' || !selectedMethod) return;
+            
+            const methodData = currentProblem[selectedMethod];
+            if (!methodData || !methodData.guided) return;
+            
+            currentStep = 0;
+            guidedSteps = [...methodData.guided];
+            
+            const container = document.getElementById('guided-steps');
+            container.innerHTML = '';
+            
+            guidedSteps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = `step ${index === 0 ? 'current' : ''}`;
+                stepDiv.id = `step-${index}`;
+                
+                let stepHTML = `<div class="step-content">`;
+                
+                if (step.type === 'choice') {
+                    // Multiple choice step
+                    stepHTML += `<span>${step.text}</span><br>`;
+                    step.choices.forEach((choice, choiceIndex) => {
+                        stepHTML += `<label style="display: block; margin: 8px 0; cursor: pointer;">
+                            <input type="radio" name="step-${index}-choice" value="${choiceIndex}" style="margin-right: 8px;">
+                            ${choice}
+                        </label>`;
+                    });
+                    stepHTML += `<button class="step-check-btn" onclick="checkStepAnswer(${index})" ${index > 0 ? 'disabled' : ''}>Check</button>`;
+                } else if (step.blanks && step.blanks.length > 0) {
+                    // Has blanks - create inputs
+                    let textParts = step.text.split('___');
+                    textParts.forEach((part, partIndex) => {
+                        stepHTML += `<span>${part}</span>`;
+                        if (partIndex < step.blanks.length) {
+                            stepHTML += `<input type="text" class="step-input" id="step-${index}-blank-${partIndex}" placeholder="?">`;
+                        }
+                    });
+                    
+                    stepHTML += `<button class="step-check-btn" onclick="checkStepAnswer(${index})" ${index > 0 ? 'disabled' : ''}>Check</button>`;
+                    
+                    if (step.hint) {
+                        stepHTML += `<button class="hint-btn" onclick="showHint(${index})">💡 Hint</button>`;
+                    }
+                } else {
+                    // No blanks - just display the text
+                    stepHTML += `<span>${step.text}</span>`;
+                }
+                
+                stepHTML += `</div>`;
+                stepDiv.innerHTML = stepHTML;
+                container.appendChild(stepDiv);
+            });
+        }
+
+        function newProblem() {
+            if (currentLevel === 0) return;
+            
+            const levelProblems = problems[currentLevel];
+            currentProblem = levelProblems[Math.floor(Math.random() * levelProblems.length)];
+            
+            // Clear previous state
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('steps-container').style.display = 'none';
+            document.getElementById('x-input').value = '';
+            document.getElementById('y-input').value = '';
+            selectedMethod = '';
+            document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Display equations (hide for word problems where students build them)
+            if (currentProblem.word) {
+                document.getElementById('equation1').textContent = "Equation 1: (You'll build this)";
+                document.getElementById('equation2').textContent = "Equation 2: (You'll build this)";
+            } else {
+                document.getElementById('equation1').textContent = currentProblem.eq1;
+                document.getElementById('equation2').textContent = currentProblem.eq2;
+            }
+            
+            // Handle word problems
+            const wordProblem = document.getElementById('word-problem');
+            if (currentProblem.word) {
+                wordProblem.textContent = currentProblem.word;
+                wordProblem.style.display = 'block';
+                
+                // Update labels for word problems
+                if (currentProblem.xLabel && currentProblem.yLabel) {
+                    document.querySelector('label[for="x-input"]').textContent = currentProblem.xLabel + ' =';
+                    document.querySelector('label[for="y-input"]').textContent = currentProblem.yLabel + ' =';
+                }
+            } else {
+                wordProblem.style.display = 'none';
+                document.querySelector('label[for="x-input"]').textContent = 'x =';
+                document.querySelector('label[for="y-input"]').textContent = 'y =';
+            }
+            
+            // Generate guided steps if in guided mode
+            if (currentMode === 'guided') {
+                generateGuidedSteps();
+            }
+            
+            problemCount++;
+            updateProgress();
+        }
+
+        function checkStepAnswer(stepIndex) {
+            const step = guidedSteps[stepIndex];
+            const stepDiv = document.getElementById(`step-${stepIndex}`);
+            let allCorrect = true;
+            
+            if (step.type === 'choice') {
+                // Check multiple choice answer
+                const selectedRadio = stepDiv.querySelector(`input[name="step-${stepIndex}-choice"]:checked`);
+                if (!selectedRadio) {
+                    allCorrect = false;
+                } else {
+                    const selectedValue = parseInt(selectedRadio.value);
+                    allCorrect = selectedValue === step.correct;
+                }
+            } else if (step.blanks) {
+                // Check each blank
+                step.blanks.forEach((expectedAnswer, blankIndex) => {
+                    const input = document.getElementById(`step-${stepIndex}-blank-${blankIndex}`);
+                    const userAnswer = input.value.trim();
+                    
+                    // Convert to number if expected answer is numeric
+                    let isCorrect = false;
+                    if (typeof expectedAnswer === 'number') {
+                        isCorrect = Math.abs(parseFloat(userAnswer) - expectedAnswer) < 0.01;
+                    } else {
+                        isCorrect = checkMathematicalEquivalence(userAnswer, expectedAnswer.toString());
+                    }
+                    
+                    if (isCorrect) {
+                        input.classList.remove('incorrect');
+                        input.classList.add('correct');
+                    } else {
+                        input.classList.remove('correct');
+                        input.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                });
+            }
+            
+            // Show feedback
+            let existingFeedback = stepDiv.querySelector('.step-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+            
+            const feedback = document.createElement('div');
+            feedback.className = `step-feedback ${allCorrect ? 'correct' : 'incorrect'}`;
+            
+            if (allCorrect) {
+                feedback.textContent = '✅ Correct! Well done!';
+                stepDiv.classList.add('completed');
+                stepDiv.classList.remove('current');
+                
+                // Enable next step
+                if (stepIndex + 1 < guidedSteps.length) {
+                    const nextStep = document.getElementById(`step-${stepIndex + 1}`);
+                    nextStep.classList.add('current');
+                    const nextButton = nextStep.querySelector('.step-check-btn');
+                    if (nextButton) nextButton.disabled = false;
+                    currentStep = stepIndex + 1;
+                } else {
+                    // All steps completed
+                    correctCount++;
+                    feedback.textContent = '🎉 Excellent! You\'ve solved the entire problem!';
+                    updateProgress();
+                }
+            } else {
+                if (step.type === 'choice') {
+                    feedback.textContent = '❌ Not the best choice. Think about which operation will eliminate a variable!';
+                } else {
+                    feedback.textContent = '❌ Not quite right. Check your answer and try again!';
+                }
+            }
+            
+            stepDiv.appendChild(feedback);
+        }
+
+        function showHint(stepIndex) {
+            const step = guidedSteps[stepIndex];
+            const stepDiv = document.getElementById(`step-${stepIndex}`);
+            
+            let existingHint = stepDiv.querySelector('.hint');
+            if (existingHint) {
+                existingHint.remove();
+                return;
+            }
+            
+            const hint = document.createElement('div');
+            hint.className = 'hint';
+            hint.textContent = step.hint;
+            stepDiv.appendChild(hint);
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Regenerate guided steps if in guided mode
+            if (currentMode === 'guided' && currentLevel > 0) {
+                generateGuidedSteps();
+            }
+        }
+
+        function checkAnswer() {
+            const xInput = parseFloat(document.getElementById('x-input').value);
+            const yInput = parseFloat(document.getElementById('y-input').value);
+            
+            if (isNaN(xInput) || isNaN(yInput)) {
+                showFeedback('Please enter values for both variables!', false);
+                return;
+            }
+            
+            const tolerance = 0.01;
+            const xCorrect = Math.abs(xInput - currentProblem.x) < tolerance;
+            const yCorrect = Math.abs(yInput - currentProblem.y) < tolerance;
+            
+            if (xCorrect && yCorrect) {
+                correctCount++;
+                showFeedback(`🎉 Excellent! You got it right! ${currentProblem.xLabel ? currentProblem.xLabel.split(' ')[0] : 'x'} = ${currentProblem.x}, ${currentProblem.yLabel ? currentProblem.yLabel.split(' ')[0] : 'y'} = ${currentProblem.y}`, true);
+            } else {
+                showFeedback(`❌ Not quite right. The correct answer is ${currentProblem.xLabel ? currentProblem.xLabel.split(' ')[0] : 'x'} = ${currentProblem.x}, ${currentProblem.yLabel ? currentProblem.yLabel.split(' ')[0] : 'y'} = ${currentProblem.y}. Try again!`, false);
+            }
+            
+            updateProgress();
+        }
+
+        function showFeedback(message, isCorrect) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.style.display = 'block';
+        }
+
+        function showSteps() {
+            const stepsContainer = document.getElementById('steps-container');
+            
+            if (!selectedMethod) {
+                stepsContainer.innerHTML = '<div class="steps"><h4>Please select a method first!</h4></div>';
+                stepsContainer.style.display = 'block';
+                return;
+            }
+            
+            const methodData = currentProblem[selectedMethod];
+            if (!methodData || !methodData.steps) return;
+            
+            const steps = methodData.steps;
+            
+            let stepsHTML = `<div class="steps"><h4>${selectedMethod.charAt(0).toUpperCase() + selectedMethod.slice(1)} Method Steps:</h4>`;
+            steps.forEach((step, index) => {
+                stepsHTML += `<div class="step">${index + 1}. ${step}</div>`;
+            });
+            stepsHTML += '</div>';
+            
+            stepsContainer.innerHTML = stepsHTML;
+            stepsContainer.style.display = 'block';
+        }
+
+        function updateProgress() {
+            const progressText = document.getElementById('progress-text');
+            if (currentLevel === 0) {
+                progressText.textContent = 'Choose a level to begin';
+            } else {
+                progressText.textContent = `Level ${currentLevel} | Problems: ${problemCount} | Correct: ${correctCount}`;
+            }
+        }
+
+        // Allow Enter key to check answer or step
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && currentLevel > 0) {
+                if (currentMode === 'guided' && e.target.classList.contains('step-input')) {
+                    // Find which step this input belongs to
+                    const stepDiv = e.target.closest('.step');
+                    if (stepDiv) {
+                        const stepIndex = parseInt(stepDiv.id.split('-')[1]);
+                        checkStepAnswer(stepIndex);
+                    }
+                } else if (currentMode === 'direct') {
+                    checkAnswer();
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9928db01d1d2deb0',t:'MTc2MTEzNDY0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
