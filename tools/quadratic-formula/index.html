@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quadratic Formula Solver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .math-display {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2em;
+        }
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .fraction .numerator {
+            display: block;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+        }
+        .fraction .denominator {
+            display: block;
+            padding-top: 2px;
+        }
+        .sqrt {
+            position: relative;
+            display: inline-block;
+        }
+        .sqrt::before {
+            content: "√";
+            font-size: 1.2em;
+            position: absolute;
+            left: -0.3em;
+            top: -0.1em;
+        }
+        .sqrt::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #000;
+        }
+        .superscript {
+            vertical-align: super;
+            font-size: 0.8em;
+        }
+        .step-box {
+            transition: all 0.3s ease;
+        }
+        .step-incomplete {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #16a34a;
+        }
+        .incorrect-answer {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+        }
+        .pulse-green {
+            animation: pulse-green 1s ease-in-out;
+        }
+        @keyframes pulse-green {
+            0%, 100% { background-color: #dcfce7; }
+            50% { background-color: #bbf7d0; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-800 mb-2">🎯 Interactive Quadratic Formula Solver</h1>
+            <p class="text-lg text-gray-600">Learn by doing - solve each step yourself!</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Progress</span>
+                <span id="progress-text" class="text-sm font-medium text-indigo-600">0/5 steps completed</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="flex gap-4">
+                <button onclick="startSolving()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Start Solving
+                </button>
+                <button onclick="generateRandom()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Generate New Equation
+                </button>
+                <button onclick="resetSolver()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Reset
+                </button>
+            </div>
+            <!-- Hidden inputs for internal calculations -->
+            <input type="hidden" id="a-input" value="1">
+            <input type="hidden" id="b-input" value="-5">
+            <input type="hidden" id="c-input" value="6">
+        </div>
+
+        <!-- Current Equation Display -->
+        <div id="equation-display" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Current Equation:</h3>
+            <div id="current-equation" class="text-2xl math-display text-center py-4 bg-gray-50 rounded-lg">
+                x² - 5x + 6 = 0
+            </div>
+        </div>
+
+        <!-- Interactive Steps -->
+        <div id="interactive-steps" class="space-y-6">
+            <!-- Steps will be populated by JavaScript -->
+        </div>
+
+        <!-- Celebration Modal -->
+        <div id="celebration-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-md mx-4 text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl font-bold text-green-800 mb-2">Congratulations!</h3>
+                <p class="text-gray-600 mb-4">You've successfully solved the quadratic equation!</p>
+                <div id="final-solutions" class="bg-green-50 p-4 rounded-lg mb-4"></div>
+                <button onclick="closeCelebration()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold">
+                    Solve Another
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let totalSteps = 5;
+        let a, b, c, discriminant;
+        let correctAnswers = {};
+
+        function updateEquationDisplay() {
+            a = parseFloat(document.getElementById('a-input').value) || 0;
+            b = parseFloat(document.getElementById('b-input').value) || 0;
+            c = parseFloat(document.getElementById('c-input').value) || 0;
+            
+            let equation = '';
+            
+            if (a === 1) equation += 'x²';
+            else if (a === -1) equation += '-x²';
+            else if (a !== 0) equation += `${a}x²`;
+            
+            if (b > 0 && a !== 0) equation += ` + ${b}x`;
+            else if (b > 0 && a === 0) equation += `${b}x`;
+            else if (b === -1) equation += ` - x`;
+            else if (b < 0) equation += ` - ${Math.abs(b)}x`;
+            else if (b === 1 && a !== 0) equation += ` + x`;
+            else if (b === 1 && a === 0) equation += `x`;
+            
+            if (c > 0 && (a !== 0 || b !== 0)) equation += ` + ${c}`;
+            else if (c > 0 && a === 0 && b === 0) equation += `${c}`;
+            else if (c < 0) equation += ` - ${Math.abs(c)}`;
+            
+            equation += ' = 0';
+            
+            if (equation.startsWith(' + ')) equation = equation.substring(3);
+            if (equation.startsWith(' - ')) equation = '-' + equation.substring(3);
+            
+            document.getElementById('current-equation').innerHTML = equation;
+        }
+
+        function updateProgress() {
+            const percentage = (currentStep / totalSteps) * 100;
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = `${currentStep}/${totalSteps} steps completed`;
+        }
+
+        function checkAnswer(inputId, correctValue, tolerance = 0.001) {
+            const userAnswer = parseFloat(document.getElementById(inputId).value);
+            const isCorrect = Math.abs(userAnswer - correctValue) < tolerance;
+            
+            const input = document.getElementById(inputId);
+            input.classList.remove('correct-answer', 'incorrect-answer');
+            
+            if (isCorrect) {
+                input.classList.add('correct-answer', 'pulse-green');
+                setTimeout(() => input.classList.remove('pulse-green'), 1000);
+                return true;
+            } else {
+                input.classList.add('incorrect-answer');
+                return false;
+            }
+        }
+
+        function startSolving() {
+            if (a === 0) {
+                alert('Error: This is not a quadratic equation (a cannot be 0).');
+                return;
+            }
+            
+            currentStep = 0;
+            correctAnswers = {};
+            discriminant = b * b - 4 * a * c;
+            
+            updateEquationDisplay();
+            createInteractiveSteps();
+            updateProgress();
+        }
+
+        function createInteractiveSteps() {
+            const stepsContainer = document.getElementById('interactive-steps');
+            
+            stepsContainer.innerHTML = `
+                <!-- Step 1: Calculate b² -->
+                <div id="step-1" class="step-box bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-3">Step 1: Calculate b²</h3>
+                    <p class="text-gray-600 mb-4">From your equation, identify the coefficient of x and calculate b²:</p>
+                    <div class="text-lg math-display mb-4">b² = ?</div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <label for="step1-b-squared" class="text-lg font-medium text-gray-700">b² =</label>
+                        <input type="number" id="step1-b-squared" class="w-24 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                    </div>
+                    <button onclick="checkStep1()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Check Step 1</button>
+                    <div id="step1-feedback" class="mt-3"></div>
+                </div>
+
+                <!-- Step 2: Calculate 4ac -->
+                <div id="step-2" class="step-box bg-white rounded-xl shadow-lg p-6 step-incomplete">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-3">Step 2: Calculate 4ac</h3>
+                    <p class="text-gray-600 mb-4">From your equation, identify the coefficients and calculate 4ac:</p>
+                    <div class="text-lg math-display mb-4">4ac = ?</div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <label for="step2-4ac" class="text-lg font-medium text-gray-700">4ac =</label>
+                        <input type="number" id="step2-4ac" class="w-24 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                    </div>
+                    <button onclick="checkStep2()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Check Step 2</button>
+                    <div id="step2-feedback" class="mt-3"></div>
+                </div>
+
+                <!-- Step 3: Calculate discriminant -->
+                <div id="step-3" class="step-box bg-white rounded-xl shadow-lg p-6 step-incomplete">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-3">Step 3: Calculate the Discriminant</h3>
+                    <p class="text-gray-600 mb-4">Calculate b² - 4ac:</p>
+                    <div class="text-lg math-display mb-4">Discriminant = b² - 4ac = <span id="b-squared-display">?</span> - <span id="four-ac-display">?</span> = ?</div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <label for="step3-discriminant" class="text-lg font-medium text-gray-700">Discriminant =</label>
+                        <input type="number" id="step3-discriminant" class="w-24 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                    </div>
+                    <button onclick="checkStep3()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Check Step 3</button>
+                    <div id="step3-feedback" class="mt-3"></div>
+                </div>
+
+                <!-- Step 4: Calculate solutions -->
+                <div id="step-4" class="step-box bg-white rounded-xl shadow-lg p-6 step-incomplete">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-3">Step 4: Calculate the Solutions</h3>
+                    <p class="text-gray-600 mb-4">Using the quadratic formula:</p>
+                    <div class="text-lg math-display text-center mb-4">
+                        x = <span class="fraction">
+                            <span class="numerator">-b ± <span class="sqrt">discriminant</span></span>
+                            <span class="denominator">2a</span>
+                        </span>
+                    </div>
+                    <div id="solution-inputs" class="space-y-4">
+                        <!-- Will be populated based on discriminant -->
+                    </div>
+                    <button onclick="checkStep4()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Check Solutions</button>
+                    <div id="step4-feedback" class="mt-3"></div>
+                </div>
+
+                <!-- Step 5: Verify solutions -->
+                <div id="step-5" class="step-box bg-white rounded-xl shadow-lg p-6 step-incomplete">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-3">Step 5: Verify Your Solutions</h3>
+                    <p class="text-gray-600 mb-4">Substitute your solutions back into the original equation to verify:</p>
+                    <div id="verification-content">
+                        <!-- Will be populated after step 4 -->
+                    </div>
+                    <button onclick="checkStep5()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Verify Solutions</button>
+                    <div id="step5-feedback" class="mt-3"></div>
+                </div>
+            `;
+        }
+
+        function checkStep1() {
+            const correctValue = b * b;
+            const isCorrect = checkAnswer('step1-b-squared', correctValue);
+            
+            const feedback = document.getElementById('step1-feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `<div class="text-green-600 font-semibold">✓ Correct! b² = ${correctValue}</div>`;
+                correctAnswers.bSquared = correctValue;
+                currentStep = 1;
+                document.getElementById('step-2').classList.remove('step-incomplete');
+                updateProgress();
+            } else {
+                feedback.innerHTML = '<div class="text-red-600">Incorrect. Look at the coefficient of x in your equation and square it.</div>';
+            }
+        }
+
+        function checkStep2() {
+            const correctValue = 4 * a * c;
+            const isCorrect = checkAnswer('step2-4ac', correctValue);
+            
+            const feedback = document.getElementById('step2-feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `<div class="text-green-600 font-semibold">✓ Correct! 4ac = ${correctValue}</div>`;
+                correctAnswers.fourAC = correctValue;
+                currentStep = 2;
+                document.getElementById('step-3').classList.remove('step-incomplete');
+                document.getElementById('b-squared-display').textContent = correctAnswers.bSquared;
+                document.getElementById('four-ac-display').textContent = correctAnswers.fourAC;
+                updateProgress();
+            } else {
+                feedback.innerHTML = '<div class="text-red-600">Incorrect. Remember: 4ac = 4 × (coefficient of x²) × (constant term)</div>';
+            }
+        }
+
+        function checkStep3() {
+            const correctValue = discriminant;
+            const isCorrect = checkAnswer('step3-discriminant', correctValue);
+            
+            const feedback = document.getElementById('step3-feedback');
+            
+            if (isCorrect) {
+                let discriminantType = '';
+                if (discriminant > 0) discriminantType = 'positive (two real solutions)';
+                else if (discriminant === 0) discriminantType = 'zero (one real solution)';
+                else discriminantType = 'negative (two complex solutions)';
+                
+                feedback.innerHTML = `<div class="text-green-600 font-semibold">✓ Correct! Discriminant = ${correctValue} (${discriminantType})</div>`;
+                correctAnswers.discriminant = correctValue;
+                currentStep = 3;
+                document.getElementById('step-4').classList.remove('step-incomplete');
+                setupSolutionInputs();
+                updateProgress();
+            } else {
+                feedback.innerHTML = `<div class="text-red-600">Incorrect. Remember: Discriminant = b² - 4ac = ${correctAnswers.bSquared} - ${correctAnswers.fourAC}</div>`;
+            }
+        }
+
+        function checkStep4() {
+            const feedback = document.getElementById('step4-feedback');
+            let allCorrect = true;
+            
+            if (discriminant >= 0) {
+                const x1Correct = checkAnswer('solution-x1', correctAnswers.x1, 0.01);
+                const x2Correct = checkAnswer('solution-x2', correctAnswers.x2, 0.01);
+                allCorrect = x1Correct && x2Correct;
+                
+                if (allCorrect) {
+                    feedback.innerHTML = `<div class="text-green-600 font-semibold">✓ Excellent! x₁ = ${correctAnswers.x1.toFixed(3)}, x₂ = ${correctAnswers.x2.toFixed(3)}</div>`;
+                } else {
+                    feedback.innerHTML = '<div class="text-red-600">Some solutions are incorrect. Double-check your calculations.</div>';
+                }
+            } else {
+                const realCorrect = checkAnswer('real-part', correctAnswers.realPart, 0.01);
+                const imaginaryCorrect = checkAnswer('imaginary-part', correctAnswers.imaginaryPart, 0.01);
+                allCorrect = realCorrect && imaginaryCorrect;
+                
+                if (allCorrect) {
+                    feedback.innerHTML = `<div class="text-green-600 font-semibold">✓ Excellent! Solutions are ${correctAnswers.realPart.toFixed(3)} ± ${correctAnswers.imaginaryPart.toFixed(3)}i</div>`;
+                } else {
+                    feedback.innerHTML = '<div class="text-red-600">Some values are incorrect. Check your calculations.</div>';
+                }
+            }
+            
+            if (allCorrect) {
+                currentStep = 4;
+                document.getElementById('step-5').classList.remove('step-incomplete');
+                setupVerification();
+                updateProgress();
+            }
+        }
+
+        function setupSolutionInputs() {
+            const solutionInputs = document.getElementById('solution-inputs');
+            
+            if (discriminant >= 0) {
+                const sqrtDiscriminant = Math.sqrt(discriminant);
+                const x1 = (-b + sqrtDiscriminant) / (2 * a);
+                const x2 = (-b - sqrtDiscriminant) / (2 * a);
+                
+                correctAnswers.x1 = x1;
+                correctAnswers.x2 = x2;
+                
+                solutionInputs.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="solution-x1" class="block text-sm font-medium text-gray-700 mb-1">x₁ = (-b + √discriminant) / 2a</label>
+                            <input type="number" step="0.001" id="solution-x1" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                        <div>
+                            <label for="solution-x2" class="block text-sm font-medium text-gray-700 mb-1">x₂ = (-b - √discriminant) / 2a</label>
+                            <input type="number" step="0.001" id="solution-x2" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                    </div>
+                `;
+            } else {
+                const realPart = -b / (2 * a);
+                const imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+                
+                correctAnswers.realPart = realPart;
+                correctAnswers.imaginaryPart = imaginaryPart;
+                
+                solutionInputs.innerHTML = `
+                    <p class="text-gray-600 mb-4">Since the discriminant is negative, we have complex solutions:</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="real-part" class="block text-sm font-medium text-gray-700 mb-1">Real part = -b / 2a</label>
+                            <input type="number" step="0.001" id="real-part" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                        <div>
+                            <label for="imaginary-part" class="block text-sm font-medium text-gray-700 mb-1">Imaginary part = √|discriminant| / 2a</label>
+                            <input type="number" step="0.001" id="imaginary-part" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function setupVerification() {
+            const verificationContent = document.getElementById('verification-content');
+            
+            if (discriminant >= 0) {
+                verificationContent.innerHTML = `
+                    <div class="space-y-4">
+                        <p>Substitute x₁ = ${correctAnswers.x1.toFixed(3)} into the original equation:</p>
+                        <div class="flex items-center gap-4">
+                            <span>Result =</span>
+                            <input type="number" step="0.01" id="verify-x1" class="w-24 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                        <p>Substitute x₂ = ${correctAnswers.x2.toFixed(3)} into the original equation:</p>
+                        <div class="flex items-center gap-4">
+                            <span>Result =</span>
+                            <input type="number" step="0.01" id="verify-x2" class="w-24 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-center">
+                        </div>
+                    </div>
+                `;
+            } else {
+                verificationContent.innerHTML = `
+                    <p class="text-gray-600">Complex solutions cannot be easily verified by substitution, but they are mathematically correct based on the quadratic formula.</p>
+                `;
+            }
+        }
+
+        function checkStep5() {
+            const feedback = document.getElementById('step5-feedback');
+            
+            if (discriminant < 0) {
+                feedback.innerHTML = '<div class="text-green-600 font-semibold">✓ Complex solutions verified mathematically!</div>';
+                currentStep = 5;
+                updateProgress();
+                showCelebration();
+                return;
+            }
+            
+            const result1 = a * correctAnswers.x1 * correctAnswers.x1 + b * correctAnswers.x1 + c;
+            const result2 = a * correctAnswers.x2 * correctAnswers.x2 + b * correctAnswers.x2 + c;
+            
+            const verify1Correct = checkAnswer('verify-x1', result1, 0.1);
+            const verify2Correct = checkAnswer('verify-x2', result2, 0.1);
+            
+            if (verify1Correct && verify2Correct) {
+                feedback.innerHTML = '<div class="text-green-600 font-semibold">✓ Perfect! Both solutions verify correctly (should equal 0).</div>';
+                currentStep = 5;
+                updateProgress();
+                showCelebration();
+            } else {
+                feedback.innerHTML = '<div class="text-red-600">The verification results should be very close to 0. Check your calculations.</div>';
+            }
+        }
+
+        function showCelebration() {
+            const modal = document.getElementById('celebration-modal');
+            const solutionsDiv = document.getElementById('final-solutions');
+            
+            if (discriminant >= 0) {
+                solutionsDiv.innerHTML = `
+                    <div class="text-lg math-display">
+                        <div>x₁ = ${correctAnswers.x1.toFixed(3)}</div>
+                        <div>x₂ = ${correctAnswers.x2.toFixed(3)}</div>
+                    </div>
+                `;
+            } else {
+                solutionsDiv.innerHTML = `
+                    <div class="text-lg math-display">
+                        <div>x₁ = ${correctAnswers.realPart.toFixed(3)} + ${correctAnswers.imaginaryPart.toFixed(3)}i</div>
+                        <div>x₂ = ${correctAnswers.realPart.toFixed(3)} - ${correctAnswers.imaginaryPart.toFixed(3)}i</div>
+                    </div>
+                `;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeCelebration() {
+            document.getElementById('celebration-modal').classList.add('hidden');
+            generateRandom();
+        }
+
+        function generateRandom() {
+            const scenarios = [
+                [1, -5, 6],   [1, -7, 12],  [1, -1, -6],  [2, -8, 6],   [1, -6, 9],
+                [1, 4, 4],    [1, 0, -9],   [1, -2, -3],  [2, -6, 4],   [1, -8, 15]
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            
+            document.getElementById('a-input').value = scenario[0];
+            document.getElementById('b-input').value = scenario[1];
+            document.getElementById('c-input').value = scenario[2];
+            
+            resetSolver();
+        }
+
+        function resetSolver() {
+            currentStep = 0;
+            correctAnswers = {};
+            updateEquationDisplay();
+            updateProgress();
+            document.getElementById('interactive-steps').innerHTML = '<p class="text-center text-gray-500 text-lg">Click "Start Solving" to begin the interactive solution process!</p>';
+        }
+
+        // Event listeners
+        document.getElementById('a-input').addEventListener('input', updateEquationDisplay);
+        document.getElementById('b-input').addEventListener('input', updateEquationDisplay);
+        document.getElementById('c-input').addEventListener('input', updateEquationDisplay);
+
+        // Initialize
+        updateEquationDisplay();
+        resetSolver();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99291686030499f8',t:'MTc2MTEzNzA4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
