@@ -1,64 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verse-al Tools Directory</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      margin: 0;
-      padding: 40px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 20px;
-    }
-    p {
-      color: rgba(255,255,255,0.9);
-      max-width: 600px;
-      margin: 0 auto 30px auto;
-      line-height: 1.6;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      display: inline-block;
-      text-align: left;
-    }
-    li {
-      margin: 10px 0;
-    }
-    a {
-      color: white;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Virtual MTSS Flow — Verse-al Learning Labs</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <h1>🧠 Verse-al Tools Directory</h1>
-  <p>
-    Welcome to the Verse-al Learning Labs tools directory.  
-    Each link below opens an interactive simulation or experiment co-created with AI.
-  </p>
+  <header class="site-head">
+    <h1>Virtual MTSS Flow</h1>
+    <p class="tag">Six clear steps with live thresholds. Click a stage to mark it done. Hover for guidance.</p>
+  </header>
 
-  <ul>
-    <li>🧮 <a href="simultaneous-equations/">Graphical Simultaneous Equations Solver</a></li>
-    <li>➗ <a href="algebraic-fractions/">Algebraic Fractions Simplifier</a></li>
-    <li><a href="./belonging-flywheel/">Belonging Flywheel (interactive)</a></li>
-    <li><a href="./virtual-mtss-flow/">Virtual MTSS Flow (interactive)</a></li>
+  <main class="wrap">
+    <section class="canvas">
+      <!-- Quick Guide chips -->
+      <ul class="quick-guide" aria-label="Quick guide">
+        <li><span class="chip">1</span>Universal</li>
+        <li><span class="chip">2</span>Trigger</li>
+        <li><span class="chip">3</span>Tier 2</li>
+        <li><span class="chip">4</span>Tier 3</li>
+        <li><span class="chip">5</span>Plan</li>
+        <li><span class="chip">6</span>Review</li>
+      </ul>
 
-  </ul>
+      <div id="flow-root" class="svg-wrap" aria-live="polite"></div>
 
-  <p style="margin-top:40px;">
-    <a href="../" style="color:#fff;opacity:0.8;">← Back to Labs Homepage</a>
-  </p>
-</body>
-</html>
+      <div class="controls">
+        <button id="resetBtn" class="btn">Reset</button>
+        <button id="downloadBtn" class="btn">Download SVG</button>
+      </div>
+
+      <!-- Tooltip (HTML, not SVG, for proper wrapping) -->
+      <div id="tooltip" class="tooltip" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <aside class="panel">
+      <h2>Live controls</h2>
+      <p class="hint">Adjust thresholds; colours and loop-back update instantly.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Tier 1 (Universal)</h3>
+          <label>Exit-poll completion % (target ≥ 80%)
+            <input id="t1Poll" type="number" min="0" max="100" value="62" />
+          </label>
+        </div>
+
+        <div class="card">
+          <h3>Tier 2 (Clinics)</h3>
+          <label>
