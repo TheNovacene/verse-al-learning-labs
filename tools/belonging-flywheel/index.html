@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Belonging Flywheel — Verse-al Learning Labs</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <h1>Belonging Flywheel</h1>
+    <p class="tag">Ritual → Safety → Micro-contribution → Recognition → repeat</p>
+  </header>
+
+  <main class="wrap">
+    <section class="canvas">
+      <div id="flywheel-root" class="svg-wrap" aria-live="polite"></div>
+      <div class="controls">
+        <button id="resetBtn" class="btn">Reset</button>
+        <button id="downloadBtn" class="btn">Download SVG</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>Edit steps</h2>
+      <p class="hint">Click a node to toggle “done”. Hover for tips. Edit labels below or add a new step (e.g., Co-design).</p>
+      <div id="editor" class="editor"></div>
+      <div class="row">
+        <button id="addStep" class="btn-outline">Add step</button>
+      </div>
+
+      <div class="note">
+        <strong>Design note:</strong> Learners regulate to rhythm, not abstract “freedom”. Keep the loop predictable; let expression vary.
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-foot">
+    <small>© The Novacene · Verse-al Learning Labs</small>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
