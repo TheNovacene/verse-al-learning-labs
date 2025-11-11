@@ -1,52 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Virtual MTSS Flow — Verse-al Learning Labs</title>
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <header class="site-head">
-    <h1>Virtual MTSS Flow</h1>
-    <p class="tag">Six clear steps with live thresholds. Click a stage to mark it done. Hover for guidance.</p>
-  </header>
-
-  <main class="wrap">
-    <section class="canvas">
-      <!-- Quick Guide chips -->
-      <ul class="quick-guide" aria-label="Quick guide">
-        <li><span class="chip">1</span>Universal</li>
-        <li><span class="chip">2</span>Trigger</li>
-        <li><span class="chip">3</span>Tier 2</li>
-        <li><span class="chip">4</span>Tier 3</li>
-        <li><span class="chip">5</span>Plan</li>
-        <li><span class="chip">6</span>Review</li>
-      </ul>
-
-      <div id="flow-root" class="svg-wrap" aria-live="polite"></div>
-
-      <div class="controls">
-        <button id="resetBtn" class="btn">Reset</button>
-        <button id="downloadBtn" class="btn">Download SVG</button>
-      </div>
-
-      <!-- Tooltip (HTML, not SVG, for proper wrapping) -->
-      <div id="tooltip" class="tooltip" role="status" aria-live="polite" hidden></div>
-    </section>
-
-    <aside class="panel">
-      <h2>Live controls</h2>
-      <p class="hint">Adjust thresholds; colours and loop-back update instantly.</p>
-
-      <div class="grid">
-        <div class="card">
-          <h3>Tier 1 (Universal)</h3>
-          <label>Exit-poll completion % (target ≥ 80%)
-            <input id="t1Poll" type="number" min="0" max="100" value="62" />
-          </label>
-        </div>
-
-        <div class="card">
-          <h3>Tier 2 (Clinics)</h3>
-          <label>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Value‑Curve Canvas</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px; background:#f7f7f8; color:#111; }
+      .container { max-width: 1100px; margin: 0 auto; }
+      .card { background:#fff; border:1px solid #e5e7eb; border-radius: 14px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+      .grid { display:grid; gap: 12px; }
+      .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+      .row { display:flex; gap:10px; align-items:center; justify-content:space-between; }
+      .btn { background:#111827; color:#fff; border:none; border-radius:10px; padding:8px 12px; cursor:pointer; }
+      .btn.secondary { background:#f3f4f6; color:#111; }
+      .badge { display:inline-flex; align-items:center; gap:6px; background:#f3f4f6; padding:4px 8px; border-radius:999px; font-size:12px; }
+      .small { font-size:12px; color:#6b7280; }
+      .range { width:100%; }
+      .pill { padding:6px 10px; border-radius:999px; border:1px solid #e5e7eb; }
+      .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+      textarea { width:100%; height:180px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      input[type="color"]{ border:none; background:transparent; }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="container"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
