@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Virtual MTSS Flow — Verse-al Learning Labs</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <h1>Virtual MTSS Flow</h1>
+    <p class="tag">Universal → Trigger → Tier 2 → Tier 3 → Plan → Review</p>
+  </header>
+
+  <main class="wrap">
+    <section class="canvas">
+      <div id="flow-root" class="svg-wrap" aria-live="polite"></div>
+      <div class="controls">
+        <button id="resetBtn" class="btn">Reset</button>
+        <button id="downloadBtn" class="btn">Download SVG</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>Live controls</h2>
+      <p class="hint">Hover boxes for guidance. Click a stage to mark it “done”. Adjust thresholds/metrics to see routing and colours update.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Tier 1 (Universal)</h3>
+          <label>Exit-poll completion % (target ≥ 80%)
+            <input id="t1Poll" type="number" min="0" max="100" value="62" />
+          </label>
+          <small>Below target raises more triggers.</small>
+        </div>
+
+        <div class="card">
+          <h3>Tier 2 (Clinics)</h3>
+          <label>Clinic attendance % (target ≥ 70%)
+            <input id="t2Attend" type="number" min="0" max="100" value="55" />
+          </label>
+          <small>Low attendance → consider invite scripts and time changes.</small>
+        </div>
+
+        <div class="card">
+          <h3>Tier 3 (Plans)</h3>
+          <label>Goal attainment % in 10 days (target ≥ 60%)
+            <input id="t3Goals" type="number" min="0" max="100" value="40" />
+          </label>
+          <small>Under target → revise plan and loop back to Tier 2.</small>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Review outcome
+          <select id="reviewOutcome">
+            <option value="met">Goals met</option>
+            <option value="not-met" selected>Goals not met</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="note">
+        <strong>Design note:</strong> Move fast at Tier 2, stay human at Tier 3. Log every “care move”, review in 10 school days, and revise lightly.
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-foot">
+    <small>© The Novacene · Verse-al Learning Labs</small>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
