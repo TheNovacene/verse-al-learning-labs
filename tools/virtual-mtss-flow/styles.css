@@ -1,10 +1,11 @@
 :root{
   --ink:#0f172a; --muted:#6b7280; --line:#e5e7eb; --soft:#f8fafc;
-  --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --bg:#ffffff;
+  --shadow: 0 8px 24px rgba(0,0,0,.08);
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#fff;color:var(--ink);
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
   font:16px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 
 .site-head{padding:24px 20px 8px;border-bottom:1px solid var(--line)}
@@ -20,6 +21,10 @@ html,body{margin:0;padding:0;background:#fff;color:var(--ink);
 .btn{cursor:pointer;border-radius:10px;padding:10px 14px;font-weight:600;border:1px solid var(--line);background:var(--ink);color:#fff}
 .btn:hover{filter:brightness(.92)}
 
+.quick-guide{list-style:none;display:flex;gap:10px;margin:0 0 10px 0;padding:0;flex-wrap:wrap}
+.quick-guide li{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.chip{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:999px;border:1px solid var(--line);font-weight:700}
+
 .panel{border:1px solid var(--line);border-radius:14px;padding:12px}
 .panel h2{margin:4px 0 8px;font-size:16px}
 .hint{margin:0 0 10px;color:var(--muted);font-size:14px}
@@ -29,18 +34,35 @@ html,body{margin:0;padding:0;background:#fff;color:var(--ink);
 label{display:grid;gap:6px;font-size:14px}
 input,select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
 .row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.legend{display:flex;gap:10px;align-items:center;margin:6px 0 10px;color:var(--muted);font-size:13px}
+.pill{display:inline-grid;place-items:center;min-width:42px;height:22px;border-radius:999px;padding:0 8px;color:#fff;font-weight:700}
+.pill.ok{background:var(--ok)} .pill.warn{background:var(--warn)} .pill.bad{background:var(--bad)}
+
 .note{margin-top:8px;color:var(--muted);font-size:13px;background:#fff;border:1px dashed var(--line);padding:10px;border-radius:10px}
+
+.site-foot{padding:16px 20px 28px;color:var(--muted);border-top:1px solid var(--line);margin-top:10px;font-size:13px}
 
 svg{user-select:none}
 .box{fill:#fff;stroke:#1f2937;stroke-width:2}
 .box.ok{stroke:var(--ok)}
 .box.warn{stroke:var(--warn)}
 .box.bad{stroke:var(--bad)}
+.badge{font-size:11px;fill:#374151}
+.badge.ok{fill:var(--ok)} .badge.warn{fill:var(--warn)} .badge.bad{fill:var(--bad)}
 .blabel{font-weight:700;fill:#111827}
 .sublabel{fill:#6b7280;font-size:11px}
 .edge{stroke:#cbd5e1;stroke-width:1.6;fill:none}
 .edge.active{stroke:#111827;stroke-width:2.4}
 .loop{stroke:#111827;stroke-width:1.6;fill:none;stroke-dasharray:5 4}
 .loop.active{stroke-width:2.2}
-.tip-bg{fill:#111827;opacity:.95}
-.tip-text{fill:#fff;font-size:11px}
+
+/* Tooltip (HTML) */
+.tooltip{
+  position:absolute; inset:auto auto auto 0; transform:translate(-9999px,-9999px);
+  max-width:260px; padding:10px 12px; border-radius:10px; background:#fff; color:#111827;
+  border:1px solid var(--line); box-shadow: var(--shadow); font-size:13px; line-height:1.35;
+}
+.tooltip .t-head{font-weight:700; margin-bottom:4px}
+.tooltip .t-sub{color:#6b7280; margin-bottom:6px}
+.tooltip .t-list{margin:0; padding-left:16px}
+.hidden{display:none}
