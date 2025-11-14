@@ -117,6 +117,26 @@
     @media (max-width: 640px) {
       body { padding: 1.8rem 1.1rem 2.5rem; }
     }
+        .disclaimer {
+      margin: 3rem 0 1.5rem;
+      padding: 1rem 1.2rem;
+      border-radius: 0.75rem;
+      border: 1px dashed #374151;
+      background: rgba(15, 23, 42, 0.7);
+      font-size: 0.78rem;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .disclaimer strong {
+      color: #e5e7eb;
+    }
+
+    .disclaimer a {
+      color: #e5e7eb;
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
@@ -171,7 +191,6 @@
         <ul class="tool-list">
           <li><a class="tool-link" href="tools/belonging-flywheel/">Belonging flywheel</a></li>
           <li><a class="tool-link" href="tools/virtual-mtss-flow/">Virtual MTSS flow</a></li>
-          <li><a class="tool-link" href="tools/value-curve-canvas/">Value-curve canvas</a></li>
         </ul>
       </article>
 
@@ -183,6 +202,14 @@
           and DAOs designing new kinds of provision.
         </p>
         <ul class="tool-list">
+          <li>
+            <a class="tool-link" href="https://schoolinthecloud.streamlit.app/" target="_blank" rel="noopener noreferrer">
+              School in the Cloud · provisioning simulator
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="tools/value-curve-canvas/">Value-curve canvas</a>
+          </li>
           <!-- TODO: update href once the budgeting tool path is final -->
           <li><a class="tool-link" href="#">Haven budgeting canvas (coming online)</a></li>
         </ul>
@@ -193,12 +220,12 @@
         <h2>Dashboards &amp; Climate Tools</h2>
         <p class="blurb">
           Experimental dashboards and climate memory tools exploring attendance,
-          elements, deliberation, and schools in the cloud.
+          elements, deliberation, and symbolic climate fields.
         </p>
         <ul class="tool-list">
           <li>
             <a class="tool-link" href="https://thenovacene.github.io/nimbus/" target="_blank" rel="noopener noreferrer">
-              Nimbus · Photosynthetic attendance dashboard
+              Nimbus · photosynthetic attendance dashboard
             </a>
           </li>
           <li>
@@ -216,15 +243,10 @@
               Element Compass · learner-state explorer
             </a>
           </li>
-          <li>
-            <a class="tool-link" href="https://schoolinthecloud.streamlit.app/" target="_blank" rel="noopener noreferrer">
-              School in the Cloud · provisioning simulator
-            </a>
-          </li>
         </ul>
       </article>
 
-      <!-- Science / Therapy placeholders -->
+      <!-- Science -->
       <article class="card coming-soon">
         <h2>Science Labs</h2>
         <p class="blurb">
@@ -233,18 +255,79 @@
         </p>
       </article>
 
-      <article class="card coming-soon">
+      <!-- Therapy & Regulation -->
+      <article class="card">
         <h2>Therapy &amp; Regulation</h2>
         <p class="blurb">
-          Coming soon – co-regulation and reflective tools for learners, parents,
-          and practitioners working at the nervous-system edge of learning.
+          Co-regulation and reflective tools for learners, parents, and practitioners
+          working at the nervous-system edge of learning.
         </p>
+        <ul class="tool-list">
+          <li>
+            <a class="tool-link" href="https://claude.ai/public/artifacts/4ceb8128-4706-4c0b-ae2a-0bc6e3c23629" target="_blank" rel="noopener noreferrer">
+              Nervous-system mapping &amp; protocol (Claude artefact)
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://firstbreath.netlify.app/" target="_blank" rel="noopener noreferrer">
+              First Breath · regulation micro-practice
+            </a>
+          </li>
+        </ul>
+      </article>
+
+      <!-- Custom GPT Research -->
+      <article class="card">
+        <h2>Custom GPT Research</h2>
+        <p class="blurb">
+          Experimental agents for weaving, pathfinding, and researching verse-al,
+          Haven, and symbolic governance in dialogue with emergent intelligence.
+        </p>
+        <ul class="tool-list">
+          <li>
+            <a class="tool-link" href="https://chatgpt.com/g/g-684a8d0b260c8191bda9f1d472647b6a-the-novacene-project-weaver" target="_blank" rel="noopener noreferrer">
+              The Novacene Project Weaver
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://chatgpt.com/g/g-68951fe999ec8191b485cbf40c42ca1b-the-pathfinder" target="_blank" rel="noopener noreferrer">
+              The Pathfinder · research companion
+            </a>
+          </li>
+        </ul>
       </article>
     </section>
 
     <p class="tagline">
       Built in the verse-al learning labs · learning in five dimensions
     </p>
+        <section class="disclaimer">
+      <p>
+        <strong>Research &amp; Collaboration Notice</strong><br />
+        The tools, dashboards, agents, and experiments in the Verse-al Learning Labs
+        are offered for research, exploration, and collaborative learning. They are
+        <strong>not</strong> a substitute for professional medical, therapeutic, legal,
+        financial, or safeguarding advice.
+      </p>
+      <p>
+        You remain responsible for how you use these tools and for any decisions you
+        make based on them. Always consult an appropriate qualified professional
+        for personal, clinical, legal, or financial matters, and follow your local
+        safeguarding procedures when working with children or vulnerable people.
+      </p>
+      <p>
+        Some labs link to external services (e.g. Streamlit apps, AI agents, and
+        third-party sites) which have their own data, privacy, and security policies.
+        By using them, you accept those terms and the risks of sharing information
+        online. All labs are shared in good faith, under the project’s open
+        licensing ethos (see the
+        <a href="https://github.com/TheNovacene/verse-al-learning-labs#readme" target="_blank" rel="noopener noreferrer">
+          README
+        </a>
+        and LICENSE for details).
+      </p>
+    </section>
+
 
     <footer style="margin-top:80px; text-align:center; color:white;">
       <hr style="border:none; border-top:2px solid rgba(255,255,255,0.3); width:60%; margin:40px auto;">
@@ -269,6 +352,8 @@
         <strong>buying us a coffee</strong> or <strong>sponsoring us</strong> below.
         Your support keeps the Labs joyful, ethical, and alive. 💖
       </p>
+          
+
 
       <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
         <a href="https://ko-fi.com/thenovacene" target="_blank"
