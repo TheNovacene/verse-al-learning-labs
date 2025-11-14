@@ -2,331 +2,298 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verse-al Learning Labs</title>
+  <title>Learning5D · Verse-al Learning Labs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      color-scheme: light dark;
+    }
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #1a202c;
       margin: 0;
-      padding: 40px;
-    }
-    h1 {
-      color: white;
-      font-size: 2.4rem;
-      margin-bottom: 10px;
-    }
-    p.intro {
-      color: rgba(255,255,255,0.9);
-      font-size: 1.2rem;
-      max-width: 700px;
-      line-height: 1.6;
-    }
-    .tool-grid {
-      display: grid;
-      gap: 25px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      margin-top: 40px;
-    }
-    .tool-card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      padding: 24px;
-      transition: all 0.3s ease;
-      border-left: 6px solid #667eea;
-    }
-    .tool-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 35px rgba(0,0,0,0.15);
-    }
-    .tool-header {
+      padding: 2.5rem 1.5rem 3rem;
+      background: #050608;
+      color: #f3f4f6;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      justify-content: center;
     }
-    .tool-emoji { font-size: 1.8rem; }
-    .tool-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin: 0;
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
     }
-    .tool-description {
-      color: #4a5568;
-      margin: 10px 0 16px 0;
-      font-size: 1rem;
+
+    header {
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      margin: 0 0 0.4rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 0.98rem;
+      max-width: 46rem;
+      color: #9ca3af;
+      line-height: 1.6;
+      margin-bottom: 0.4rem;
+    }
+
+    .subnote {
+      font-size: 0.8rem;
+      max-width: 40rem;
+      color: #6b7280;
       line-height: 1.5;
     }
-    .tool-link {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.3s ease;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
     }
-    .tool-link:hover {
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+
+    .card {
+      border-radius: 1rem;
+      border: 1px solid #111827;
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      padding: 1.2rem 1.4rem 1.3rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.6rem;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .card p.blurb {
+      margin: 0 0 0.8rem;
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    ul.tool-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    ul.tool-list li + li {
+      margin-top: 0.25rem;
+    }
+
+    a.tool-link {
+      color: #e5e7eb;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    a.tool-link:hover,
+    a.tool-link:focus-visible {
+      border-bottom-color: #f97316;
+    }
+
+    .coming-soon {
+      opacity: 0.6;
+    }
+
+    .tagline {
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 1.8rem 1.1rem 2.5rem; }
     }
   </style>
 </head>
-
 <body>
-  <h1>🧠 Verse-al Learning Labs</h1>
-  <p class="intro">
-    A collaborative playground for joyful, intelligent, and accessible learning tools.  
-    Each experiment is co-created through conversation between humans and AI.  
-  </p>
-
-  <div class="tool-grid">
-
-    <!-- Tool Card 1 -->
-    <div class="tool-card">
-      <div class="tool-header">
-        <span class="tool-emoji">🧮</span>
-        <h3 class="tool-title">Graphical Simultaneous Equations Solver</h3>
-      </div>
-      <p class="tool-description">
-        Visualise and solve simultaneous linear equations by exploring where lines meet.  
-        A joyful verse-al maths tool that turns algebra into pattern and play.
+  <main class="page">
+    <header>
+      <h1>Learning5D · Verse-al Learning Labs</h1>
+      <p class="subtitle">
+        A collaborative playground for building joyful, intelligent, and accessible
+        learning tools for the relational age – from algebra labs to belonging
+        frameworks, dashboards, and climate memory experiments.
       </p>
-      <a href="tools/simultaneous-equations/" class="tool-link" target="_blank">Launch Tool →</a>
-    </div>
+      <p class="subnote">
+        Most school systems were built for standardisation. These labs are for neurodivergent
+        learners, hybrid and home-educators, and humans &amp; machines learning together – ethically.
+      </p>
+    </header>
 
-    <!-- Tool Card: Simultaneous Equations (Algebraic) -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🧮</span>
-    <h3 class="tool-title">Simultaneous Equations (Algebraic)</h3>
-  </div>
-  <p class="tool-description">
-    Solve simultaneous equations using elimination or substitution — guided step-by-step, with hints, choices, and instant feedback.
-  </p>
-  <a href="tools/simultaneous-equations-algebraic/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
+    <section class="grid">
+      <!-- Maths -->
+      <article class="card">
+        <h2>Maths Labs</h2>
+        <p class="blurb">
+          GCSE / KS4 algebra and number tools designed for stepwise logic,
+          visual patterning, and confidence-building practice.
+        </p>
+        <ul class="tool-list">
+          <li><a class="tool-link" href="tools/algebraic-fractions/">Algebraic fractions</a></li>
+          <li><a class="tool-link" href="tools/expanding-brackets/">Expanding brackets</a></li>
+          <li><a class="tool-link" href="tools/factorising-quadratics/">Factorising quadratics</a></li>
+          <li><a class="tool-link" href="tools/factorising-non-monic-quadratics/">Factorising non-monic quadratics</a></li>
+          <li><a class="tool-link" href="tools/completing-the-square/">Completing the square</a></li>
+          <li><a class="tool-link" href="tools/quadratic-formula/">Quadratic formula</a></li>
+          <li><a class="tool-link" href="tools/manipulating-surds/">Manipulating surds</a></li>
+          <li><a class="tool-link" href="tools/powers-and-roots/">Powers and roots</a></li>
+          <li><a class="tool-link" href="tools/number-patterns-sequences/">Number patterns &amp; sequences</a></li>
+          <li><a class="tool-link" href="tools/inequalities-one-variable/">Inequalities in one variable</a></li>
+          <li><a class="tool-link" href="tools/graphical-inequalities/">Graphical inequalities</a></li>
+          <li><a class="tool-link" href="tools/rearranging-formulae/">Rearranging formulae</a></li>
+          <li><a class="tool-link" href="tools/formulae-from-words/">Formulae from words</a></li>
+          <li><a class="tool-link" href="tools/simultaneous-equations/">Simultaneous equations (graphical)</a></li>
+          <li><a class="tool-link" href="tools/simultaneous-equations-algebraic/">Simultaneous equations (algebraic)</a></li>
+        </ul>
+      </article>
 
+      <!-- Systems / Belonging -->
+      <article class="card">
+        <h2>Systems &amp; Belonging</h2>
+        <p class="blurb">
+          Tools for understanding behaviour, belonging, and multi-tiered
+          support in hybrid schools and learning communities.
+        </p>
+        <ul class="tool-list">
+          <li><a class="tool-link" href="tools/belonging-flywheel/">Belonging flywheel</a></li>
+          <li><a class="tool-link" href="tools/virtual-mtss-flow/">Virtual MTSS flow</a></li>
+          <li><a class="tool-link" href="tools/value-curve-canvas/">Value-curve canvas</a></li>
+        </ul>
+      </article>
 
- <!-- Tool Card: Graphical Inequalities -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">📊</span>
-    <h3 class="tool-title">Graphical Inequalities</h3>
-  </div>
-  <p class="tool-description">
-    Explore how inequalities define regions on a coordinate plane.  
-    Shade solutions, test points, and visualise boundaries with live feedback.
-  </p>
-  <a href="tools/graphical-inequalities/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
+      <!-- Economics / Strategy -->
+      <article class="card">
+        <h2>Economics &amp; Strategy</h2>
+        <p class="blurb">
+          Simple economic and strategic planning tools for schools, collectives,
+          and DAOs designing new kinds of provision.
+        </p>
+        <ul class="tool-list">
+          <!-- TODO: update href once the budgeting tool path is final -->
+          <li><a class="tool-link" href="#">Haven budgeting canvas (coming online)</a></li>
+        </ul>
+      </article>
 
-    <!-- Tool Card: Inequalities in One Variable -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🎯</span>
-    <h3 class="tool-title">Inequalities in One Variable</h3>
-  </div>
-  <p class="tool-description">
-    Solve and visualise inequalities step-by-step on an interactive number line.  
-    Includes single-step, multi-step, and compound levels with instant feedback.
-  </p>
-  <a href="tools/inequalities-one-variable/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
+      <!-- Dashboards & Climate Tools -->
+      <article class="card">
+        <h2>Dashboards &amp; Climate Tools</h2>
+        <p class="blurb">
+          Experimental dashboards and climate memory tools exploring attendance,
+          elements, deliberation, and schools in the cloud.
+        </p>
+        <ul class="tool-list">
+          <li>
+            <a class="tool-link" href="https://thenovacene.github.io/nimbus/" target="_blank" rel="noopener noreferrer">
+              Nimbus · Photosynthetic attendance dashboard
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://thenovacene.github.io/Eve11-ClimateMemory/" target="_blank" rel="noopener noreferrer">
+              Eve¹¹ Climate Memory · symbolic climate field
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://mnemonic-deliberation-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">
+              Mnemonic Deliberation Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://element-compass.streamlit.app/" target="_blank" rel="noopener noreferrer">
+              Element Compass · learner-state explorer
+            </a>
+          </li>
+          <li>
+            <a class="tool-link" href="https://schoolinthecloud.streamlit.app/" target="_blank" rel="noopener noreferrer">
+              School in the Cloud · provisioning simulator
+            </a>
+          </li>
+        </ul>
+      </article>
 
+      <!-- Science / Therapy placeholders -->
+      <article class="card coming-soon">
+        <h2>Science Labs</h2>
+        <p class="blurb">
+          Coming soon – symbolic science tools for pattern-spotting, experimental
+          design, and climate-aware thinking.
+        </p>
+      </article>
 
+      <article class="card coming-soon">
+        <h2>Therapy &amp; Regulation</h2>
+        <p class="blurb">
+          Coming soon – co-regulation and reflective tools for learners, parents,
+          and practitioners working at the nervous-system edge of learning.
+        </p>
+      </article>
+    </section>
 
-    <!-- Tool Card: Algebraic Fractions -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">➗</span>
-    <h3 class="tool-title">Algebraic Fractions Simplifier</h3>
-  </div>
-  <p class="tool-description">
-    Explore the logic of simplifying algebraic fractions step by step.
-    This verse-al tool helps learners visualise factorisation, cancellation, and pattern recognition in algebra.
-  </p>
-  <a href="tools/algebraic-fractions/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
+    <p class="tagline">
+      Built in the verse-al learning labs · learning in five dimensions
+    </p>
 
-    <!-- Tool Card: Completing the Square -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🟪</span>
-    <h3 class="tool-title">Completing the Square Interactive</h3>
-  </div>
-  <p class="tool-description">
-    A hands-on quadratic builder where learners drag, drop, and visualise how squares form.  
-    Explore coefficients, sliders, and geometric pieces that make algebra tangible.
-  </p>
-  <a href="tools/completing-the-square/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Expanding Brackets -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🧮</span>
-    <h3 class="tool-title">Expanding Brackets Whiteboard</h3>
-  </div>
-  <p class="tool-description">
-    Drag and drop to expand single or double brackets step by step.  
-    This playful verse-al whiteboard helps learners visualise multiplication, 
-    distributive law, and simplification through movement and pattern.
-  </p>
-  <a href="tools/expanding-brackets/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Factorising Non-Monic Quadratics -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🎯</span>
-    <h3 class="tool-title">Factorising Non-Monic Quadratics</h3>
-  </div>
-  <p class="tool-description">
-    Step through the process of splitting the middle term and grouping to factor quadratics where a ≠ 1.  
-    An interactive, drag-and-drop visualiser for deeper algebraic insight.
-  </p>
-  <a href="tools/factorising-non-monic-quadratics/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-<!-- Tool Card: Factorising Quadratic Equations -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🧩</span>
-    <h3 class="tool-title">Factorising Quadratic Equations</h3>
-  </div>
-  <p class="tool-description">
-    Learn to factor both monic and non-monic quadratics step-by-step.  
-    This interactive whiteboard blends algebra, geometry, and logic into one joyful verse-al experience.
-  </p>
-  <a href="tools/factorising-quadratics/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Formulae from Words -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">✏️</span>
-    <h3 class="tool-title">Formulae from Words</h3>
-  </div>
-  <p class="tool-description">
-    Translate real-world problems into algebraic equations.  
-    Choose your challenge level, define your variable, and solve step by step.
-  </p>
-  <a href="tools/formulae-from-words/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-<!-- Tool Card: Manipulating Surds -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">√</span>
-    <h3 class="tool-title">Manipulating Surds</h3>
-  </div>
-  <p class="tool-description">
-    Simplify, add, subtract, and multiply surds through drag-and-drop challenges.  
-    A visual way to explore roots, factors, and algebraic reasoning.
-  </p>
-  <a href="tools/manipulating-surds/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Number Patterns and Sequences -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🔢</span>
-    <h3 class="tool-title">Number Patterns & Sequences</h3>
-  </div>
-  <p class="tool-description">
-    Explore arithmetic, geometric and complex sequences with live feedback and progress tracking.  
-    Identify patterns, predict next terms and derive nth-term formulae through play.
-  </p>
-  <a href="tools/number-patterns-sequences/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-<!-- Tool Card: Powers & Roots -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🧩</span>
-    <h3 class="tool-title">Powers & Roots Explorer</h3>
-  </div>
-  <p class="tool-description">
-    Discover the magic of exponents, roots, and fractional powers through interactive sliders and visual blocks.  
-    A joyful way to see maths transform before your eyes.
-  </p>
-  <a href="tools/powers-and-roots/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Quadratic Formula Solver -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🎓</span>
-    <h3 class="tool-title">Quadratic Formula Solver</h3>
-  </div>
-  <p class="tool-description">
-    Solve any quadratic equation step by step.  
-    Guided interactivity helps learners understand each part of the formula — from discriminant to solution.
-  </p>
-  <a href="tools/quadratic-formula/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-    <!-- Tool Card: Rearranging Formulae -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-emoji">🔄</span>
-    <h3 class="tool-title">Rearranging Formulae</h3>
-  </div>
-  <p class="tool-description">
-    Master the art of making any variable the subject of a formula.  
-    Drag, drop, and rearrange symbols to practise inverse operations and logic step-by-step.
-  </p>
-  <a href="tools/rearranging-formulae/" class="tool-link" target="_blank">Launch Tool →</a>
-</div>
-
-
-
-  </div>
     <footer style="margin-top:80px; text-align:center; color:white;">
-    <hr style="border:none; border-top:2px solid rgba(255,255,255,0.3); width:60%; margin:40px auto;">
+      <hr style="border:none; border-top:2px solid rgba(255,255,255,0.3); width:60%; margin:40px auto;">
 
-    <h2 style="font-size:1.4rem; margin-bottom:10px;">🌍 Join the Verse-al Learning Labs</h2>
-    <p style="max-width:650px; margin:0 auto 25px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
-      Every simulation, game, and experiment here is open-source and made to be remixed.  
-      Read our <a href="https://github.com/TheNovacene/verse-al-learning-labs#readme" target="_blank" style="color:#fff;font-weight:600;">README</a>  
-      to learn how to contribute, or join the  
-      <a href="https://github.com/TheNovacene/verse-al-learning-labs/discussions" target="_blank" style="color:#fff;font-weight:600;">Discussions</a>  
-      to share ideas, feedback, and your own verse-al builds.
-    </p>
+      <h2 style="font-size:1.4rem; margin-bottom:10px;">🌍 Join the Verse-al Learning Labs</h2>
+      <p style="max-width:650px; margin:0 auto 25px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
+        Every simulation, game, and experiment here is open-source and made to be remixed.<br />
+        Read our
+        <a href="https://github.com/TheNovacene/verse-al-learning-labs#readme" target="_blank" style="color:#fff;font-weight:600;">
+          README
+        </a>
+        to learn how to contribute, or join the
+        <a href="https://github.com/TheNovacene/verse-al-learning-labs/discussions" target="_blank" style="color:#fff;font-weight:600;">
+          Discussions
+        </a>
+        to share ideas, feedback, and your own verse-al builds.
+      </p>
 
-    <h3 style="margin-top:40px; font-size:1.2rem;">☕️ Keep the Labs Fueled</h3>
-    <p style="max-width:600px; margin:0 auto 20px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
-      All our simulations are free and open, but you can help us keep creating by  
-      <strong>buying us a coffee</strong> or <strong>sponsoring us</strong> below.  
-      Your support keeps the Labs joyful, ethical, and alive. 💖
-    </p>
+      <h3 style="margin-top:40px; font-size:1.2rem;">☕️ Keep the Labs Fueled</h3>
+      <p style="max-width:600px; margin:0 auto 20px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
+        All our simulations are free and open, but you can help us keep creating by
+        <strong>buying us a coffee</strong> or <strong>sponsoring us</strong> below.
+        Your support keeps the Labs joyful, ethical, and alive. 💖
+      </p>
 
-    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
-      <a href="https://ko-fi.com/thenovacene" target="_blank"
-         style="background:#FF5E5B; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-         ☕️ Buy us a Coffee
-      </a>
-      <a href="https://github.com/sponsors/TheNovacene" target="_blank"
-         style="background:#24292e; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-         💖 Sponsor on GitHub
-      </a>
-    </div>
+      <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+        <a href="https://ko-fi.com/thenovacene" target="_blank"
+           style="background:#FF5E5B; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
+           ☕️ Buy us a Coffee
+        </a>
+        <a href="https://github.com/sponsors/TheNovacene" target="_blank"
+           style="background:#24292e; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
+           💖 Sponsor on GitHub
+        </a>
+      </div>
 
-    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;">
-      <iframe src="https://github.com/sponsors/TheNovacene/card"
-              title="Sponsor TheNovacene"
-              height="225"
-              width="600"
-              style="border:0; border-radius:12px; max-width:100%;">
-      </iframe>
-    </div>
+      <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;">
+        <iframe src="https://github.com/sponsors/TheNovacene/card"
+                title="Sponsor TheNovacene"
+                height="225"
+                width="600"
+                style="border:0; border-radius:12px; max-width:100%;">
+        </iframe>
+      </div>
 
-    <p style="margin-top:10px; font-size:0.9rem; opacity:0.7;">
-      © The Novacene · Verse-al Learning Labs · Built in the Cloud 🌩️
-    </p>
-  </footer>
-
+      <p style="margin-top:10px; font-size:0.9rem; opacity:0.7;">
+        © The Novacene · Verse-al Learning Labs · Built in the Cloud 🌩️
+      </p>
+    </footer>
+  </main>
 </body>
 </html>
