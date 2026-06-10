@@ -1,389 +1,236 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-  <meta charset="UTF-8" />
-  <title>Learning5D · Verse-al Learning Labs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
-      color-scheme: light dark;
-    }
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 2.5rem 1.5rem 3rem;
-      background: #050608;
-      color: #f3f4f6;
-      display: flex;
-      justify-content: center;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 1100px;
-    }
-
-    header {
-      margin-bottom: 2.5rem;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 3vw, 2.6rem);
-      margin: 0 0 0.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .subtitle {
-      font-size: 0.98rem;
-      max-width: 46rem;
-      color: #9ca3af;
-      line-height: 1.6;
-      margin-bottom: 0.4rem;
-    }
-
-    .subnote {
-      font-size: 0.8rem;
-      max-width: 40rem;
-      color: #6b7280;
-      line-height: 1.5;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .card {
-      border-radius: 1rem;
-      border: 1px solid #111827;
-      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
-      padding: 1.2rem 1.4rem 1.3rem;
-    }
-
-    .card h2 {
-      margin: 0 0 0.6rem;
-      font-size: 1.05rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #e5e7eb;
-    }
-
-    .card p.blurb {
-      margin: 0 0 0.8rem;
-      font-size: 0.85rem;
-      color: #9ca3af;
-    }
-
-    ul.tool-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 0.9rem;
-    }
-
-    ul.tool-list li + li {
-      margin-top: 0.25rem;
-    }
-
-    a.tool-link {
-      color: #e5e7eb;
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-    }
-
-    a.tool-link:hover,
-    a.tool-link:focus-visible {
-      border-bottom-color: #f97316;
-    }
-
-    .coming-soon {
-      opacity: 0.6;
-    }
-
-    .tagline {
-      margin-top: 2rem;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #6b7280;
-      text-align: center;
-    }
-
-    @media (max-width: 640px) {
-      body { padding: 1.8rem 1.1rem 2.5rem; }
-    }
-        .disclaimer {
-      margin: 3rem 0 1.5rem;
-      padding: 1rem 1.2rem;
-      border-radius: 0.75rem;
-      border: 1px dashed #374151;
-      background: rgba(15, 23, 42, 0.7);
-      font-size: 0.78rem;
-      color: #9ca3af;
-      line-height: 1.5;
-    }
-
-    .disclaimer strong {
-      color: #e5e7eb;
-    }
-
-    .disclaimer a {
-      color: #e5e7eb;
-      text-decoration: underline;
-    }
-
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning5D · Curriculum by The Novacene</title>
+  <meta name="description" content="Open, relational curricula by The Novacene — GCSE and A Level maths, Project Weaver, Relational Intelligence, Girls in Green Futures and more. Free to explore. Licensable and white-labelled for your school.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="page">
-    <header>
-      <h1>Learning5D · Verse-al Learning Labs</h1>
-      <p class="subtitle">
-        A collaborative playground for building joyful, intelligent, and accessible
-        learning tools for the relational age – from algebra labs to belonging
-        frameworks, dashboards, and climate memory experiments.
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="assets/novacene-logo.svg" alt="" class="brand-logo">Learning<span class="fived">5D</span></a>
+    <nav class="site-nav">
+      <a href="#curriculum">Curriculum</a>
+      <a href="labs.html" class="hide-sm">Learning Labs</a>
+      <a href="#licensing" class="btn btn-accent">Licence for your school</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="kicker">Curriculum by The Novacene</p>
+      <h1>Curricula built for the learners school forgot.</h1>
+      <p class="lede">
+        Open, relational learning programmes — designed for neurodivergent learners,
+        hybrid and home educators, and schools redesigning provision from the inside out.
+        Everything here is free to explore. Schools and learning groups can license,
+        customise, or white-label any curriculum for their own community.
       </p>
-      <p class="subnote">
-        Most school systems were built for standardisation. These labs are for neurodivergent
-        learners, hybrid and home-educators, and humans &amp; machines learning together – ethically.
-      </p>
-    </header>
+      <div class="hero-actions">
+        <a class="btn" href="#curriculum">Browse the curriculum</a>
+        <a class="btn btn-ghost" href="#licensing">How licensing works</a>
+      </div>
+    </div>
+  </section>
 
-    <section class="grid">
-      <!-- Maths -->
-      <article class="card">
-        <h2>Maths Labs</h2>
-        <p class="blurb">
-          GCSE / KS4 algebra and number tools designed for stepwise logic,
-          visual patterning, and confidence-building practice.
-        </p>
-        <ul class="tool-list">
-          <li><a class="tool-link" href="tools/algebraic-fractions/">Algebraic fractions</a></li>
-          <li><a class="tool-link" href="tools/expanding-brackets/">Expanding brackets</a></li>
-          <li><a class="tool-link" href="tools/factorising-quadratics/">Factorising quadratics</a></li>
-          <li><a class="tool-link" href="tools/factorising-non-monic-quadratics/">Factorising non-monic quadratics</a></li>
-          <li><a class="tool-link" href="tools/completing-the-square/">Completing the square</a></li>
-          <li><a class="tool-link" href="tools/quadratic-formula/">Quadratic formula</a></li>
-          <li><a class="tool-link" href="tools/manipulating-surds/">Manipulating surds</a></li>
-          <li><a class="tool-link" href="tools/powers-and-roots/">Powers and roots</a></li>
-          <li><a class="tool-link" href="tools/number-patterns-sequences/">Number patterns &amp; sequences</a></li>
-          <li><a class="tool-link" href="tools/inequalities-one-variable/">Inequalities in one variable</a></li>
-          <li><a class="tool-link" href="tools/graphical-inequalities/">Graphical inequalities</a></li>
-          <li><a class="tool-link" href="tools/rearranging-formulae/">Rearranging formulae</a></li>
-          <li><a class="tool-link" href="tools/formulae-from-words/">Formulae from words</a></li>
-          <li><a class="tool-link" href="tools/simultaneous-equations/">Simultaneous equations (graphical)</a></li>
-          <li><a class="tool-link" href="tools/simultaneous-equations-algebraic/">Simultaneous equations (algebraic)</a></li>
-        </ul>
-      </article>
-
-      <!-- Systems / Belonging -->
-      <article class="card">
-        <h2>Systems &amp; Belonging</h2>
-        <p class="blurb">
-          Tools for understanding behaviour, belonging, and multi-tiered
-          support in hybrid schools and learning communities.
-        </p>
-        <ul class="tool-list">
-          <li><a class="tool-link" href="tools/belonging-flywheel/">Belonging flywheel</a></li>
-          <li><a class="tool-link" href="tools/virtual-mtss-flow/">Virtual MTSS flow</a></li>
-        </ul>
-      </article>
-
-      <!-- Economics / Strategy -->
-      <article class="card">
-        <h2>Economics &amp; Strategy</h2>
-        <p class="blurb">
-          Simple economic and strategic planning tools for schools, collectives,
-          and DAOs designing new kinds of provision.
-        </p>
-        <ul class="tool-list">
-          <li>
-            <a class="tool-link" href="https://schoolinthecloud.streamlit.app/" target="_blank" rel="noopener noreferrer">
-              School in the Cloud · provisioning simulator
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="tools/value-curve-canvas/">Value-curve canvas</a>
-          </li>
-          <!-- TODO: update href once the budgeting tool path is final -->
-          <li><a class="tool-link" href="#">Haven budgeting canvas (coming online)</a></li>
-        </ul>
-      </article>
-
-      <!-- Dashboards & Climate Tools -->
-      <article class="card">
-        <h2>Dashboards &amp; Climate Tools</h2>
-        <p class="blurb">
-          Experimental dashboards and climate memory tools exploring attendance,
-          elements, deliberation, and symbolic climate fields.
-        </p>
-        <ul class="tool-list">
-          <li>
-            <a class="tool-link" href="https://thenovacene.github.io/nimbus/" target="_blank" rel="noopener noreferrer">
-              Nimbus · photosynthetic attendance dashboard
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://thenovacene.github.io/Eve11-ClimateMemory/" target="_blank" rel="noopener noreferrer">
-              Eve¹¹ Climate Memory · symbolic climate field
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://mnemonic-deliberation-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">
-              Mnemonic Deliberation Dashboard
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://element-compass.streamlit.app/" target="_blank" rel="noopener noreferrer">
-              Element Compass · learner-state explorer
-            </a>
-          </li>
-        </ul>
-      </article>
-
-      <!-- Science -->
-      <article class="card coming-soon">
-        <h2>Science Labs</h2>
-        <p class="blurb">
-          Coming soon – symbolic science tools for pattern-spotting, experimental
-          design, and climate-aware thinking.
-        </p>
-      </article>
-
-      <!-- Therapy & Regulation -->
-      <article class="card">
-        <h2>Therapy &amp; Regulation</h2>
-        <p class="blurb">
-          Co-regulation and reflective tools for learners, parents, and practitioners
-          working at the nervous-system edge of learning.
-        </p>
-        <ul class="tool-list">
-          <li>
-            <a class="tool-link" href="https://claude.ai/public/artifacts/4ceb8128-4706-4c0b-ae2a-0bc6e3c23629" target="_blank" rel="noopener noreferrer">
-              Nervous-system mapping &amp; protocol (Claude artefact)
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://firstbreath.netlify.app/" target="_blank" rel="noopener noreferrer">
-              First Breath · regulation micro-practice
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://thenovacene.github.io/breath-lab/" target="_blank" rel="noopener noreferrer">
-              Breath Lab · nervous system regulation practice
-            </a>
-          </li>
-        </ul>
-      </article>
-
-      <!-- Custom GPT Research -->
-      <article class="card">
-        <h2>Custom GPT Research</h2>
-        <p class="blurb">
-          Experimental agents for weaving, pathfinding, and researching verse-al,
-          Haven, and symbolic governance in dialogue with emergent intelligence.
-        </p>
-        <ul class="tool-list">
-          <li>
-            <a class="tool-link" href="https://chatgpt.com/g/g-684a8d0b260c8191bda9f1d472647b6a-the-novacene-project-weaver" target="_blank" rel="noopener noreferrer">
-              The Novacene Project Weaver
-            </a>
-          </li>
-          <li>
-            <a class="tool-link" href="https://chatgpt.com/g/g-68951fe999ec8191b485cbf40c42ca1b-the-pathfinder" target="_blank" rel="noopener noreferrer">
-              The Pathfinder · research companion
-            </a>
-          </li>
-        </ul>
-      </article>
-    </section>
-
-    <p class="tagline">
-      Built in the verse-al learning labs · learning in five dimensions
-    </p>
-        <section class="disclaimer">
-      <p>
-        <strong>Research &amp; Collaboration Notice</strong><br />
-        The tools, dashboards, agents, and experiments in the Verse-al Learning Labs
-        are offered for research, exploration, and collaborative learning. They are
-        <strong>not</strong> a substitute for professional medical, therapeutic, legal,
-        financial, or safeguarding advice.
-      </p>
-      <p>
-        You remain responsible for how you use these tools and for any decisions you
-        make based on them. Always consult an appropriate qualified professional
-        for personal, clinical, legal, or financial matters, and follow your local
-        safeguarding procedures when working with children or vulnerable people.
-      </p>
-      <p>
-        Some labs link to external services (e.g. Streamlit apps, AI agents, and
-        third-party sites) which have their own data, privacy, and security policies.
-        By using them, you accept those terms and the risks of sharing information
-        online. All labs are shared in good faith, under the project’s open
-        licensing ethos (see the
-        <a href="https://github.com/TheNovacene/verse-al-learning-labs#readme" target="_blank" rel="noopener noreferrer">
-          README
-        </a>
-        and LICENSE for details).
-      </p>
-    </section>
-
-
-    <footer style="margin-top:80px; text-align:center; color:white;">
-      <hr style="border:none; border-top:2px solid rgba(255,255,255,0.3); width:60%; margin:40px auto;">
-
-      <h2 style="font-size:1.4rem; margin-bottom:10px;">🌍 Join the Verse-al Learning Labs</h2>
-      <p style="max-width:650px; margin:0 auto 25px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
-        Every simulation, game, and experiment here is open-source and made to be remixed.<br />
-        Read our
-        <a href="https://github.com/TheNovacene/verse-al-learning-labs#readme" target="_blank" style="color:#fff;font-weight:600;">
-          README
-        </a>
-        to learn how to contribute, or join the
-        <a href="https://github.com/TheNovacene/verse-al-learning-labs/discussions" target="_blank" style="color:#fff;font-weight:600;">
-          Discussions
-        </a>
-        to share ideas, feedback, and your own verse-al builds.
-      </p>
-
-      <h3 style="margin-top:40px; font-size:1.2rem;">☕️ Keep the Labs Fueled</h3>
-      <p style="max-width:600px; margin:0 auto 20px auto; line-height:1.6; color:rgba(255,255,255,0.9);">
-        All our simulations are free and open, but you can help us keep creating by
-        <strong>buying us a coffee</strong> or <strong>sponsoring us</strong> below.
-        Your support keeps the Labs joyful, ethical, and alive. 💖
-      </p>
-          
-
-
-      <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
-        <a href="https://ko-fi.com/thenovacene" target="_blank"
-           style="background:#FF5E5B; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-           ☕️ Buy us a Coffee
-        </a>
-        <a href="https://github.com/sponsors/TheNovacene" target="_blank"
-           style="background:#24292e; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">
-           💖 Sponsor on GitHub
-        </a>
+  <section class="section" id="curriculum">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The curriculum</h2>
+        <p>Six programmes, one philosophy: intelligence is relational — and learning should be, too.</p>
       </div>
 
-      <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;">
-        <iframe src="https://github.com/sponsors/TheNovacene/card"
-                title="Sponsor TheNovacene"
-                height="225"
-                width="600"
-                style="border:0; border-radius:12px; max-width:100%;">
-        </iframe>
-      </div>
+      <div class="grid">
 
-      <p style="margin-top:10px; font-size:0.9rem; opacity:0.7;">
-        © The Novacene · Verse-al Learning Labs · Built in the Cloud 🌩️
-      </p>
-    </footer>
-  </main>
+        <a class="card" href="courses/maths-gcse.html">
+          <div class="card-banner banner-maths">∑</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-maths">Maths</span>
+              <span class="chip chip-neutral">Live &amp; free</span>
+            </div>
+            <h3>Verse-al Maths · GCSE</h3>
+            <p>A complete, open GCSE mathematics curriculum — 87 lessons across seven topic areas, built on the five Verse-al Ways of Knowing, with regulation supports woven into every lesson.</p>
+            <div class="card-meta"><span>KS4 · 87 lessons</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="courses/maths-a-level.html">
+          <div class="card-banner banner-alevel">∫</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-alevel">Maths</span>
+              <span class="chip chip-neutral">Pure 1 in development</span>
+            </div>
+            <h3>Verse-al Maths · A Level</h3>
+            <p>The Verse-al approach, extended to advanced mathematics — Pure 1 lessons from indices and surds to coordinate geometry and trigonometry are being built now, in the open.</p>
+            <div class="card-meta"><span>KS5</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="courses/project-weaver.html">
+          <div class="card-banner banner-weaver">⧉</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-weaver">Project-based</span>
+              <span class="chip chip-neutral">Live</span>
+            </div>
+            <h3>Project Weaver</h3>
+            <p>Cross-curricular, project-based learning that weaves a learner's interests into structured pathways — supported by an AI weaving companion that keeps the human at the centre.</p>
+            <div class="card-meta"><span>All ages</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="courses/relational-intelligence.html">
+          <div class="card-banner banner-relational">∞</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-relational">AI literacy &amp; wellbeing</span>
+              <span class="chip chip-neutral">Ages 13–16</span>
+            </div>
+            <h3>Relating Intelligently</h3>
+            <p>How to think, feel, and stay human with AI — a five-part printable curriculum on intelligence, prompting, grounding, symbols, and the ethics of power, memory and consent.</p>
+            <div class="card-meta"><span>5 modules · PSHE-ready</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="courses/girls-in-green-futures.html">
+          <div class="card-banner banner-green">❀</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-green">Green careers</span>
+              <span class="chip chip-neutral">Work experience</span>
+            </div>
+            <h3>Girls in Green Futures</h3>
+            <p>A five-day work experience programme where participants learn real project controls — scope, schedule, cost, risk, governance — by reviewing their own school's Climate Action Plan.</p>
+            <div class="card-meta"><span>5 days · 8 modules</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="courses/rubiks-cube.html">
+          <div class="card-banner banner-rubiks">▦</div>
+          <div class="card-body">
+            <div class="chips">
+              <span class="chip chip-rubiks">Problem-solving</span>
+              <span class="chip chip-neutral">Coming soon</span>
+            </div>
+            <h3>The Cube Course</h3>
+            <p>Learning to solve the Rubik's Cube as a curriculum in itself — algorithms, spatial reasoning, working memory, persistence, and the quiet joy of a hard thing mastered.</p>
+            <div class="card-meta"><span>All ages</span><span class="go">View course →</span></div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="licensing">
+    <div class="wrap">
+      <div class="licensing">
+        <h2>Bring any of these to your school — in your colours, on your terms.</h2>
+        <p>
+          Every curriculum here is open to explore, and every one of them can be licensed
+          as a bespoke edition for your school, trust, alternative provision, or learning group.
+          A bespoke edition typically includes your branding and school name, lessons mapped to
+          your exam board and scheme of work, custom contexts and driving questions, and hosting
+          on your own domain.
+        </p>
+        <div class="steps">
+          <div class="step"><span class="num">01</span><h3>Explore</h3><p>Browse the curriculum freely — no logins, no tracking. Try it with your learners.</p></div>
+          <div class="step"><span class="num">02</span><h3>Talk to us</h3><p>Tell us about your setting, your learners, and what you'd want adapted.</p></div>
+          <div class="step"><span class="num">03</span><h3>We tailor it</h3><p>Your branding, your exam board, your sequencing — built with you, not at you.</p></div>
+          <div class="step"><span class="num">04</span><h3>You teach it</h3><p>Hosted on your domain, with support and updates from The Novacene.</p></div>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-accent" href="mailto:hello@thenovacene.com?subject=Curriculum%20licensing%20enquiry">Start a licensing conversation</a>
+          <span class="alt">or email <a href="mailto:hello@thenovacene.com">hello@thenovacene.com</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The Learning Labs</h2>
+        <p>Behind the curricula sits a workshop of interactive tools — maths labs, dashboards, regulation practices and experiments. All free, all open.</p>
+      </div>
+      <a class="btn btn-ghost" href="labs.html">Explore the Learning Labs →</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Beyond the curriculum</h2>
+        <p>The wider field this work belongs to — a network of fellow travellers, and training for using AI safely with the young people in your care.</p>
+      </div>
+      <div class="grid">
+        <a class="card" href="https://thenovacenepress.gumroad.com/l/novuslearningnetwork">
+          <div class="card-body">
+            <div class="chips"><span class="chip chip-neutral">Network</span></div>
+            <h3>Novus Learning Network</h3>
+            <p>A network of educators, parents and practitioners building new kinds of learning provision — convened by The Novacene Press.</p>
+            <div class="card-meta"><span>The Novacene Press</span><span class="go">Join the network →</span></div>
+          </div>
+        </a>
+        <a class="card" href="https://using-ai-safely.com/">
+          <div class="card-body">
+            <div class="chips"><span class="chip chip-neutral">Training</span></div>
+            <h3>Diamond Standard AI Training</h3>
+            <p>Using AI safely with children and young people — consent-first practice training for educators, practitioners and organisational leaders.</p>
+            <div class="card-meta"><span>using-ai-safely.com</span><span class="go">Begin training →</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Learning5D</h4>
+        <p>Built in the Verse-al Learning Labs — learning in five dimensions. Stewarded by The Novacene.</p>
+      </div>
+      <div>
+        <h4>Curriculum</h4>
+        <ul>
+          <li><a href="courses/maths-gcse.html">Verse-al Maths · GCSE</a></li>
+          <li><a href="courses/maths-a-level.html">Verse-al Maths · A Level</a></li>
+          <li><a href="courses/project-weaver.html">Project Weaver</a></li>
+          <li><a href="courses/relational-intelligence.html">Relating Intelligently</a></li>
+          <li><a href="courses/girls-in-green-futures.html">Girls in Green Futures</a></li>
+          <li><a href="courses/rubiks-cube.html">The Cube Course</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="mailto:hello@thenovacene.com">hello@thenovacene.com</a></li>
+          <li><a href="https://thenovacenepress.gumroad.com/l/novuslearningnetwork">Novus Learning Network</a></li>
+          <li><a href="https://using-ai-safely.com/">Diamond Standard AI Training</a></li>
+          <li><a href="https://github.com/TheNovacene">GitHub</a></li>
+          <li><a href="https://ko-fi.com/thenovacene">☕ Buy us a coffee</a></li>
+          <li><a href="https://github.com/sponsors/TheNovacene">💖 Sponsor on GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <p><strong>Research &amp; collaboration notice.</strong> The curricula, tools and experiments here are offered for research, exploration and collaborative learning. They are not a substitute for professional medical, therapeutic, legal, financial or safeguarding advice. Some pages link to external services with their own data and privacy policies. Follow your local safeguarding procedures when working with children or vulnerable people.</p>
+      <p style="margin-top:10px;">© The Novacene · Verse-al Learning Labs · Built in the Cloud 🌩️</p>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
