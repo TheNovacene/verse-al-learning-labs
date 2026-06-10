@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="The Novacene">
+  <!-- The Novacene mark: eight-petal flower with central eye.
+       Vector recreation of the brand logo; swap for the official
+       asset file if one exists. -->
+  <g fill="#1d1a2e">
+    <g id="petals">
+      <path id="petal" d="M300,38 C338,96 354,158 300,222 C246,158 262,96 300,38 Z"/>
+      <use href="#petal" transform="rotate(45 300 300)"/>
+      <use href="#petal" transform="rotate(90 300 300)"/>
+      <use href="#petal" transform="rotate(135 300 300)"/>
+      <use href="#petal" transform="rotate(180 300 300)"/>
+      <use href="#petal" transform="rotate(225 300 300)"/>
+      <use href="#petal" transform="rotate(270 300 300)"/>
+      <use href="#petal" transform="rotate(315 300 300)"/>
+    </g>
+    <path d="M176,300 Q300,206 424,300 Q300,394 176,300 Z" stroke="#faf8f3" stroke-width="24"/>
+    <circle cx="300" cy="300" r="56" fill="#faf8f3"/>
+    <circle cx="300" cy="300" r="32"/>
+  </g>
+</svg>
