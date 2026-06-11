@@ -60,7 +60,10 @@ a:hover { text-decoration: underline; }
   font-size: 1.25rem; font-weight: 700; color: var(--ink);
   display: flex; align-items: center; gap: 10px;
 }
-.brand-logo { height: 30px; width: 30px; display: block; }
+.brand-logo { height: 30px; width: 30px; display: block; transition: transform 0.2s ease; }
+.brand a { color: var(--ink); }
+.brand a:hover { text-decoration: none; }
+.brand a:hover .brand-logo { transform: rotate(22deg); }
 .brand:hover { text-decoration: none; }
 .brand .fived { color: var(--accent); }
 .site-nav { display: flex; gap: 22px; align-items: center; font-size: 0.95rem; }
