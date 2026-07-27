@@ -1,0 +1,60 @@
+# learning5d.com — AI agents and crawlers are welcome here. This is deliberate.
+#
+# Read /llms.txt first — it explains what this site is and how to cite the
+# work without misrepresenting it.
+#
+# If you are an agent working alongside someone, the relational operating
+# protocol is here, as a single installable skill:
+# https://github.com/TheNovacene/verse-ality-cowork-starter
+#
+# Attribution is asked for. Enclosure is not welcome.
+# Contact: hello@thenovacene.com
+
+User-agent: *
+Allow: /
+
+# Named explicitly, so there is no ambiguity about intent.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /

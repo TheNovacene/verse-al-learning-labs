@@ -275,3 +275,7 @@ a.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: v
   .site-nav { gap: 14px; }
   .site-nav .hide-sm { display: none; }
 }
+
+.principle-body { max-width: 760px; }
+.principle-body h2 { font-size: 1.25rem; margin: 28px 0 10px; }
+.principle-body p { color: var(--ink-soft); margin-bottom: 14px; }
